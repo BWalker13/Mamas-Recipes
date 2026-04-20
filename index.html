@@ -38,14 +38,8 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .mt-tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:2px 7px;border-radius:99px;width:fit-content;}
 .meal-val{font-size:12px;font-weight:700;color:#292524;line-height:1.3;}
 .meal-ph{font-size:11px;color:#c4b9ac;margin:auto;text-align:center;width:100%;}
-.tip-banner{background:#fffbeb;border-radius:14px;padding:14px;margin-bottom:16px;border:1px solid #fde68a;font-size:13px;color:#92400e;font-weight:600;}
-.prep-card{background:white;border-radius:18px;border:1px solid #f0ebe3;padding:16px;margin-bottom:12px;}
-.prep-title{font-weight:800;font-size:14px;color:#292524;margin-bottom:12px;}
-.chk-row{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px;}
 .chkbox{width:20px;height:20px;border-radius:6px;border:2px solid #d6d3d1;background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:11px;font-weight:900;color:white;}
 .chkbox.on{border-color:#d97706;background:#d97706;}
-.chk-lbl{font-size:13px;color:#44403c;}
-.chk-lbl.on{color:#a8a29e;text-decoration:line-through;}
 .groc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .groc-cnt{font-size:13px;color:#78716c;}
 .btn-rst{background:none;border:none;color:#d97706;font-size:12px;font-weight:700;}
@@ -77,6 +71,11 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .cat-tag{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;text-transform:capitalize;}
 .up-badge{font-size:9px;padding:2px 6px;border-radius:99px;background:#ede9fe;color:#7c3aed;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
 .rec-steps{padding:0 16px 18px;border-top:1px solid #f0ebe3;}
+.rec-section-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#b45309;margin:14px 0 8px;}
+.ingr-list{display:flex;flex-direction:column;gap:5px;margin-bottom:4px;}
+.ingr-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#44403c;line-height:1.5;}
+.ingr-dot{flex-shrink:0;width:6px;height:6px;border-radius:50%;background:#d97706;margin-top:6px;}
+.ingr-divider{border:none;border-top:1px solid #f0ebe3;margin:12px 0 0;}
 .steps-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
 .step-row{display:flex;gap:12px;align-items:flex-start;}
 .step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#fffbeb;border:1.5px solid #fde68a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#b45309;}
@@ -146,15 +145,6 @@ const MEAL_IDEAS={
   dinner:["Spaghetti & Meatballs","Sheet Pan Chicken","Taco Night","Slow Cooker Chili","Stir Fry","Baked Ziti","BBQ Chicken"],
   snacks:["Apple Slices + PB","Cheese & Crackers","Veggies + Hummus","Trail Mix","Fruit Cups","Popcorn","Yogurt Tubes"]
 };
-const PREP_TASKS={
-  "Overnight Oats":["Measure oats","Add milk & yogurt","Portion into jars","Refrigerate"],
-  "Pancakes":["Mix dry ingredients","Prep wet ingredients","Cook & stack","Freeze extras"],
-  "Sheet Pan Chicken":["Marinate chicken","Chop vegetables","Line pans","Season & arrange"],
-  "Slow Cooker Chili":["Brown meat","Drain beans","Chop onion & peppers","Load slow cooker"],
-  "Baked Ziti":["Cook pasta al dente","Make sauce","Layer in dish","Cover & refrigerate"],
-  "Pasta Salad":["Cook pasta","Chop veggies","Mix dressing","Combine & chill"]
-};
-const DEFAULT_TASKS=["Gather ingredients","Prep & chop","Cook/assemble","Portion & store"];
 const BUDGET_TIPS=[
   "Buy proteins in bulk & freeze in meal-size portions",
   "Shop store-brand staples: pasta, rice, canned goods",
@@ -182,34 +172,34 @@ const GROCERY_MAP={
 };
 const TC={breakfast:{bg:"#fef3c7",text:"#b45309"},lunch:{bg:"#e0f2fe",text:"#0369a1"},dinner:{bg:"#ffe4e6",text:"#be123c"},snacks:{bg:"#dcfce7",text:"#15803d"}};
 const RECIPES={
-  "Overnight Oats":{tag:"breakfast",time:"5 min + overnight",servings:5,steps:["Measure ½ cup rolled oats per jar (5 jars total).","Add ½ cup milk and ¼ cup Greek yogurt to each jar.","Stir in 1 tsp honey and a pinch of salt.","Seal jars and refrigerate overnight (at least 6 hours).","In the morning, top with fresh berries and serve cold."]},
-  "Scrambled Eggs & Toast":{tag:"breakfast",time:"10 min",servings:5,steps:["Crack 2 eggs per person into a bowl, season with salt & pepper, and whisk until combined.","Melt ½ tbsp butter in a non-stick skillet over medium-low heat.","Pour in eggs and let sit 10 seconds, then gently fold with a spatula every few seconds.","Remove from heat just before fully set — residual heat finishes them.","While eggs cook, toast bread and spread with butter. Plate together and serve immediately."]},
-  "Pancakes":{tag:"breakfast",time:"25 min",servings:5,steps:["Combine 2 cups pancake mix, 1½ cups milk, and 2 eggs in a large bowl. Stir until just combined — lumps are okay.","Heat a griddle or non-stick pan over medium heat; lightly butter the surface.","Pour ¼ cup batter per pancake. Cook until bubbles form on the surface and edges look set, about 2–3 min.","Flip and cook another 1–2 min until golden. Repeat with remaining batter.","Stack cooled extras between sheets of parchment, place in a zip bag, and freeze for quick weekday breakfasts."]},
-  "Yogurt Parfait":{tag:"breakfast",time:"5 min",servings:5,steps:["Spoon ½ cup Greek yogurt into the bottom of each cup or jar.","Add a layer of granola (about 3 tbsp per cup) on top of the yogurt.","Layer fresh or thawed berries over the granola.","Repeat yogurt and granola layers if the container is tall enough.","Drizzle with honey and serve immediately, or refrigerate (un-topped) for up to 2 days."]},
-  "Breakfast Burritos":{tag:"breakfast",time:"20 min",servings:5,steps:["Scramble 10 eggs in a large skillet with salt, pepper, and a splash of milk. Set aside.","Cook ½ lb breakfast sausage or bacon in the same pan; crumble and drain excess fat.","Warm flour tortillas one at a time in a dry skillet for 20 seconds per side.","Layer eggs, meat, shredded cheese, and salsa down the center of each tortilla.","Fold sides in, then roll tightly. Wrap individually in foil and refrigerate or freeze.","Reheat from frozen: unwrap foil, microwave 2–3 min, flipping halfway through."]},
-  "Smoothie Bowls":{tag:"breakfast",time:"10 min",servings:5,steps:["Blend 2 cups frozen berries, 1 frozen banana, and ½ cup Greek yogurt until thick and smooth — use minimal liquid.","Pour into bowls; the consistency should be thick enough to hold toppings.","Top with granola, fresh fruit slices, coconut flakes, and a drizzle of honey.","Serve immediately — smoothie bowls melt quickly!"]},
-  "French Toast":{tag:"breakfast",time:"20 min",servings:5,steps:["Whisk together 4 eggs, ½ cup milk, 1 tsp vanilla, 1 tsp cinnamon, and a pinch of salt in a shallow dish.","Melt 1 tbsp butter in a large skillet over medium heat.","Dip bread slices in the egg mixture, letting each side soak for 10–15 seconds.","Cook in batches, 2–3 min per side, until golden brown. Add more butter between batches.","Serve with maple syrup and powdered sugar, or freeze extras for quick reheating."]},
-  "Turkey Wraps":{tag:"lunch",time:"10 min",servings:5,steps:["Lay a large flour tortilla flat on a cutting board.","Spread a thin layer of mayo across the center.","Layer 3–4 slices deli turkey, a handful of lettuce, and 2–3 tomato slices.","Season with salt, pepper, and any other desired condiments.","Fold the sides in and roll tightly from the bottom. Slice diagonally and serve, or wrap in parchment for packing."]},
-  "Mac & Cheese":{tag:"lunch",time:"20 min",servings:5,steps:["Bring a large pot of salted water to a boil. Add elbow pasta and cook per package directions until al dente.","Drain pasta, reserving ¼ cup pasta water, and return to the pot over low heat.","Add 2 tbsp butter and stir until melted.","Pour in ½ cup milk and 2 cups shredded cheddar. Stir continuously until smooth and creamy.","If sauce is too thick, add reserved pasta water a splash at a time. Season with salt & pepper and serve."]},
-  "Grilled Cheese + Soup":{tag:"lunch",time:"15 min",servings:5,steps:["Butter one side of each bread slice generously.","Heat a skillet over medium heat. Place bread butter-side down, add 2 slices of cheese, and top with second slice butter-side up.","Cook 3–4 min until golden brown, then flip carefully. Cook another 2–3 min until the other side is golden and cheese is melted.","While sandwiches cook, heat canned tomato soup per label instructions. Add a splash of milk for creaminess.","Serve sandwich alongside a bowl of soup. Cut diagonally for dipping!"]},
-  "Quesadillas":{tag:"lunch",time:"15 min",servings:5,steps:["Shred or dice pre-cooked chicken into small pieces.","Sprinkle a generous layer of shredded cheddar on one half of a flour tortilla.","Add chicken on top of the cheese, then fold the tortilla in half.","Heat a dry skillet over medium heat. Cook quesadilla 2–3 min per side until golden and crispy.","Slice into wedges and serve with salsa and sour cream."]},
-  "PB&J + Fruit":{tag:"lunch",time:"5 min",servings:5,steps:["Spread a generous layer of peanut butter on one slice of bread.","Spread your favorite jam or jelly on the second slice.","Press slices together and cut in half (diagonal or straight — you know your kids!).","Wash and slice fruit — apples, grapes, or strawberries all work great.","Pack in a container with a small ice pack to keep fresh."]},
-  "Pasta Salad":{tag:"lunch",time:"25 min + chill",servings:5,steps:["Cook 1 lb pasta (rotini or penne work best) in salted water per package. Drain and rinse under cold water to stop cooking.","Chop 1 bell pepper, 1 cucumber, ½ red onion, and halve 1 cup cherry tomatoes.","In a large bowl, whisk together ¼ cup olive oil, 3 tbsp red wine vinegar, 1 tsp Italian seasoning, salt and pepper.","Combine cooled pasta and veggies in the bowl; toss well to coat in dressing.","Refrigerate at least 1 hour before serving. Keeps well for 4–5 days — great for batch prep!"]},
-  "Rice Bowls":{tag:"lunch",time:"30 min",servings:5,steps:["Cook 3 cups dry rice per package directions (makes ~6 cups cooked). Season with salt and a drizzle of sesame oil if desired.","Prepare your protein: bake or pan-cook chicken, or use canned beans for a quick option.","Roast or sauté vegetables — broccoli, carrots, and snap peas all work well at 400°F for 20 min.","Portion rice into bowls or meal prep containers.","Top with protein and veggies. Add soy sauce, teriyaki, or any sauce on the side to keep things fresh."]},
-  "Spaghetti & Meatballs":{tag:"dinner",time:"45 min",servings:5,steps:["Mix 1½ lbs ground beef with ½ cup breadcrumbs, 1 egg, 2 minced garlic cloves, salt, pepper, and Italian seasoning. Roll into golf ball–sized meatballs.","Brown meatballs in a large skillet with olive oil over medium-high heat, about 2 min per side. They don't need to be fully cooked through.","Pour 2 jars marinara sauce into a large pot over medium heat. Nestle meatballs in the sauce, cover, and simmer 20–25 min.","Meanwhile, bring a large pot of salted water to a boil. Cook spaghetti per package directions until al dente.","Drain pasta and serve topped with meatballs and sauce. Finish with grated Parmesan."]},
-  "Sheet Pan Chicken":{tag:"dinner",time:"50 min",servings:5,steps:["Preheat oven to 425°F. Line two large sheet pans with foil and spray with cooking spray.","In a large bowl, toss 3 lbs chicken thighs with olive oil, garlic powder, paprika, salt, and pepper.","Cube potatoes and cut broccoli into florets. Toss veggies separately with olive oil, salt, and pepper.","Arrange chicken on one pan and vegetables on the second. Don't crowd the pans — space = crispiness.","Roast 35–40 min, flipping chicken halfway, until chicken reaches 165°F and veggies are caramelized."]},
-  "Taco Night":{tag:"dinner",time:"25 min",servings:5,steps:["Brown 1½ lbs ground beef in a large skillet over medium-high heat, breaking it apart as it cooks. Drain excess fat.","Add 1 packet taco seasoning and ⅔ cup water. Stir and simmer 3–5 min until sauce thickens.","Set up a taco bar: warm shells in the oven at 350°F for 5 min, and set out toppings — cheese, lettuce, salsa, sour cream, diced tomato.","Let everyone build their own tacos!","Leftover taco meat keeps 4 days refrigerated — great for nachos or taco salads later in the week."]},
-  "Slow Cooker Chili":{tag:"dinner",time:"20 min prep + 6–8 hrs",servings:5,steps:["Brown 1½ lbs ground beef in a skillet. Drain fat and transfer to slow cooker.","Drain and rinse 2 cans kidney beans; add to slow cooker.","Add 2 cans diced tomatoes (with liquid), 1 diced onion, 1 diced bell pepper, and 1 cup beef broth.","Season with 2 tbsp chili powder, 1 tsp cumin, 1 tsp garlic powder, salt, and pepper. Stir everything together.","Cover and cook on LOW 6–8 hours or HIGH 3–4 hours. Taste and adjust seasoning before serving.","Serve with shredded cheese, sour cream, and cornbread. Freezes beautifully for up to 3 months!"]},
-  "Stir Fry":{tag:"dinner",time:"20 min",servings:5,steps:["Cook 2 cups dry rice or noodles per package directions. Keep warm.","Slice chicken, beef, or tofu into thin strips. Season with salt and pepper.","Heat 2 tbsp oil in a wok or large skillet over high heat until shimmering.","Add protein and cook 3–4 min without moving too much, until browned. Remove and set aside.","Add veggies (broccoli, snap peas, carrots, bell pepper) to the same pan. Stir-fry 3–4 min until tender-crisp.","Return protein to pan, pour in ¼ cup stir-fry sauce, and toss to coat. Serve over rice or noodles."]},
-  "Baked Ziti":{tag:"dinner",time:"55 min",servings:5,steps:["Preheat oven to 375°F. Cook 1 lb ziti 2 min less than package directions (it finishes in the oven). Drain.","Mix pasta with 1 jar marinara sauce, 1 cup ricotta, half the mozzarella, salt, and pepper.","Transfer to a greased 9×13 baking dish. Top with remaining mozzarella and a drizzle of olive oil.","Cover with foil and bake 25 min. Remove foil and bake another 10–15 min until bubbly and golden.","Let rest 5–10 min before serving. Cover and refrigerate leftovers up to 4 days."]},
-  "BBQ Chicken":{tag:"dinner",time:"40 min",servings:5,steps:["Preheat oven to 400°F or heat grill to medium-high.","Pat chicken pieces dry and season both sides with salt, pepper, and garlic powder.","Brush a generous layer of BBQ sauce on each piece.","Bake on a foil-lined sheet pan 30–35 min (or grill 6–8 min per side), brushing with more sauce halfway through.","Chicken is done when it reaches 165°F internally. Let rest 5 min before serving.","Serve with corn on the cob, coleslaw, or baked beans for a complete meal."]},
-  "Apple Slices + PB":{tag:"snacks",time:"5 min",servings:5,steps:["Wash apples thoroughly under running water.","Core and slice apples into wedges (a slicer tool makes this fast for a big family!).","To prevent browning, toss slices in a bowl with a squeeze of lemon juice.","Portion into snack containers with 2–3 tbsp peanut butter per container.","Refrigerate and consume within 2 days for best freshness."]},
-  "Cheese & Crackers":{tag:"snacks",time:"5 min",servings:5,steps:["Slice a cheese block into bite-sized cubes or thin slices — about 1 oz per person.","Portion crackers (about 10–12 per serving) into snack bags or small containers.","Pack cheese and crackers separately to keep crackers crisp.","Optional add-ins: grapes, deli meat slices, or a small pickle on the side.","Refrigerate cheese portions; crackers can stay at room temperature."]},
-  "Veggies + Hummus":{tag:"snacks",time:"10 min",servings:5,steps:["Wash and dry all vegetables thoroughly.","Peel and cut carrots into sticks; slice celery into 3-inch pieces; cut cucumber into rounds or spears.","Portion veggies into individual containers or a large serving platter.","Scoop 3–4 tbsp hummus per person into small cups or directly into the container.","Keep refrigerated. Prepped veggies stay crisp for 4–5 days when stored in an airtight container with a damp paper towel."]},
-  "Trail Mix":{tag:"snacks",time:"5 min",servings:5,steps:["In a large bowl, combine 2 cups nuts (peanuts, almonds, or cashews), 1 cup pretzels or cereal, 1 cup dried fruit (raisins, cranberries), and ½ cup chocolate chips.","Stir well to distribute ingredients evenly.","Portion into snack-sized zip bags or small containers — about ¼ cup per serving for kids.","Store at room temperature for up to 2 weeks."]},
-  "Fruit Cups":{tag:"snacks",time:"10 min",servings:5,steps:["Wash all fruit thoroughly.","Cut melon into cubes, halve grapes, quarter strawberries, and slice any larger fruit into bite-sized pieces.","Toss with a squeeze of lime juice to keep fruit bright and add a subtle flavor boost.","Portion into small cups or containers with lids.","Refrigerate and consume within 3 days. Add a small fork or toothpick for easy eating."]},
-  "Popcorn":{tag:"snacks",time:"10 min",servings:5,steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
-  "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
+  "Overnight Oats":{tag:"breakfast",time:"5 min + overnight",servings:5,ingredients:["2½ cups rolled oats","2½ cups milk","1¼ cups Greek yogurt","5 tsp honey","Pinch of salt","Fresh berries (for topping)"],steps:["Measure ½ cup rolled oats per jar (5 jars total).","Add ½ cup milk and ¼ cup Greek yogurt to each jar.","Stir in 1 tsp honey and a pinch of salt.","Seal jars and refrigerate overnight (at least 6 hours).","In the morning, top with fresh berries and serve cold."]},
+  "Scrambled Eggs & Toast":{tag:"breakfast",time:"10 min",servings:5,ingredients:["10 eggs","5 slices bread","2½ tbsp butter","Salt & pepper to taste"],steps:["Crack 2 eggs per person into a bowl, season with salt & pepper, and whisk until combined.","Melt ½ tbsp butter in a non-stick skillet over medium-low heat.","Pour in eggs and let sit 10 seconds, then gently fold with a spatula every few seconds.","Remove from heat just before fully set — residual heat finishes them.","While eggs cook, toast bread and spread with butter. Plate together and serve immediately."]},
+  "Pancakes":{tag:"breakfast",time:"25 min",servings:5,ingredients:["2 cups pancake mix","1½ cups milk","2 eggs","Butter (for griddle)","Maple syrup (for serving)"],steps:["Combine 2 cups pancake mix, 1½ cups milk, and 2 eggs in a large bowl. Stir until just combined — lumps are okay.","Heat a griddle or non-stick pan over medium heat; lightly butter the surface.","Pour ¼ cup batter per pancake. Cook until bubbles form on the surface and edges look set, about 2–3 min.","Flip and cook another 1–2 min until golden. Repeat with remaining batter.","Stack cooled extras between sheets of parchment, place in a zip bag, and freeze for quick weekday breakfasts."]},
+  "Yogurt Parfait":{tag:"breakfast",time:"5 min",servings:5,ingredients:["2½ cups Greek yogurt","1 cup + 3 tbsp granola","1½ cups fresh or thawed berries","Honey (for drizzling)"],steps:["Spoon ½ cup Greek yogurt into the bottom of each cup or jar.","Add a layer of granola (about 3 tbsp per cup) on top of the yogurt.","Layer fresh or thawed berries over the granola.","Repeat yogurt and granola layers if the container is tall enough.","Drizzle with honey and serve immediately, or refrigerate (un-topped) for up to 2 days."]},
+  "Breakfast Burritos":{tag:"breakfast",time:"20 min",servings:5,ingredients:["10 eggs","½ lb breakfast sausage or bacon","5 large flour tortillas","1 cup shredded cheese","Salsa to taste","Salt, pepper, splash of milk"],steps:["Scramble 10 eggs in a large skillet with salt, pepper, and a splash of milk. Set aside.","Cook ½ lb breakfast sausage or bacon in the same pan; crumble and drain excess fat.","Warm flour tortillas one at a time in a dry skillet for 20 seconds per side.","Layer eggs, meat, shredded cheese, and salsa down the center of each tortilla.","Fold sides in, then roll tightly. Wrap individually in foil and refrigerate or freeze.","Reheat from frozen: unwrap foil, microwave 2–3 min, flipping halfway through."]},
+  "Smoothie Bowls":{tag:"breakfast",time:"10 min",servings:5,ingredients:["2 cups frozen mixed berries","1 frozen banana","½ cup Greek yogurt","Granola (for topping)","Fresh fruit slices (for topping)","Coconut flakes & honey (for topping)"],steps:["Blend 2 cups frozen berries, 1 frozen banana, and ½ cup Greek yogurt until thick and smooth — use minimal liquid.","Pour into bowls; the consistency should be thick enough to hold toppings.","Top with granola, fresh fruit slices, coconut flakes, and a drizzle of honey.","Serve immediately — smoothie bowls melt quickly!"]},
+  "French Toast":{tag:"breakfast",time:"20 min",servings:5,ingredients:["4 eggs","½ cup milk","1 tsp vanilla extract","1 tsp cinnamon","Pinch of salt","8–10 slices thick bread","2 tbsp butter","Maple syrup & powdered sugar (for serving)"],steps:["Whisk together 4 eggs, ½ cup milk, 1 tsp vanilla, 1 tsp cinnamon, and a pinch of salt in a shallow dish.","Melt 1 tbsp butter in a large skillet over medium heat.","Dip bread slices in the egg mixture, letting each side soak for 10–15 seconds.","Cook in batches, 2–3 min per side, until golden brown. Add more butter between batches.","Serve with maple syrup and powdered sugar, or freeze extras for quick reheating."]},
+  "Turkey Wraps":{tag:"lunch",time:"10 min",servings:5,ingredients:["5 large flour tortillas","15–20 slices deli turkey","5 large lettuce leaves","2 tomatoes, sliced","Mayo to taste","Salt & pepper to taste"],steps:["Lay a large flour tortilla flat on a cutting board.","Spread a thin layer of mayo across the center.","Layer 3–4 slices deli turkey, a handful of lettuce, and 2–3 tomato slices.","Season with salt, pepper, and any other desired condiments.","Fold the sides in and roll tightly from the bottom. Slice diagonally and serve, or wrap in parchment for packing."]},
+  "Mac & Cheese":{tag:"lunch",time:"20 min",servings:5,ingredients:["1 lb elbow pasta","2 cups shredded cheddar cheese","½ cup milk","2 tbsp butter","Salt & pepper to taste"],steps:["Bring a large pot of salted water to a boil. Add elbow pasta and cook per package directions until al dente.","Drain pasta, reserving ¼ cup pasta water, and return to the pot over low heat.","Add 2 tbsp butter and stir until melted.","Pour in ½ cup milk and 2 cups shredded cheddar. Stir continuously until smooth and creamy.","If sauce is too thick, add reserved pasta water a splash at a time. Season with salt & pepper and serve."]},
+  "Grilled Cheese + Soup":{tag:"lunch",time:"15 min",servings:5,ingredients:["10 slices bread","10 slices American cheese","3 tbsp butter","2 cans (10.75 oz each) tomato soup","½ cup milk (for soup)"],steps:["Butter one side of each bread slice generously.","Heat a skillet over medium heat. Place bread butter-side down, add 2 slices of cheese, and top with second slice butter-side up.","Cook 3–4 min until golden brown, then flip carefully. Cook another 2–3 min until the other side is golden and cheese is melted.","While sandwiches cook, heat canned tomato soup per label instructions. Add a splash of milk for creaminess.","Serve sandwich alongside a bowl of soup. Cut diagonally for dipping!"]},
+  "Quesadillas":{tag:"lunch",time:"15 min",servings:5,ingredients:["5 large flour tortillas","2 cups shredded cheddar cheese","2 cups cooked chicken, shredded","Salsa & sour cream (for serving)"],steps:["Shred or dice pre-cooked chicken into small pieces.","Sprinkle a generous layer of shredded cheddar on one half of a flour tortilla.","Add chicken on top of the cheese, then fold the tortilla in half.","Heat a dry skillet over medium heat. Cook quesadilla 2–3 min per side until golden and crispy.","Slice into wedges and serve with salsa and sour cream."]},
+  "PB&J + Fruit":{tag:"lunch",time:"5 min",servings:5,ingredients:["10 slices bread","Peanut butter","Jam or jelly","Fruit (apples, grapes, or strawberries)"],steps:["Spread a generous layer of peanut butter on one slice of bread.","Spread your favorite jam or jelly on the second slice.","Press slices together and cut in half (diagonal or straight — you know your kids!).","Wash and slice fruit — apples, grapes, or strawberries all work great.","Pack in a container with a small ice pack to keep fresh."]},
+  "Pasta Salad":{tag:"lunch",time:"25 min + chill",servings:5,ingredients:["1 lb rotini or penne pasta","1 bell pepper, diced","1 cucumber, diced","½ red onion, diced","1 cup cherry tomatoes, halved","¼ cup olive oil","3 tbsp red wine vinegar","1 tsp Italian seasoning","Salt & pepper to taste"],steps:["Cook 1 lb pasta (rotini or penne work best) in salted water per package. Drain and rinse under cold water to stop cooking.","Chop 1 bell pepper, 1 cucumber, ½ red onion, and halve 1 cup cherry tomatoes.","In a large bowl, whisk together ¼ cup olive oil, 3 tbsp red wine vinegar, 1 tsp Italian seasoning, salt and pepper.","Combine cooled pasta and veggies in the bowl; toss well to coat in dressing.","Refrigerate at least 1 hour before serving. Keeps well for 4–5 days — great for batch prep!"]},
+  "Rice Bowls":{tag:"lunch",time:"30 min",servings:5,ingredients:["3 cups dry rice","Protein of choice (chicken or canned beans)","Broccoli, carrots, snap peas","Soy sauce or teriyaki sauce","Salt, sesame oil (optional)"],steps:["Cook 3 cups dry rice per package directions (makes ~6 cups cooked). Season with salt and a drizzle of sesame oil if desired.","Prepare your protein: bake or pan-cook chicken, or use canned beans for a quick option.","Roast or sauté vegetables — broccoli, carrots, and snap peas all work well at 400°F for 20 min.","Portion rice into bowls or meal prep containers.","Top with protein and veggies. Add soy sauce, teriyaki, or any sauce on the side to keep things fresh."]},
+  "Spaghetti & Meatballs":{tag:"dinner",time:"45 min",servings:5,ingredients:["1½ lbs ground beef","½ cup breadcrumbs","1 egg","2 garlic cloves, minced","1 tsp Italian seasoning","2 jars (24 oz each) marinara sauce","1 lb spaghetti","Grated Parmesan (for serving)","Salt, pepper, olive oil"],steps:["Mix 1½ lbs ground beef with ½ cup breadcrumbs, 1 egg, 2 minced garlic cloves, salt, pepper, and Italian seasoning. Roll into golf ball–sized meatballs.","Brown meatballs in a large skillet with olive oil over medium-high heat, about 2 min per side. They don't need to be fully cooked through.","Pour 2 jars marinara sauce into a large pot over medium heat. Nestle meatballs in the sauce, cover, and simmer 20–25 min.","Meanwhile, bring a large pot of salted water to a boil. Cook spaghetti per package directions until al dente.","Drain pasta and serve topped with meatballs and sauce. Finish with grated Parmesan."]},
+  "Sheet Pan Chicken":{tag:"dinner",time:"50 min",servings:5,ingredients:["3 lbs bone-in chicken thighs","1½ lbs potatoes, cubed","1 large head broccoli, cut into florets","3 tbsp olive oil","1 tsp garlic powder","1 tsp paprika","Salt & pepper to taste","Cooking spray"],steps:["Preheat oven to 425°F. Line two large sheet pans with foil and spray with cooking spray.","In a large bowl, toss 3 lbs chicken thighs with olive oil, garlic powder, paprika, salt, and pepper.","Cube potatoes and cut broccoli into florets. Toss veggies separately with olive oil, salt, and pepper.","Arrange chicken on one pan and vegetables on the second. Don't crowd the pans — space = crispiness.","Roast 35–40 min, flipping chicken halfway, until chicken reaches 165°F and veggies are caramelized."]},
+  "Taco Night":{tag:"dinner",time:"25 min",servings:5,ingredients:["1½ lbs ground beef","1 packet taco seasoning","⅔ cup water","10 taco shells","1 cup shredded cheese","2 cups shredded lettuce","Salsa, sour cream, diced tomato"],steps:["Brown 1½ lbs ground beef in a large skillet over medium-high heat, breaking it apart as it cooks. Drain excess fat.","Add 1 packet taco seasoning and ⅔ cup water. Stir and simmer 3–5 min until sauce thickens.","Set up a taco bar: warm shells in the oven at 350°F for 5 min, and set out toppings — cheese, lettuce, salsa, sour cream, diced tomato.","Let everyone build their own tacos!","Leftover taco meat keeps 4 days refrigerated — great for nachos or taco salads later in the week."]},
+  "Slow Cooker Chili":{tag:"dinner",time:"20 min prep + 6–8 hrs",servings:5,ingredients:["1½ lbs ground beef","2 cans (15 oz) kidney beans, drained","2 cans (14.5 oz) diced tomatoes","1 onion, diced","1 bell pepper, diced","1 cup beef broth","2 tbsp chili powder","1 tsp cumin","1 tsp garlic powder","Salt & pepper to taste"],steps:["Brown 1½ lbs ground beef in a skillet. Drain fat and transfer to slow cooker.","Drain and rinse 2 cans kidney beans; add to slow cooker.","Add 2 cans diced tomatoes (with liquid), 1 diced onion, 1 diced bell pepper, and 1 cup beef broth.","Season with 2 tbsp chili powder, 1 tsp cumin, 1 tsp garlic powder, salt, and pepper. Stir everything together.","Cover and cook on LOW 6–8 hours or HIGH 3–4 hours. Taste and adjust seasoning before serving.","Serve with shredded cheese, sour cream, and cornbread. Freezes beautifully for up to 3 months!"]},
+  "Stir Fry":{tag:"dinner",time:"20 min",servings:5,ingredients:["2 cups dry rice or noodles","1½ lbs chicken, beef, or tofu","2 tbsp vegetable oil","2 cups broccoli florets","1 cup snap peas","2 carrots, sliced","1 bell pepper, sliced","¼ cup stir-fry sauce","Salt & pepper to taste"],steps:["Cook 2 cups dry rice or noodles per package directions. Keep warm.","Slice chicken, beef, or tofu into thin strips. Season with salt and pepper.","Heat 2 tbsp oil in a wok or large skillet over high heat until shimmering.","Add protein and cook 3–4 min without moving too much, until browned. Remove and set aside.","Add veggies (broccoli, snap peas, carrots, bell pepper) to the same pan. Stir-fry 3–4 min until tender-crisp.","Return protein to pan, pour in ¼ cup stir-fry sauce, and toss to coat. Serve over rice or noodles."]},
+  "Baked Ziti":{tag:"dinner",time:"55 min",servings:5,ingredients:["1 lb ziti pasta","1 jar (24 oz) marinara sauce","1 cup ricotta cheese","2 cups shredded mozzarella (divided)","Salt & pepper to taste","Olive oil","Cooking spray"],steps:["Preheat oven to 375°F. Cook 1 lb ziti 2 min less than package directions (it finishes in the oven). Drain.","Mix pasta with 1 jar marinara sauce, 1 cup ricotta, half the mozzarella, salt, and pepper.","Transfer to a greased 9×13 baking dish. Top with remaining mozzarella and a drizzle of olive oil.","Cover with foil and bake 25 min. Remove foil and bake another 10–15 min until bubbly and golden.","Let rest 5–10 min before serving. Cover and refrigerate leftovers up to 4 days."]},
+  "BBQ Chicken":{tag:"dinner",time:"40 min",servings:5,ingredients:["3 lbs bone-in chicken pieces","1½ cups BBQ sauce","1 tsp garlic powder","Salt & pepper to taste"],steps:["Preheat oven to 400°F or heat grill to medium-high.","Pat chicken pieces dry and season both sides with salt, pepper, and garlic powder.","Brush a generous layer of BBQ sauce on each piece.","Bake on a foil-lined sheet pan 30–35 min (or grill 6–8 min per side), brushing with more sauce halfway through.","Chicken is done when it reaches 165°F internally. Let rest 5 min before serving.","Serve with corn on the cob, coleslaw, or baked beans for a complete meal."]},
+  "Apple Slices + PB":{tag:"snacks",time:"5 min",servings:5,ingredients:["5 medium apples","⅔ cup peanut butter","Squeeze of lemon juice (to prevent browning)"],steps:["Wash apples thoroughly under running water.","Core and slice apples into wedges (a slicer tool makes this fast for a big family!).","To prevent browning, toss slices in a bowl with a squeeze of lemon juice.","Portion into snack containers with 2–3 tbsp peanut butter per container.","Refrigerate and consume within 2 days for best freshness."]},
+  "Cheese & Crackers":{tag:"snacks",time:"5 min",servings:5,ingredients:["8 oz cheese block (cheddar or colby jack)","1 sleeve crackers (50–60 crackers)","Optional: grapes, deli meat, pickles"],steps:["Slice a cheese block into bite-sized cubes or thin slices — about 1 oz per person.","Portion crackers (about 10–12 per serving) into snack bags or small containers.","Pack cheese and crackers separately to keep crackers crisp.","Optional add-ins: grapes, deli meat slices, or a small pickle on the side.","Refrigerate cheese portions; crackers can stay at room temperature."]},
+  "Veggies + Hummus":{tag:"snacks",time:"10 min",servings:5,ingredients:["1 bag (16 oz) baby carrots","4 stalks celery","1 large cucumber","1 container (16 oz) hummus"],steps:["Wash and dry all vegetables thoroughly.","Peel and cut carrots into sticks; slice celery into 3-inch pieces; cut cucumber into rounds or spears.","Portion veggies into individual containers or a large serving platter.","Scoop 3–4 tbsp hummus per person into small cups or directly into the container.","Keep refrigerated. Prepped veggies stay crisp for 4–5 days when stored in an airtight container with a damp paper towel."]},
+  "Trail Mix":{tag:"snacks",time:"5 min",servings:5,ingredients:["2 cups mixed nuts (peanuts, almonds, cashews)","1 cup pretzels or cereal","1 cup dried fruit (raisins or cranberries)","½ cup chocolate chips"],steps:["In a large bowl, combine 2 cups nuts (peanuts, almonds, or cashews), 1 cup pretzels or cereal, 1 cup dried fruit (raisins, cranberries), and ½ cup chocolate chips.","Stir well to distribute ingredients evenly.","Portion into snack-sized zip bags or small containers — about ¼ cup per serving for kids.","Store at room temperature for up to 2 weeks."]},
+  "Fruit Cups":{tag:"snacks",time:"10 min",servings:5,ingredients:["½ small melon (honeydew or cantaloupe)","1 cup grapes","1 cup strawberries","Squeeze of lime juice"],steps:["Wash all fruit thoroughly.","Cut melon into cubes, halve grapes, quarter strawberries, and slice any larger fruit into bite-sized pieces.","Toss with a squeeze of lime juice to keep fruit bright and add a subtle flavor boost.","Portion into small cups or containers with lids.","Refrigerate and consume within 3 days. Add a small fork or toothpick for easy eating."]},
+  "Popcorn":{tag:"snacks",time:"10 min",servings:5,ingredients:["½ cup popcorn kernels","2 tbsp vegetable or coconut oil","2 tbsp melted butter","Salt to taste"],steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
+  "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,ingredients:["1 multipack (12–16 count) yogurt tubes"],steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
 };
 
 // ── STORAGE ───────────────────────────────────────────────────────────────
@@ -224,7 +214,7 @@ function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 const S={
-  tab:          lsGet("s_tab","planner"),
+  tab:          lsGet("s_tab","planner")==="prep"?"planner":lsGet("s_tab","planner"),
   weekOffset:   lsGet("s_weekOffset",0),
   meals:{},
   customMeals:  lsGet("customMeals",{breakfast:[],lunch:[],dinner:[],snacks:[]}),
@@ -234,7 +224,6 @@ const S={
   showUpload:false, uploadText:"", uploadPreview:null, uploadError:"",
   recipeOpen:   lsGet("s_recipeOpen",{}),
   recipeFilter: lsGet("s_recipeFilter","all"),
-  prepChecked:  lsGet("s_prepChecked",{}),
   groceryChecked: lsGet("s_groceryChecked",{})
 };
 function loadMeals(){S.meals=lsGet("week:"+weekKey(S.weekOffset),{});}
@@ -244,7 +233,6 @@ function saveUIState(){
   lsSet("s_weekOffset",S.weekOffset);
   lsSet("s_recipeFilter",S.recipeFilter);
   lsSet("s_recipeOpen",S.recipeOpen);
-  lsSet("s_prepChecked",S.prepChecked);
   lsSet("s_groceryChecked",S.groceryChecked);
 }
 loadMeals();
@@ -273,11 +261,10 @@ function buildApp(){
     </div>
   </div></div>
   <div class="tabs"><div class="tabs-inner">
-    ${[["planner","🗓 Meal Plan"],["prep","✅ Prep Tasks"],["grocery","🛒 Grocery"],["recipes","📖 Recipes"]].map(([id,lbl])=>`<button class="tab${S.tab===id?" on":""}" data-tab="${id}">${lbl}</button>`).join("")}
+    ${[["planner","🗓 Meal Plan"],["grocery","🛒 Grocery"],["recipes","📖 Recipes"]].map(([id,lbl])=>`<button class="tab${S.tab===id?" on":""}" data-tab="${id}">${lbl}</button>`).join("")}
   </div></div>
   <div class="content">
     ${S.tab==="planner"?buildPlanner():""}
-    ${S.tab==="prep"?buildPrep():""}
     ${S.tab==="grocery"?buildGrocery():""}
     ${S.tab==="recipes"?buildRecipes():""}
   </div>
@@ -299,20 +286,6 @@ function buildPlanner(){
         ${meal?`<span class="meal-val">${esc(meal)}</span>`:`<span class="meal-ph">+ Add</span>`}
       </div>`;
     }).join("")+`</div></div>`;
-  }).join("");
-}
-
-// ── PREP ──────────────────────────────────────────────────────────────────
-function buildPrep(){
-  const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
-  if(!meals.length)return`<div class="empty"><div class="empty-icon">📋</div><p class="empty-txt">Add meals to your plan to generate a prep checklist.</p></div>`;
-  return`<div class="tip-banner">⏱ Pro tip: Do all your prep on Sunday! Batch similar tasks to save hours.</div>`+
-  meals.map(meal=>{
-    const tasks=PREP_TASKS[meal]||DEFAULT_TASKS;
-    return`<div class="prep-card"><div class="prep-title">${esc(meal)}</div>`+
-    tasks.map((t,i)=>{const k=meal+"-"+i;const on=!!S.prepChecked[k];
-      return`<div class="chk-row" data-pk="${esc(k)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="chk-lbl${on?" on":""}">${esc(t)}</span></div>`;
-    }).join("")+`</div>`;
   }).join("");
 }
 
@@ -360,7 +333,12 @@ function buildRecipes(){
         </div>
         ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
       </div>
-      ${isOpen?`<div class="rec-steps"><div class="steps-list">`+
+      ${isOpen?`<div class="rec-steps">
+        ${recipe.ingredients&&recipe.ingredients.length?`<div class="rec-section-lbl">Ingredients</div><div class="ingr-list">`+
+          recipe.ingredients.map(i=>`<div class="ingr-row"><div class="ingr-dot"></div><span>${esc(i)}</span></div>`).join("")+
+        `</div><hr class="ingr-divider">`:""}
+        <div class="rec-section-lbl">Preparation</div>
+        <div class="steps-list">`+
         recipe.steps.map((s,i)=>`<div class="step-row"><div class="step-num">${i+1}</div><div class="step-txt">${esc(s)}</div></div>`).join("")+
       `</div></div>`:""}
     </div>`;
@@ -437,6 +415,12 @@ function buildUpload(){
 Time: 35 min
 Serves: 5
 Category: dinner
+Ingredients
+- 1 lb fettuccine pasta
+- 2 cups heavy cream
+- 1 cup Parmesan cheese
+- 2 tbsp butter
+Preparation
 1. Boil pasta until al dente
 2. Make Alfredo sauce
 3. Combine and serve
@@ -444,6 +428,10 @@ Category: dinner
 Banana Muffins
 Time: 40 min
 Category: breakfast
+Ingredients
+- 3 ripe bananas
+- 2 cups flour
+- ¾ cup sugar
 1. Mash bananas
 2. Mix batter
 3. Bake at 375°F</pre></div>
@@ -473,7 +461,8 @@ function parseRecipes(text){
   blocks.forEach(block=>{
     const lines=block.split("\n").map(l=>l.trim()).filter(Boolean);
     if(lines.length<2)return;
-    const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];
+    const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];const ingredients=[];
+    let inIngredients=false;
     lines.slice(1).forEach(line=>{
       const lo=line.toLowerCase();
       if(lo.startsWith("time:")){time=line.split(":").slice(1).join(":").trim();return;}
@@ -482,10 +471,18 @@ function parseRecipes(text){
         const v=line.split(":")[1].trim().toLowerCase();
         if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
       }
-      const sm=line.match(/^\d+[\.\)]\s+(.+)/);if(sm){steps.push(sm[1]);return;}
-      if(line.startsWith("-")||line.startsWith("•")){steps.push(line.replace(/^[-•]\s*/,""));return;}
+      if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;return;}
+      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
+      const sm=line.match(/^\d+[\.\)]\s+(.+)/);
+      if(sm){inIngredients=false;steps.push(sm[1]);return;}
+      if(line.startsWith("-")||line.startsWith("•")){
+        const val=line.replace(/^[-•]\s*/,"");
+        if(inIngredients||!steps.length)ingredients.push(val);
+        else steps.push(val);
+        return;
+      }
     });
-    if(steps.length>0)out[name]={tag,time,servings,steps,_uploaded:true};
+    if(steps.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
   });
   return out;
 }
@@ -519,8 +516,6 @@ function bind(){
   q("btnPickAdd",addAndSelect);
   document.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>selectMeal(b.dataset.pick)));
   q("btnPickRm",()=>{const{day,mealType}=S.picker;if(S.meals[day])S.meals[day][mealType]="";saveMeals();S.picker=null;S.pickerInput="";render();});
-  // Prep
-  document.querySelectorAll("[data-pk]").forEach(r=>r.addEventListener("click",()=>{S.prepChecked[r.dataset.pk]=!S.prepChecked[r.dataset.pk];lsSet("s_prepChecked",S.prepChecked);render();}));
   // Grocery
   document.querySelectorAll("[data-gi]").forEach(r=>r.addEventListener("click",()=>{S.groceryChecked[r.dataset.gi]=!S.groceryChecked[r.dataset.gi];lsSet("s_groceryChecked",S.groceryChecked);render();}));
   q("btnResetGroc",()=>{S.groceryChecked={};lsSet("s_groceryChecked",{});render();});
