@@ -1,292 +1,439 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mama's Meal Prep Planner</title>
-<link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Georgia', Georgia, serif; background: #faf9f6; min-height: 100vh; }
-
-  /* Header */
-  .header { background: linear-gradient(135deg, #92400e 0%, #d97706 100%); color: white; padding: 22px 18px 16px; }
-  .header-inner { max-width: 900px; margin: 0 auto; }
-  .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .header-subtitle { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; margin-bottom: 3px; }
-  .header-title { font-size: 24px; font-weight: 800; line-height: 1.2; }
-  .btn-history { background: rgba(255,255,255,0.2); border: none; border-radius: 12px; padding: 8px 14px; color: white; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; margin-top: 2px; font-family: Georgia, serif; }
-  .week-nav { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
-  .btn-week { background: rgba(255,255,255,0.2); border: none; border-radius: 10px; width: 32px; height: 32px; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: Georgia, serif; }
-  .week-label-box { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 8px 14px; flex: 1; text-align: center; }
-  .week-label-main { font-size: 13px; font-weight: 800; }
-  .week-label-sub { font-size: 11px; opacity: 0.8; margin-top: 1px; }
-  .progress-row { margin-top: 12px; display: flex; align-items: center; gap: 10px; }
-  .progress-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,0.25); border-radius: 99px; }
-  .progress-bar-fill { height: 100%; background: white; border-radius: 99px; transition: width 0.4s ease; }
-  .progress-label { font-size: 11px; font-weight: 700; opacity: 0.9; white-space: nowrap; }
-  .saving-indicator { font-size: 10px; opacity: 0.7; }
-
-  /* Tabs */
-  .tabs-bar { background: white; border-bottom: 2px solid #f0ebe3; position: sticky; top: 0; z-index: 40; }
-  .tabs-inner { max-width: 900px; margin: 0 auto; display: flex; padding: 0 8px; }
-  .tab-btn { padding: 13px 12px; border: none; background: none; cursor: pointer; font-size: 13px; font-weight: 700; font-family: Georgia, serif; color: #78716c; border-bottom: 3px solid transparent; transition: all 0.2s; flex: 1; text-align: center; }
-  .tab-btn.active { color: #b45309; border-bottom-color: #d97706; }
-
-  /* Content */
-  .content { max-width: 900px; margin: 0 auto; padding: 18px 14px 40px; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  /* Planner */
-  .planner-grid { display: flex; flex-direction: column; gap: 12px; }
-  .planner-hint { font-size: 12px; color: #a8a29e; margin-bottom: 4px; }
-  .day-card { background: white; border-radius: 18px; padding: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); border: 1px solid #f0ebe3; }
-  .day-name { font-size: 14px; font-weight: 800; color: #292524; margin-bottom: 10px; }
-  .meal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .meal-cell { min-height: 66px; border-radius: 13px; padding: 9px; cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; gap: 4px; border: 2px dashed #e7e0d6; background: #faf9f6; }
-  .meal-cell.filled { background: #fffcf5; }
-  .meal-cell:hover { border-color: #d97706 !important; background: #fffbeb !important; }
-  .meal-tag { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; padding: 2px 7px; border-radius: 99px; width: fit-content; }
-  .meal-name { font-size: 12px; font-weight: 700; color: #292524; line-height: 1.3; }
-  .meal-empty { font-size: 11px; color: #c4b9ac; margin: auto; text-align: center; width: 100%; }
-
-  /* Prep */
-  .prep-tip { background: #fffbeb; border-radius: 14px; padding: 14px; margin-bottom: 16px; border: 1px solid #fde68a; font-size: 13px; color: #92400e; font-weight: 600; }
-  .prep-meal-card { background: white; border-radius: 18px; border: 1px solid #f0ebe3; padding: 16px; margin-bottom: 14px; }
-  .prep-meal-name { font-weight: 800; font-size: 14px; color: #292524; margin-bottom: 12px; }
-  .task-list { display: flex; flex-direction: column; gap: 8px; }
-  .task-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-  .task-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #d6d3d1; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
-  .task-checkbox.checked { border-color: #d97706; background: #d97706; }
-  .task-checkbox .check-mark { color: white; font-size: 11px; font-weight: 900; display: none; }
-  .task-checkbox.checked .check-mark { display: block; }
-  .task-label { font-size: 13px; color: #44403c; }
-  .task-label.checked { color: #a8a29e; text-decoration: line-through; }
-
-  /* Grocery */
-  .grocery-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .grocery-count { font-size: 13px; color: #78716c; }
-  .btn-reset { background: none; border: none; color: #d97706; font-size: 12px; font-weight: 700; cursor: pointer; font-family: Georgia, serif; }
-  .grocery-list { display: flex; flex-direction: column; gap: 4px; }
-  .grocery-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; cursor: pointer; background: white; border: 1px solid #f0ebe3; transition: all 0.15s; }
-  .grocery-item.checked { background: #faf9f6; }
-  .grocery-item .task-label { font-size: 13px; }
-  .budget-tip { margin-top: 6px; padding: 14px 16px; border-radius: 16px; background: #fffbeb; border: 1px solid #fde68a; }
-  .budget-tip-label { font-size: 11px; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-  .budget-tip-text { font-size: 12px; color: #92400e; }
-
-  /* Recipes */
-  .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .pill-btn { padding: 6px 14px; border-radius: 99px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; font-family: Georgia, serif; background: #f0ebe3; color: #78716c; transition: all 0.15s; }
-  .pill-btn.active { background: #d97706; color: white; }
-  .pill-btn.upload-pill { border: 1.5px dashed #d97706; background: white; color: #d97706; }
-  .recipes-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .recipes-count { font-size: 12px; color: #a8a29e; }
-  .uploaded-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: #ede9fe; color: #7c3aed; font-weight: 700; }
-  .recipe-card { background: white; border-radius: 18px; border: 1.5px solid #f0ebe3; overflow: hidden; margin-bottom: 14px; transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-  .recipe-card.open { border-color: #d97706; box-shadow: 0 4px 16px rgba(217,119,6,0.1); }
-  .recipe-header { padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; background: white; user-select: none; }
-  .recipe-card.open .recipe-header { background: #fffcf5; }
-  .recipe-arrow-box { width: 26px; height: 26px; border-radius: 8px; background: #f0ebe3; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
-  .recipe-card.open .recipe-arrow-box { background: #d97706; }
-  .recipe-arrow { font-size: 11px; color: #78716c; display: block; transition: transform 0.2s; }
-  .recipe-card.open .recipe-arrow { color: white; transform: rotate(90deg); }
-  .recipe-info { flex: 1; min-width: 0; }
-  .recipe-name-row { display: flex; align-items: center; gap: 6px; }
-  .recipe-name { font-weight: 800; font-size: 14px; color: #292524; line-height: 1.2; }
-  .recipe-uploaded-badge { font-size: 9px; padding: 2px 6px; border-radius: 99px; background: #ede9fe; color: #7c3aed; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-  .recipe-meta-row { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
-  .recipe-time, .recipe-serves { font-size: 11px; color: #a8a29e; }
-  .btn-delete-recipe { padding: 4px 10px; border-radius: 8px; border: 1.5px solid #fca5a5; background: white; color: #ef4444; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
-  .recipe-steps { padding: 0 16px 18px; border-top: 1px solid #f0ebe3; display: none; }
-  .recipe-card.open .recipe-steps { display: block; }
-  .steps-list { margin: 14px 0 0; padding: 0 0 0 4px; list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .step-item { display: flex; gap: 12px; align-items: flex-start; }
-  .step-num { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: #fffbeb; border: 1.5px solid #fde68a; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #b45309; line-height: 1; }
-  .step-text { font-size: 13px; color: #44403c; line-height: 1.6; padding-top: 2px; }
-  .recipes-empty { text-align: center; padding: 48px 0; color: #a8a29e; }
-  .recipes-empty-icon { font-size: 40px; margin-bottom: 12px; }
-  .recipes-empty-text { font-size: 13px; }
-
-  /* Modals */
-  .modal-overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); }
-  .modal-box { background: white; border-radius: 24px; padding: 24px; width: 340px; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 14px; }
-  .modal-day { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a8a29e; margin-bottom: 2px; }
-  .modal-meal-type { font-family: Georgia, serif; font-size: 20px; font-weight: 800; color: #292524; text-transform: capitalize; }
-  .modal-search-box { background: #fffbeb; border-radius: 14px; padding: 12px; border: 1px solid #fde68a; }
-  .modal-search-label { font-size: 11px; font-weight: 700; color: #b45309; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .modal-search-row { display: flex; gap: 8px; }
-  .modal-input { flex: 1; padding: 9px 12px; border-radius: 10px; border: 1.5px solid #fed7aa; font-size: 13px; font-family: Georgia, serif; outline: none; color: #292524; background: white; }
-  .btn-add-meal { padding: 9px 16px; border-radius: 10px; background: #d97706; color: white; border: none; font-weight: 800; font-size: 15px; cursor: pointer; }
-  .modal-search-hint { font-size: 11px; color: #a8a29e; margin-top: 6px; }
-  .modal-suggestions-label { font-size: 11px; font-weight: 700; color: #78716c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .suggestions-list { display: flex; flex-direction: column; gap: 6px; }
-  .suggestion-btn { text-align: left; padding: 11px 14px; border-radius: 12px; border: 1.5px solid #f0ebe3; background: #faf9f6; color: #292524; font-size: 13px; font-weight: 600; cursor: pointer; font-family: Georgia, serif; transition: all 0.15s; }
-  .suggestion-btn.selected { border-color: #d97706; background: #fffbeb; color: #b45309; }
-  .btn-remove-meal { padding: 10px 14px; border-radius: 12px; border: 1.5px dashed #fca5a5; background: white; color: #ef4444; font-size: 13px; font-weight: 600; cursor: pointer; font-family: Georgia, serif; }
-  .btn-modal-close { background: none; border: none; color: #a8a29e; font-size: 13px; cursor: pointer; padding-top: 4px; font-family: Georgia, serif; }
-
-  /* History panel */
-  .history-overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); }
-  .history-box { background: white; border-radius: 24px 24px 0 0; padding: 24px; width: 100%; max-width: 900px; max-height: 85vh; overflow-y: auto; box-shadow: 0 -8px 40px rgba(0,0,0,0.2); }
-  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .history-title { font-family: Georgia, serif; font-size: 20px; font-weight: 800; color: #292524; }
-  .btn-close-history { background: none; border: none; font-size: 22px; cursor: pointer; color: #78716c; line-height: 1; }
-  .history-week-card { border-radius: 16px; border: 1.5px solid #f0ebe3; overflow: hidden; margin-bottom: 10px; transition: border-color 0.2s; }
-  .history-week-card.open { border-color: #d97706; }
-  .history-week-header { padding: 14px 18px; cursor: pointer; background: white; display: flex; justify-content: space-between; align-items: center; }
-  .history-week-card.open .history-week-header { background: #fffbeb; }
-  .history-week-label { font-weight: 800; font-size: 14px; color: #292524; }
-  .history-week-arrow { font-size: 16px; color: #d97706; }
-  .history-week-body { padding: 4px 18px 18px; border-top: 1px solid #f0ebe3; background: #fffcf8; }
-  .history-day-section { margin-top: 14px; }
-  .history-day-name { font-size: 11px; font-weight: 800; color: #78716c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-  .history-meals-row { display: flex; flex-wrap: wrap; gap: 6px; }
-
-  /* Upload Modal */
-  .upload-box { background: white; border-radius: 24px; padding: 24px; width: 380px; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 16px; }
-  .upload-title { font-family: Georgia, serif; font-size: 20px; font-weight: 800; color: #292524; margin-bottom: 4px; }
-  .upload-subtitle { font-size: 12px; color: #78716c; }
-  .format-guide { background: #fffbeb; border-radius: 14px; padding: 12px; border: 1px solid #fde68a; }
-  .format-guide-label { font-size: 11px; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-  .format-guide pre { font-size: 11px; color: #92400e; line-height: 1.7; font-family: monospace; white-space: pre-wrap; }
-  .btn-choose-file { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1.5px dashed #d6d3d1; background: #faf9f6; color: #78716c; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Georgia, serif; }
-  .or-separator { font-size: 11px; color: #a8a29e; text-align: center; margin-top: 6px; }
-  .upload-textarea { width: 100%; height: 160px; padding: 10px 12px; border-radius: 12px; border: 1.5px solid #e7e0d6; font-size: 12px; font-family: monospace; resize: vertical; outline: none; color: #292524; line-height: 1.6; }
-  .upload-error { font-size: 12px; color: #ef4444; font-weight: 600; }
-  .preview-box { background: #f0fdf4; border-radius: 14px; padding: 12px; border: 1px solid #bbf7d0; }
-  .preview-label { font-size: 11px; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-  .preview-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #dcfce7; }
-  .preview-item-name { font-size: 13px; font-weight: 700; color: #292524; }
-  .preview-item-meta { font-size: 11px; color: #78716c; }
-  .upload-actions { display: flex; gap: 8px; }
-  .btn-preview { flex: 1; padding: 12px; border-radius: 12px; border: none; background: #d97706; color: white; font-size: 14px; font-weight: 800; cursor: pointer; font-family: Georgia, serif; }
-  .btn-preview:disabled { background: #e7e0d6; cursor: default; }
-  .btn-save-recipes { flex: 1; padding: 12px; border-radius: 12px; border: none; background: #d97706; color: white; font-size: 14px; font-weight: 800; cursor: pointer; font-family: Georgia, serif; }
-  .btn-cancel { padding: 12px 16px; border-radius: 12px; border: 1.5px solid #e7e0d6; background: white; color: #78716c; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Georgia, serif; }
-
-  /* Empty states */
-  .empty-state { text-align: center; padding: 48px 0; color: #a8a29e; }
-  .empty-icon { font-size: 40px; margin-bottom: 12px; }
-  .empty-text { font-size: 13px; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,serif;background:#faf9f6;min-height:100vh;}
+button{font-family:Georgia,serif;cursor:pointer;}
+.hdr{background:linear-gradient(135deg,#92400e 0%,#d97706 100%);color:white;padding:22px 18px 16px;}
+.hdr-inner{max-width:900px;margin:0 auto;}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.hdr-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:.7;margin-bottom:3px;}
+.hdr-title{font-size:24px;font-weight:800;line-height:1.2;}
+.btn-hist{background:rgba(255,255,255,.2);border:none;border-radius:12px;padding:8px 14px;color:white;font-size:12px;font-weight:700;white-space:nowrap;margin-top:2px;}
+.week-nav{margin-top:14px;display:flex;align-items:center;gap:10px;}
+.btn-wk{background:rgba(255,255,255,.2);border:none;border-radius:10px;width:32px;height:32px;color:white;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wk-lbl{background:rgba(255,255,255,.15);border-radius:12px;padding:8px 14px;flex:1;text-align:center;}
+.wk-main{font-size:13px;font-weight:800;}
+.wk-sub{font-size:11px;opacity:.8;margin-top:2px;}
+.prog-row{margin-top:12px;display:flex;align-items:center;gap:10px;}
+.prog-bg{flex:1;height:5px;background:rgba(255,255,255,.25);border-radius:99px;}
+.prog-fill{height:100%;background:white;border-radius:99px;transition:width .4s ease;}
+.prog-txt{font-size:11px;font-weight:700;opacity:.9;white-space:nowrap;}
+.tabs{background:white;border-bottom:2px solid #f0ebe3;position:sticky;top:0;z-index:40;}
+.tabs-inner{max-width:900px;margin:0 auto;display:flex;padding:0 8px;}
+.tab{padding:13px 12px;border:none;background:none;font-size:13px;font-weight:700;color:#78716c;border-bottom:3px solid transparent;transition:all .2s;flex:1;text-align:center;}
+.tab.on{color:#b45309;border-bottom-color:#d97706;}
+.content{max-width:900px;margin:0 auto;padding:18px 14px 40px;}
+.hint{font-size:12px;color:#a8a29e;margin-bottom:12px;}
+.day-card{background:white;border-radius:18px;padding:14px;box-shadow:0 1px 6px rgba(0,0,0,.05);border:1px solid #f0ebe3;margin-bottom:12px;}
+.day-name{font-size:14px;font-weight:800;color:#292524;margin-bottom:10px;}
+.meal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.meal-cell{min-height:66px;border-radius:13px;border:2px dashed #e7e0d6;background:#faf9f6;padding:9px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:4px;}
+.meal-cell:hover{border-color:#d97706!important;background:#fffbeb!important;}
+.meal-cell.filled{background:#fffcf5;}
+.mt-tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:2px 7px;border-radius:99px;width:fit-content;}
+.meal-val{font-size:12px;font-weight:700;color:#292524;line-height:1.3;}
+.meal-ph{font-size:11px;color:#c4b9ac;margin:auto;text-align:center;width:100%;}
+.tip-banner{background:#fffbeb;border-radius:14px;padding:14px;margin-bottom:16px;border:1px solid #fde68a;font-size:13px;color:#92400e;font-weight:600;}
+.prep-card{background:white;border-radius:18px;border:1px solid #f0ebe3;padding:16px;margin-bottom:12px;}
+.prep-title{font-weight:800;font-size:14px;color:#292524;margin-bottom:12px;}
+.chk-row{display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px;}
+.chkbox{width:20px;height:20px;border-radius:6px;border:2px solid #d6d3d1;background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:11px;font-weight:900;color:white;}
+.chkbox.on{border-color:#d97706;background:#d97706;}
+.chk-lbl{font-size:13px;color:#44403c;}
+.chk-lbl.on{color:#a8a29e;text-decoration:line-through;}
+.groc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.groc-cnt{font-size:13px;color:#78716c;}
+.btn-rst{background:none;border:none;color:#d97706;font-size:12px;font-weight:700;}
+.groc-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;cursor:pointer;background:white;border:1px solid #f0ebe3;margin-bottom:4px;transition:all .15s;}
+.groc-item.on{background:#faf9f6;}
+.groc-lbl{font-size:13px;color:#44403c;}
+.groc-lbl.on{color:#a8a29e;text-decoration:line-through;}
+.budget-box{margin-top:10px;padding:14px 16px;border-radius:16px;background:#fffbeb;border:1px solid #fde68a;}
+.budget-lbl{font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.budget-txt{font-size:12px;color:#92400e;}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.pill{padding:6px 14px;border-radius:99px;border:none;font-size:12px;font-weight:700;background:#f0ebe3;color:#78716c;transition:all .15s;}
+.pill.on{background:#d97706;color:white;}
+.pill-upload{background:white;border:1.5px dashed #d97706;color:#d97706;padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;transition:all .15s;}
+.rec-count-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.rec-count-txt{font-size:12px;color:#a8a29e;}
+.rec-up-badge{font-size:11px;padding:3px 10px;border-radius:99px;background:#ede9fe;color:#7c3aed;font-weight:700;}
+.rec-card{background:white;border-radius:18px;border:1.5px solid #f0ebe3;overflow:hidden;transition:border-color .2s;box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:10px;}
+.rec-card.open{border-color:#d97706;box-shadow:0 4px 16px rgba(217,119,6,.1);}
+.rec-hdr{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:white;user-select:none;}
+.rec-card.open .rec-hdr{background:#fffcf5;}
+.rec-arrow{width:26px;height:26px;border-radius:8px;background:#f0ebe3;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:11px;color:#78716c;}
+.rec-card.open .rec-arrow{background:#d97706;color:white;transform:rotate(90deg);}
+.rec-info{flex:1;min-width:0;}
+.rec-name-row{display:flex;align-items:center;gap:6px;}
+.rec-name{font-weight:800;font-size:14px;color:#292524;line-height:1.2;}
+.rec-meta{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;align-items:center;}
+.rec-meta-txt{font-size:11px;color:#a8a29e;}
+.cat-tag{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;text-transform:capitalize;}
+.up-badge{font-size:9px;padding:2px 6px;border-radius:99px;background:#ede9fe;color:#7c3aed;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+.rec-steps{padding:0 16px 18px;border-top:1px solid #f0ebe3;}
+.steps-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+.step-row{display:flex;gap:12px;align-items:flex-start;}
+.step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#fffbeb;border:1.5px solid #fde68a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#b45309;}
+.step-txt{font-size:13px;color:#44403c;line-height:1.6;padding-top:2px;}
+.btn-del{padding:4px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:white;color:#ef4444;font-size:11px;font-weight:700;flex-shrink:0;}
+.empty{text-align:center;padding:48px 0;color:#a8a29e;}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-txt{font-size:13px;}
+.overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);}
+.overlay.bottom{align-items:flex-end;}
+.modal{background:white;border-radius:24px;padding:24px;width:340px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
+.modal.wide{width:390px;}
+.modal.sheet{border-radius:24px 24px 0 0;width:100%;max-width:900px;max-height:85vh;box-shadow:0 -8px 40px rgba(0,0,0,.2);}
+.picker-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#a8a29e;margin-bottom:2px;}
+.picker-title{font-size:20px;font-weight:800;color:#292524;text-transform:capitalize;}
+.search-box{background:#fffbeb;border-radius:14px;padding:12px;border:1px solid #fde68a;}
+.search-lbl{font-size:11px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.search-row{display:flex;gap:8px;}
+.search-inp{flex:1;padding:9px 12px;border-radius:10px;border:1.5px solid #fed7aa;font-size:13px;font-family:Georgia,serif;outline:none;color:#292524;background:white;}
+.btn-plus{padding:9px 16px;border-radius:10px;background:#d97706;color:white;border:none;font-weight:800;font-size:15px;}
+.search-hint{font-size:11px;color:#a8a29e;margin-top:6px;}
+.sugg-lbl{font-size:11px;font-weight:700;color:#78716c;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.sugg-btn{text-align:left;padding:11px 14px;border-radius:12px;border:1.5px solid #f0ebe3;background:#faf9f6;color:#292524;font-size:13px;font-weight:600;font-family:Georgia,serif;transition:all .15s;width:100%;margin-bottom:6px;}
+.sugg-btn.on{border-color:#d97706;background:#fffbeb;color:#b45309;}
+.btn-remove{padding:10px 14px;border-radius:12px;border:1.5px dashed #fca5a5;background:white;color:#ef4444;font-size:13px;font-weight:600;}
+.btn-close-sm{background:none;border:none;color:#a8a29e;font-size:13px;padding-top:4px;}
+.fmt-guide{background:#fffbeb;border-radius:14px;padding:12px;border:1px solid #fde68a;}
+.fmt-lbl{font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.fmt-pre{font-size:11px;color:#92400e;line-height:1.7;font-family:monospace;white-space:pre-wrap;}
+.btn-file{width:100%;padding:10px 14px;border-radius:12px;border:1.5px dashed #d6d3d1;background:#faf9f6;color:#78716c;font-size:13px;font-weight:700;}
+.divider{font-size:11px;color:#a8a29e;text-align:center;margin:4px 0;}
+.upload-ta{width:100%;height:160px;padding:10px 12px;border-radius:12px;border:1.5px solid #e7e0d6;font-size:12px;font-family:monospace;resize:vertical;outline:none;color:#292524;line-height:1.6;}
+.err-txt{font-size:12px;color:#ef4444;font-weight:600;}
+.preview-box{background:#f0fdf4;border-radius:14px;padding:12px;border:1px solid #bbf7d0;}
+.preview-lbl{font-size:11px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.preview-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #dcfce7;}
+.preview-name{font-size:13px;font-weight:700;color:#292524;}
+.preview-meta{font-size:11px;color:#78716c;}
+.btn-row{display:flex;gap:8px;}
+.btn-primary{flex:1;padding:12px;border-radius:12px;border:none;background:#d97706;color:white;font-size:14px;font-weight:800;}
+.btn-primary:disabled{background:#e7e0d6;cursor:default;}
+.btn-secondary{padding:12px 16px;border-radius:12px;border:1.5px solid #e7e0d6;background:white;color:#78716c;font-size:13px;font-weight:700;}
+.hist-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.hist-title{font-size:20px;font-weight:800;color:#292524;}
+.btn-x{background:none;border:none;font-size:22px;color:#78716c;line-height:1;}
+.hist-week{border-radius:16px;border:1.5px solid #f0ebe3;overflow:hidden;margin-bottom:10px;transition:border-color .2s;}
+.hist-week.open{border-color:#d97706;}
+.hist-wk-hdr{padding:14px 18px;cursor:pointer;background:white;display:flex;justify-content:space-between;align-items:center;}
+.hist-week.open .hist-wk-hdr{background:#fffbeb;}
+.hist-wk-lbl{font-weight:800;font-size:14px;color:#292524;}
+.hist-wk-body{padding:4px 18px 18px;border-top:1px solid #f0ebe3;background:#fffcf8;}
+.hist-day-lbl{font-size:11px;font-weight:800;color:#78716c;text-transform:uppercase;letter-spacing:1px;margin:14px 0 6px;}
+.hist-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.hist-tag{font-size:12px;padding:4px 10px;border-radius:99px;font-weight:700;}
+@media(max-width:480px){.modal,.modal.wide{width:calc(100vw - 32px);}}
 </style>
 </head>
 <body>
+<div id="app"></div>
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const MEAL_TYPES=["breakfast","lunch","dinner","snacks"];
+const MEAL_IDEAS={
+  breakfast:["Overnight Oats","Scrambled Eggs & Toast","Pancakes","Yogurt Parfait","Breakfast Burritos","Smoothie Bowls","French Toast"],
+  lunch:["Turkey Wraps","Mac & Cheese","Grilled Cheese + Soup","Quesadillas","PB&J + Fruit","Pasta Salad","Rice Bowls"],
+  dinner:["Spaghetti & Meatballs","Sheet Pan Chicken","Taco Night","Slow Cooker Chili","Stir Fry","Baked Ziti","BBQ Chicken"],
+  snacks:["Apple Slices + PB","Cheese & Crackers","Veggies + Hummus","Trail Mix","Fruit Cups","Popcorn","Yogurt Tubes"]
+};
+const PREP_TASKS={
+  "Overnight Oats":["Measure oats","Add milk & yogurt","Portion into jars","Refrigerate"],
+  "Pancakes":["Mix dry ingredients","Prep wet ingredients","Cook & stack","Freeze extras"],
+  "Sheet Pan Chicken":["Marinate chicken","Chop vegetables","Line pans","Season & arrange"],
+  "Slow Cooker Chili":["Brown meat","Drain beans","Chop onion & peppers","Load slow cooker"],
+  "Baked Ziti":["Cook pasta al dente","Make sauce","Layer in dish","Cover & refrigerate"],
+  "Pasta Salad":["Cook pasta","Chop veggies","Mix dressing","Combine & chill"]
+};
+const DEFAULT_TASKS=["Gather ingredients","Prep & chop","Cook/assemble","Portion & store"];
+const BUDGET_TIPS=[
+  "Buy proteins in bulk & freeze in meal-size portions",
+  "Shop store-brand staples: pasta, rice, canned goods",
+  "Plan around weekly sales & seasonal produce",
+  "Prep double batches — freeze half for next week",
+  "Use leftover proteins across multiple meals",
+  "Eggs are your best friend: cheap, fast, versatile"
+];
+const GROCERY_MAP={
+  "Overnight Oats":["Rolled oats","Milk","Greek yogurt","Honey","Berries"],
+  "Scrambled Eggs & Toast":["Eggs (x2 dozen)","Bread","Butter"],
+  "Pancakes":["Pancake mix","Eggs","Milk","Syrup"],
+  "Spaghetti & Meatballs":["Spaghetti (2 lbs)","Ground beef","Marinara sauce","Parmesan"],
+  "Sheet Pan Chicken":["Chicken thighs (3 lbs)","Potatoes","Broccoli","Olive oil","Garlic"],
+  "Taco Night":["Ground beef","Taco shells","Cheese","Lettuce","Salsa","Sour cream"],
+  "Slow Cooker Chili":["Ground beef","Kidney beans","Diced tomatoes","Onion","Bell pepper","Chili powder"],
+  "Baked Ziti":["Ziti pasta","Ricotta","Mozzarella","Marinara sauce"],
+  "Quesadillas":["Flour tortillas","Cheddar cheese","Chicken (cooked)"],
+  "Turkey Wraps":["Flour tortillas","Deli turkey","Lettuce","Tomato","Mayo"],
+  "Mac & Cheese":["Elbow pasta","Cheddar cheese","Milk","Butter"],
+  "Grilled Cheese + Soup":["Bread","American cheese","Butter","Canned tomato soup"],
+  "Apple Slices + PB":["Apples (bag)","Peanut butter"],
+  "Cheese & Crackers":["Crackers","Cheese block"],
+  "Veggies + Hummus":["Baby carrots","Celery","Cucumber","Hummus (large)"]
+};
+const TC={breakfast:{bg:"#fef3c7",text:"#b45309"},lunch:{bg:"#e0f2fe",text:"#0369a1"},dinner:{bg:"#ffe4e6",text:"#be123c"},snacks:{bg:"#dcfce7",text:"#15803d"}};
+const RECIPES={
+  "Overnight Oats":{tag:"breakfast",time:"5 min + overnight",servings:5,steps:["Measure ½ cup rolled oats per jar (5 jars total).","Add ½ cup milk and ¼ cup Greek yogurt to each jar.","Stir in 1 tsp honey and a pinch of salt.","Seal jars and refrigerate overnight (at least 6 hours).","In the morning, top with fresh berries and serve cold."]},
+  "Scrambled Eggs & Toast":{tag:"breakfast",time:"10 min",servings:5,steps:["Crack 2 eggs per person into a bowl, season with salt & pepper, and whisk until combined.","Melt ½ tbsp butter in a non-stick skillet over medium-low heat.","Pour in eggs and let sit 10 seconds, then gently fold with a spatula every few seconds.","Remove from heat just before fully set — residual heat finishes them.","While eggs cook, toast bread and spread with butter. Plate together and serve immediately."]},
+  "Pancakes":{tag:"breakfast",time:"25 min",servings:5,steps:["Combine 2 cups pancake mix, 1½ cups milk, and 2 eggs in a large bowl. Stir until just combined — lumps are okay.","Heat a griddle or non-stick pan over medium heat; lightly butter the surface.","Pour ¼ cup batter per pancake. Cook until bubbles form on the surface and edges look set, about 2–3 min.","Flip and cook another 1–2 min until golden. Repeat with remaining batter.","Stack cooled extras between sheets of parchment, place in a zip bag, and freeze for quick weekday breakfasts."]},
+  "Yogurt Parfait":{tag:"breakfast",time:"5 min",servings:5,steps:["Spoon ½ cup Greek yogurt into the bottom of each cup or jar.","Add a layer of granola (about 3 tbsp per cup) on top of the yogurt.","Layer fresh or thawed berries over the granola.","Repeat yogurt and granola layers if the container is tall enough.","Drizzle with honey and serve immediately, or refrigerate (un-topped) for up to 2 days."]},
+  "Breakfast Burritos":{tag:"breakfast",time:"20 min",servings:5,steps:["Scramble 10 eggs in a large skillet with salt, pepper, and a splash of milk. Set aside.","Cook ½ lb breakfast sausage or bacon in the same pan; crumble and drain excess fat.","Warm flour tortillas one at a time in a dry skillet for 20 seconds per side.","Layer eggs, meat, shredded cheese, and salsa down the center of each tortilla.","Fold sides in, then roll tightly. Wrap individually in foil and refrigerate or freeze.","Reheat from frozen: unwrap foil, microwave 2–3 min, flipping halfway through."]},
+  "Smoothie Bowls":{tag:"breakfast",time:"10 min",servings:5,steps:["Blend 2 cups frozen berries, 1 frozen banana, and ½ cup Greek yogurt until thick and smooth — use minimal liquid.","Pour into bowls; the consistency should be thick enough to hold toppings.","Top with granola, fresh fruit slices, coconut flakes, and a drizzle of honey.","Serve immediately — smoothie bowls melt quickly!"]},
+  "French Toast":{tag:"breakfast",time:"20 min",servings:5,steps:["Whisk together 4 eggs, ½ cup milk, 1 tsp vanilla, 1 tsp cinnamon, and a pinch of salt in a shallow dish.","Melt 1 tbsp butter in a large skillet over medium heat.","Dip bread slices in the egg mixture, letting each side soak for 10–15 seconds.","Cook in batches, 2–3 min per side, until golden brown. Add more butter between batches.","Serve with maple syrup and powdered sugar, or freeze extras for quick reheating."]},
+  "Turkey Wraps":{tag:"lunch",time:"10 min",servings:5,steps:["Lay a large flour tortilla flat on a cutting board.","Spread a thin layer of mayo across the center.","Layer 3–4 slices deli turkey, a handful of lettuce, and 2–3 tomato slices.","Season with salt, pepper, and any other desired condiments.","Fold the sides in and roll tightly from the bottom. Slice diagonally and serve, or wrap in parchment for packing."]},
+  "Mac & Cheese":{tag:"lunch",time:"20 min",servings:5,steps:["Bring a large pot of salted water to a boil. Add elbow pasta and cook per package directions until al dente.","Drain pasta, reserving ¼ cup pasta water, and return to the pot over low heat.","Add 2 tbsp butter and stir until melted.","Pour in ½ cup milk and 2 cups shredded cheddar. Stir continuously until smooth and creamy.","If sauce is too thick, add reserved pasta water a splash at a time. Season with salt & pepper and serve."]},
+  "Grilled Cheese + Soup":{tag:"lunch",time:"15 min",servings:5,steps:["Butter one side of each bread slice generously.","Heat a skillet over medium heat. Place bread butter-side down, add 2 slices of cheese, and top with second slice butter-side up.","Cook 3–4 min until golden brown, then flip carefully. Cook another 2–3 min until the other side is golden and cheese is melted.","While sandwiches cook, heat canned tomato soup per label instructions. Add a splash of milk for creaminess.","Serve sandwich alongside a bowl of soup. Cut diagonally for dipping!"]},
+  "Quesadillas":{tag:"lunch",time:"15 min",servings:5,steps:["Shred or dice pre-cooked chicken into small pieces.","Sprinkle a generous layer of shredded cheddar on one half of a flour tortilla.","Add chicken on top of the cheese, then fold the tortilla in half.","Heat a dry skillet over medium heat. Cook quesadilla 2–3 min per side until golden and crispy.","Slice into wedges and serve with salsa and sour cream."]},
+  "PB&J + Fruit":{tag:"lunch",time:"5 min",servings:5,steps:["Spread a generous layer of peanut butter on one slice of bread.","Spread your favorite jam or jelly on the second slice.","Press slices together and cut in half (diagonal or straight — you know your kids!).","Wash and slice fruit — apples, grapes, or strawberries all work great.","Pack in a container with a small ice pack to keep fresh."]},
+  "Pasta Salad":{tag:"lunch",time:"25 min + chill",servings:5,steps:["Cook 1 lb pasta (rotini or penne work best) in salted water per package. Drain and rinse under cold water to stop cooking.","Chop 1 bell pepper, 1 cucumber, ½ red onion, and halve 1 cup cherry tomatoes.","In a large bowl, whisk together ¼ cup olive oil, 3 tbsp red wine vinegar, 1 tsp Italian seasoning, salt and pepper.","Combine cooled pasta and veggies in the bowl; toss well to coat in dressing.","Refrigerate at least 1 hour before serving. Keeps well for 4–5 days — great for batch prep!"]},
+  "Rice Bowls":{tag:"lunch",time:"30 min",servings:5,steps:["Cook 3 cups dry rice per package directions (makes ~6 cups cooked). Season with salt and a drizzle of sesame oil if desired.","Prepare your protein: bake or pan-cook chicken, or use canned beans for a quick option.","Roast or sauté vegetables — broccoli, carrots, and snap peas all work well at 400°F for 20 min.","Portion rice into bowls or meal prep containers.","Top with protein and veggies. Add soy sauce, teriyaki, or any sauce on the side to keep things fresh."]},
+  "Spaghetti & Meatballs":{tag:"dinner",time:"45 min",servings:5,steps:["Mix 1½ lbs ground beef with ½ cup breadcrumbs, 1 egg, 2 minced garlic cloves, salt, pepper, and Italian seasoning. Roll into golf ball–sized meatballs.","Brown meatballs in a large skillet with olive oil over medium-high heat, about 2 min per side. They don't need to be fully cooked through.","Pour 2 jars marinara sauce into a large pot over medium heat. Nestle meatballs in the sauce, cover, and simmer 20–25 min.","Meanwhile, bring a large pot of salted water to a boil. Cook spaghetti per package directions until al dente.","Drain pasta and serve topped with meatballs and sauce. Finish with grated Parmesan."]},
+  "Sheet Pan Chicken":{tag:"dinner",time:"50 min",servings:5,steps:["Preheat oven to 425°F. Line two large sheet pans with foil and spray with cooking spray.","In a large bowl, toss 3 lbs chicken thighs with olive oil, garlic powder, paprika, salt, and pepper.","Cube potatoes and cut broccoli into florets. Toss veggies separately with olive oil, salt, and pepper.","Arrange chicken on one pan and vegetables on the second. Don't crowd the pans — space = crispiness.","Roast 35–40 min, flipping chicken halfway, until chicken reaches 165°F and veggies are caramelized."]},
+  "Taco Night":{tag:"dinner",time:"25 min",servings:5,steps:["Brown 1½ lbs ground beef in a large skillet over medium-high heat, breaking it apart as it cooks. Drain excess fat.","Add 1 packet taco seasoning and ⅔ cup water. Stir and simmer 3–5 min until sauce thickens.","Set up a taco bar: warm shells in the oven at 350°F for 5 min, and set out toppings — cheese, lettuce, salsa, sour cream, diced tomato.","Let everyone build their own tacos!","Leftover taco meat keeps 4 days refrigerated — great for nachos or taco salads later in the week."]},
+  "Slow Cooker Chili":{tag:"dinner",time:"20 min prep + 6–8 hrs",servings:5,steps:["Brown 1½ lbs ground beef in a skillet. Drain fat and transfer to slow cooker.","Drain and rinse 2 cans kidney beans; add to slow cooker.","Add 2 cans diced tomatoes (with liquid), 1 diced onion, 1 diced bell pepper, and 1 cup beef broth.","Season with 2 tbsp chili powder, 1 tsp cumin, 1 tsp garlic powder, salt, and pepper. Stir everything together.","Cover and cook on LOW 6–8 hours or HIGH 3–4 hours. Taste and adjust seasoning before serving.","Serve with shredded cheese, sour cream, and cornbread. Freezes beautifully for up to 3 months!"]},
+  "Stir Fry":{tag:"dinner",time:"20 min",servings:5,steps:["Cook 2 cups dry rice or noodles per package directions. Keep warm.","Slice chicken, beef, or tofu into thin strips. Season with salt and pepper.","Heat 2 tbsp oil in a wok or large skillet over high heat until shimmering.","Add protein and cook 3–4 min without moving too much, until browned. Remove and set aside.","Add veggies (broccoli, snap peas, carrots, bell pepper) to the same pan. Stir-fry 3–4 min until tender-crisp.","Return protein to pan, pour in ¼ cup stir-fry sauce, and toss to coat. Serve over rice or noodles."]},
+  "Baked Ziti":{tag:"dinner",time:"55 min",servings:5,steps:["Preheat oven to 375°F. Cook 1 lb ziti 2 min less than package directions (it finishes in the oven). Drain.","Mix pasta with 1 jar marinara sauce, 1 cup ricotta, half the mozzarella, salt, and pepper.","Transfer to a greased 9×13 baking dish. Top with remaining mozzarella and a drizzle of olive oil.","Cover with foil and bake 25 min. Remove foil and bake another 10–15 min until bubbly and golden.","Let rest 5–10 min before serving. Cover and refrigerate leftovers up to 4 days."]},
+  "BBQ Chicken":{tag:"dinner",time:"40 min",servings:5,steps:["Preheat oven to 400°F or heat grill to medium-high.","Pat chicken pieces dry and season both sides with salt, pepper, and garlic powder.","Brush a generous layer of BBQ sauce on each piece.","Bake on a foil-lined sheet pan 30–35 min (or grill 6–8 min per side), brushing with more sauce halfway through.","Chicken is done when it reaches 165°F internally. Let rest 5 min before serving.","Serve with corn on the cob, coleslaw, or baked beans for a complete meal."]},
+  "Apple Slices + PB":{tag:"snacks",time:"5 min",servings:5,steps:["Wash apples thoroughly under running water.","Core and slice apples into wedges (a slicer tool makes this fast for a big family!).","To prevent browning, toss slices in a bowl with a squeeze of lemon juice.","Portion into snack containers with 2–3 tbsp peanut butter per container.","Refrigerate and consume within 2 days for best freshness."]},
+  "Cheese & Crackers":{tag:"snacks",time:"5 min",servings:5,steps:["Slice a cheese block into bite-sized cubes or thin slices — about 1 oz per person.","Portion crackers (about 10–12 per serving) into snack bags or small containers.","Pack cheese and crackers separately to keep crackers crisp.","Optional add-ins: grapes, deli meat slices, or a small pickle on the side.","Refrigerate cheese portions; crackers can stay at room temperature."]},
+  "Veggies + Hummus":{tag:"snacks",time:"10 min",servings:5,steps:["Wash and dry all vegetables thoroughly.","Peel and cut carrots into sticks; slice celery into 3-inch pieces; cut cucumber into rounds or spears.","Portion veggies into individual containers or a large serving platter.","Scoop 3–4 tbsp hummus per person into small cups or directly into the container.","Keep refrigerated. Prepped veggies stay crisp for 4–5 days when stored in an airtight container with a damp paper towel."]},
+  "Trail Mix":{tag:"snacks",time:"5 min",servings:5,steps:["In a large bowl, combine 2 cups nuts (peanuts, almonds, or cashews), 1 cup pretzels or cereal, 1 cup dried fruit (raisins, cranberries), and ½ cup chocolate chips.","Stir well to distribute ingredients evenly.","Portion into snack-sized zip bags or small containers — about ¼ cup per serving for kids.","Store at room temperature for up to 2 weeks."]},
+  "Fruit Cups":{tag:"snacks",time:"10 min",servings:5,steps:["Wash all fruit thoroughly.","Cut melon into cubes, halve grapes, quarter strawberries, and slice any larger fruit into bite-sized pieces.","Toss with a squeeze of lime juice to keep fruit bright and add a subtle flavor boost.","Portion into small cups or containers with lids.","Refrigerate and consume within 3 days. Add a small fork or toothpick for easy eating."]},
+  "Popcorn":{tag:"snacks",time:"10 min",servings:5,steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
+  "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
+};
 
-<!-- Header -->
-<div class="header">
-  <div class="header-inner">
-    <div class="header-top">
-      <div>
-        <p class="header-subtitle">Family of 5 · Weekly System</p>
-        <h1 class="header-title">Mama's Meal Prep Planner</h1>
-      </div>
-      <button class="btn-history" onclick="openHistory()">📚 History</button>
+// ── STORAGE ───────────────────────────────────────────────────────────────
+function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+// ── WEEK HELPERS ──────────────────────────────────────────────────────────
+function getMonday(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-((n.getDay()+6)%7)+off*7);m.setHours(0,0,0,0);return m;}
+function weekKey(off){return getMonday(off).toISOString().slice(0,10);}
+function weekLabel(off){const m=getMonday(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
+function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week";if(off===-1)return"Last Week";return"Week of "+weekLabel(off).split("–")[0].trim();}
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+const S={
+  tab:          lsGet("s_tab","planner"),
+  weekOffset:   lsGet("s_weekOffset",0),
+  meals:{},
+  customMeals:  lsGet("customMeals",{breakfast:[],lunch:[],dinner:[],snacks:[]}),
+  uploadedRecipes: lsGet("uploadedRecipes",{}),
+  picker:null, pickerInput:"",
+  showHistory:false, historyOpen:{},
+  showUpload:false, uploadText:"", uploadPreview:null, uploadError:"",
+  recipeOpen:   lsGet("s_recipeOpen",{}),
+  recipeFilter: lsGet("s_recipeFilter","all"),
+  prepChecked:  lsGet("s_prepChecked",{}),
+  groceryChecked: lsGet("s_groceryChecked",{})
+};
+function loadMeals(){S.meals=lsGet("week:"+weekKey(S.weekOffset),{});}
+function saveMeals(){lsSet("week:"+weekKey(S.weekOffset),S.meals);}
+function saveUIState(){
+  lsSet("s_tab",S.tab);
+  lsSet("s_weekOffset",S.weekOffset);
+  lsSet("s_recipeFilter",S.recipeFilter);
+  lsSet("s_recipeOpen",S.recipeOpen);
+  lsSet("s_prepChecked",S.prepChecked);
+  lsSet("s_groceryChecked",S.groceryChecked);
+}
+loadMeals();
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render(){saveUIState();document.getElementById("app").innerHTML=buildApp();bind();}
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function buildApp(){
+  const total=DAYS.length*4;
+  const planned=Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean).length;
+  return`<div class="hdr"><div class="hdr-inner">
+    <div class="hdr-top">
+      <div><div class="hdr-eyebrow">Family of 5 · Weekly System</div><div class="hdr-title">Mama's Meal Prep Planner</div></div>
+      <button class="btn-hist" id="btnHist">📚 History</button>
     </div>
     <div class="week-nav">
-      <button class="btn-week" onclick="changeWeek(-1)">‹</button>
-      <div class="week-label-box">
-        <p class="week-label-main" id="weekLabel">This Week</p>
-        <p class="week-label-sub" id="weekRange"></p>
+      <button class="btn-wk" id="btnPrev">‹</button>
+      <div class="wk-lbl"><div class="wk-main">${weekTitle(S.weekOffset)}</div><div class="wk-sub">${weekLabel(S.weekOffset)}</div></div>
+      <button class="btn-wk" id="btnNext">›</button>
+    </div>
+    <div class="prog-row">
+      <div class="prog-bg"><div class="prog-fill" style="width:${Math.round(planned/total*100)}%"></div></div>
+      <span class="prog-txt">${planned}/${total} meals</span>
+    </div>
+  </div></div>
+  <div class="tabs"><div class="tabs-inner">
+    ${[["planner","🗓 Meal Plan"],["prep","✅ Prep Tasks"],["grocery","🛒 Grocery"],["recipes","📖 Recipes"]].map(([id,lbl])=>`<button class="tab${S.tab===id?" on":""}" data-tab="${id}">${lbl}</button>`).join("")}
+  </div></div>
+  <div class="content">
+    ${S.tab==="planner"?buildPlanner():""}
+    ${S.tab==="prep"?buildPrep():""}
+    ${S.tab==="grocery"?buildGrocery():""}
+    ${S.tab==="recipes"?buildRecipes():""}
+  </div>
+  ${S.picker?buildPicker():""}
+  ${S.showHistory?buildHistory():""}
+  ${S.showUpload?buildUpload():""}`;
+}
+
+// ── PLANNER ───────────────────────────────────────────────────────────────
+function buildPlanner(){
+  return`<p class="hint">Tap any cell to pick a meal. Everything saves automatically. ✨</p>`+
+  DAYS.map(day=>{
+    const dm=S.meals[day]||{};
+    return`<div class="day-card"><div class="day-name">${day}</div><div class="meal-grid">`+
+    MEAL_TYPES.map(mt=>{
+      const meal=dm[mt]||"";const c=TC[mt];
+      return`<div class="meal-cell${meal?" filled":""}" data-day="${day}" data-mt="${mt}" style="border-color:${meal?c.bg:"#e7e0d6"}">
+        <span class="mt-tag" style="background:${c.bg};color:${c.text}">${mt}</span>
+        ${meal?`<span class="meal-val">${esc(meal)}</span>`:`<span class="meal-ph">+ Add</span>`}
+      </div>`;
+    }).join("")+`</div></div>`;
+  }).join("");
+}
+
+// ── PREP ──────────────────────────────────────────────────────────────────
+function buildPrep(){
+  const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
+  if(!meals.length)return`<div class="empty"><div class="empty-icon">📋</div><p class="empty-txt">Add meals to your plan to generate a prep checklist.</p></div>`;
+  return`<div class="tip-banner">⏱ Pro tip: Do all your prep on Sunday! Batch similar tasks to save hours.</div>`+
+  meals.map(meal=>{
+    const tasks=PREP_TASKS[meal]||DEFAULT_TASKS;
+    return`<div class="prep-card"><div class="prep-title">${esc(meal)}</div>`+
+    tasks.map((t,i)=>{const k=meal+"-"+i;const on=!!S.prepChecked[k];
+      return`<div class="chk-row" data-pk="${esc(k)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="chk-lbl${on?" on":""}">${esc(t)}</span></div>`;
+    }).join("")+`</div>`;
+  }).join("");
+}
+
+// ── GROCERY ───────────────────────────────────────────────────────────────
+function buildGrocery(){
+  const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
+  const items=[...new Set(meals.flatMap(m=>GROCERY_MAP[m]||["Ingredients for "+m]))];
+  if(!items.length)return`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">Add meals to your plan to generate a grocery list.</p></div>`;
+  const rem=items.filter(i=>!S.groceryChecked[i]).length;
+  const tip=BUDGET_TIPS[Math.floor(Math.random()*BUDGET_TIPS.length)];
+  return`<div class="groc-hdr"><span class="groc-cnt">${rem} of ${items.length} items remaining</span><button class="btn-rst" id="btnResetGroc">Reset</button></div>`+
+  items.map(item=>{const on=!!S.groceryChecked[item];
+    return`<div class="groc-item${on?" on":""}" data-gi="${esc(item)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="groc-lbl${on?" on":""}">${esc(item)}</span></div>`;
+  }).join("")+
+  `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`;
+}
+
+// ── RECIPES ───────────────────────────────────────────────────────────────
+function buildRecipes(){
+  const all=Object.assign({},RECIPES,S.uploadedRecipes);
+  const upCount=Object.keys(S.uploadedRecipes).length;
+  const cats=[{id:"all",lbl:"All"},{id:"breakfast",lbl:"🌅 Breakfast"},{id:"lunch",lbl:"☀️ Lunch"},{id:"dinner",lbl:"🍽 Dinner"},{id:"snacks",lbl:"🍎 Snacks"}];
+  const entries=Object.entries(all).filter(([,r])=>S.recipeFilter==="all"||r.tag===S.recipeFilter);
+  return`<div class="pills">
+    ${cats.map(c=>`<button class="pill${S.recipeFilter===c.id?" on":""}" data-rf="${c.id}">${c.lbl}</button>`).join("")}
+    <button class="pill-upload" id="btnShowUpload">📤 Upload</button>
+  </div>
+  <div class="rec-count-row">
+    <span class="rec-count-txt">${entries.length} recipe${entries.length!==1?"s":""}. Tap to expand steps.</span>
+    ${upCount?`<span class="rec-up-badge">📤 ${upCount} uploaded</span>`:""}
+  </div>`+
+  (entries.length===0?`<div class="empty"><div class="empty-icon">📖</div><p class="empty-txt">No recipes in this category.</p></div>`:"")+
+  entries.map(([name,recipe])=>{
+    const isOpen=!!S.recipeOpen[name];const isUp=!!S.uploadedRecipes[name];const c=TC[recipe.tag]||TC.dinner;
+    return`<div class="rec-card${isOpen?" open":""}">
+      <div class="rec-hdr" data-rn="${esc(name)}">
+        <div class="rec-arrow">▶</div>
+        <div class="rec-info">
+          <div class="rec-name-row"><span class="rec-name">${esc(name)}</span>${isUp?`<span class="up-badge">Uploaded</span>`:""}</div>
+          <div class="rec-meta">
+            <span class="cat-tag" style="background:${c.bg};color:${c.text}">${recipe.tag}</span>
+            <span class="rec-meta-txt">⏱ ${esc(recipe.time)}</span>
+            <span class="rec-meta-txt">👨‍👩‍👧‍👦 Serves ${recipe.servings}</span>
+          </div>
+        </div>
+        ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
       </div>
-      <button class="btn-week" onclick="changeWeek(1)">›</button>
-    </div>
-    <div class="progress-row">
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      ${isOpen?`<div class="rec-steps"><div class="steps-list">`+
+        recipe.steps.map((s,i)=>`<div class="step-row"><div class="step-num">${i+1}</div><div class="step-txt">${esc(s)}</div></div>`).join("")+
+      `</div></div>`:""}
+    </div>`;
+  }).join("");
+}
+
+// ── PICKER MODAL ──────────────────────────────────────────────────────────
+function buildPicker(){
+  const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
+  const custom=S.customMeals[mealType]||[];
+  const all=[...new Set([...MEAL_IDEAS[mealType],...custom])];
+  const sugg=inp.trim()?all.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):all;
+  return`<div class="overlay" id="pickerOv">
+    <div class="modal" id="pickerBox">
+      <div><div class="picker-eyebrow">${esc(day)}</div><div class="picker-title">${esc(mealType)}</div></div>
+      <div class="search-box">
+        <div class="search-lbl">Type anything or search</div>
+        <div class="search-row">
+          <input class="search-inp" id="pickerInp" value="${esc(inp)}" placeholder="e.g. Chicken Alfredo..."/>
+          <button class="btn-plus" id="btnPickAdd">+</button>
+        </div>
+        <div class="search-hint">Press Enter or + to add your own meal.</div>
       </div>
-      <span class="progress-label" id="progressLabel">0/28 meals</span>
-      <span class="saving-indicator" id="savingIndicator" style="display:none">💾 saving…</span>
-    </div>
-  </div>
-</div>
-
-<!-- Tabs -->
-<div class="tabs-bar">
-  <div class="tabs-inner">
-    <button class="tab-btn active" onclick="switchTab('planner', this)">🗓 Meal Plan</button>
-    <button class="tab-btn" onclick="switchTab('prep', this)">✅ Prep Tasks</button>
-    <button class="tab-btn" onclick="switchTab('grocery', this)">🛒 Grocery</button>
-    <button class="tab-btn" onclick="switchTab('recipes', this)">📖 Recipes</button>
-  </div>
-</div>
-
-<!-- Content -->
-<div class="content">
-  <!-- Planner Tab -->
-  <div id="tab-planner" class="tab-panel active">
-    <p class="planner-hint">Tap any cell to pick from suggestions or type your own meal. Everything saves automatically. ✨</p>
-    <div class="planner-grid" id="plannerGrid"></div>
-  </div>
-
-  <!-- Prep Tab -->
-  <div id="tab-prep" class="tab-panel">
-    <div class="prep-tip">⏱ Pro tip: Do all your prep on Sunday! Batch similar tasks to save hours.</div>
-    <div id="prepChecklist"></div>
-  </div>
-
-  <!-- Grocery Tab -->
-  <div id="tab-grocery" class="tab-panel">
-    <div id="groceryList"></div>
-  </div>
-
-  <!-- Recipes Tab -->
-  <div id="tab-recipes" class="tab-panel">
-    <div class="filter-pills" id="recipePills"></div>
-    <div class="recipes-meta">
-      <span class="recipes-count" id="recipesCount"></span>
-      <span class="uploaded-badge" id="uploadedBadge" style="display:none"></span>
-    </div>
-    <div id="recipesList"></div>
-  </div>
-</div>
-
-<!-- Meal Picker Modal -->
-<div id="pickerModal" class="modal-overlay" style="display:none" onclick="closePicker()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div>
-      <p class="modal-day" id="pickerDay"></p>
-      <h3 class="modal-meal-type" id="pickerMealType"></h3>
-    </div>
-    <div class="modal-search-box">
-      <p class="modal-search-label">Type anything or search</p>
-      <div class="modal-search-row">
-        <input id="pickerInput" class="modal-input" placeholder="e.g. Chicken Alfredo..." onkeydown="if(event.key==='Enter')addCustomAndSelect()" oninput="filterSuggestions()">
-        <button class="btn-add-meal" onclick="addCustomAndSelect()">+</button>
+      <div>
+        <div class="sugg-lbl">${inp?"Matching meals":"All suggestions"}</div>
+        ${sugg.length===0?`<p style="font-size:12px;color:#a8a29e">No matches — hit + to add "${esc(inp)}"</p>`:""}
+        ${sugg.map(o=>`<button class="sugg-btn${currentMeal===o?" on":""}" data-pick="${esc(o)}">${currentMeal===o?"✓ ":""}${esc(o)}</button>`).join("")}
       </div>
-      <p class="modal-search-hint">Press Enter or + to add your own. It'll be saved to your list.</p>
+      ${currentMeal?`<button class="btn-remove" id="btnPickRm">🗑 Remove current meal</button>`:""}
+      <button class="btn-close-sm" id="btnPickClose">Close</button>
     </div>
-    <div>
-      <p class="modal-suggestions-label" id="suggestionsLabel">All suggestions</p>
-      <div class="suggestions-list" id="suggestionsList"></div>
-    </div>
-    <button id="btnRemoveMeal" class="btn-remove-meal" onclick="removeMeal()" style="display:none">🗑 Remove current meal</button>
-    <button class="btn-modal-close" onclick="closePicker()">Close</button>
-  </div>
-</div>
+  </div>`;
+}
 
-<!-- History Panel -->
-<div id="historyPanel" class="history-overlay" style="display:none" onclick="closeHistory()">
-  <div class="history-box" onclick="event.stopPropagation()">
-    <div class="history-header">
-      <h3 class="history-title">📚 Saved Weeks</h3>
-      <button class="btn-close-history" onclick="closeHistory()">×</button>
+// ── HISTORY SHEET ─────────────────────────────────────────────────────────
+function buildHistory(){
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("week:"))keys.push(k);}
+  keys.sort().reverse();
+  return`<div class="overlay bottom" id="histOv">
+    <div class="modal sheet">
+      <div class="hist-top"><div class="hist-title">📚 Saved Weeks</div><button class="btn-x" id="btnHistClose">×</button></div>
+      ${keys.length===0?`<p style="color:#a8a29e;font-size:13px">No saved weeks yet. Start planning!</p>`:""}
+      ${keys.map(k=>{
+        const dateKey=k.replace("week:","");const isOpen=!!S.historyOpen[k];
+        const mon=new Date(dateKey+"T12:00:00");const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+        const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+        const weekMeals=lsGet(k,{});
+        return`<div class="hist-week${isOpen?" open":""}">
+          <div class="hist-wk-hdr" data-hk="${k}"><span class="hist-wk-lbl">${f(mon)} – ${f(sun)}</span><span>${isOpen?"▲":"▼"}</span></div>
+          ${isOpen?`<div class="hist-wk-body">`+
+            DAYS.map(day=>{
+              const dm=weekMeals[day]||{};const entries=MEAL_TYPES.map(mt=>({mt,val:dm[mt]})).filter(x=>x.val);
+              if(!entries.length)return"";
+              return`<div class="hist-day-lbl">${day}</div><div class="hist-tags">`+
+                entries.map(({mt,val})=>{const c=TC[mt];return`<span class="hist-tag" style="background:${c.bg};color:${c.text}">${esc(val)}</span>`;}).join("")+
+              `</div>`;
+            }).join("")+`</div>`:""}
+        </div>`;
+      }).join("")}
     </div>
-    <div id="historyContent"></div>
-  </div>
-</div>
+  </div>`;
+}
 
-<!-- Upload Modal -->
-<div id="uploadModal" class="modal-overlay" style="display:none" onclick="closeUpload()">
-  <div class="upload-box" onclick="event.stopPropagation()">
-    <div>
-      <h3 class="upload-title">📤 Upload Recipes</h3>
-      <p class="upload-subtitle">Paste your recipes below, or upload a <strong>.txt</strong> file exported from Google Docs.</p>
-    </div>
-    <div class="format-guide">
-      <p class="format-guide-label">Format guide</p>
-      <pre>Chicken Alfredo
+// ── UPLOAD MODAL ──────────────────────────────────────────────────────────
+function buildUpload(){
+  const prev=S.uploadPreview;
+  return`<div class="overlay" id="uploadOv">
+    <div class="modal wide">
+      <div><div style="font-size:20px;font-weight:800;color:#292524;margin-bottom:4px">📤 Upload Recipes</div>
+      <div style="font-size:12px;color:#78716c">Paste your recipes below, or upload a <strong>.txt</strong> file exported from Google Docs.</div></div>
+      <div class="fmt-guide"><div class="fmt-lbl">Format guide</div>
+      <pre class="fmt-pre">Chicken Alfredo
 Time: 35 min
 Serves: 5
 Category: dinner
@@ -299,648 +446,146 @@ Time: 40 min
 Category: breakfast
 1. Mash bananas
 2. Mix batter
-3. Bake at 375°F</pre>
+3. Bake at 375°F</pre></div>
+      <div>
+        <input type="file" id="fileInp" accept=".txt,.text" style="display:none"/>
+        <button class="btn-file" id="btnChooseFile">📁 Choose .txt file from your computer</button>
+        <div class="divider">— or paste text directly below —</div>
+      </div>
+      <textarea class="upload-ta" id="uploadTA" placeholder="Paste your recipes here...">${esc(S.uploadText)}</textarea>
+      ${S.uploadError?`<div class="err-txt">${esc(S.uploadError)}</div>`:""}
+      ${prev?`<div class="preview-box"><div class="preview-lbl">✓ Found ${Object.keys(prev).length} recipe${Object.keys(prev).length!==1?"s":""}</div>`+
+        Object.entries(prev).map(([n,r])=>`<div class="preview-row"><span class="preview-name">${esc(n)}</span><span class="preview-meta">${r.steps.length} steps · ${r.tag}</span></div>`).join("")+
+      `</div>`:""}
+      <div class="btn-row">
+        ${!prev?`<button class="btn-primary" id="btnPreview" ${!S.uploadText.trim()?"disabled":""}>Preview Recipes</button>`
+              :`<button class="btn-primary" id="btnSaveUp">✓ Save ${Object.keys(prev).length} Recipes</button>`}
+        <button class="btn-secondary" id="btnUploadClose">Cancel</button>
+      </div>
     </div>
-    <div>
-      <input type="file" id="fileInput" accept=".txt,.text" style="display:none" onchange="handleFileUpload(event)">
-      <button class="btn-choose-file" onclick="document.getElementById('fileInput').click()">📁 Choose .txt file from your computer</button>
-      <p class="or-separator">— or paste text directly below —</p>
-    </div>
-    <textarea id="uploadTextarea" class="upload-textarea" placeholder="Paste your recipes here..." oninput="clearUploadPreview()"></textarea>
-    <p id="uploadError" class="upload-error" style="display:none"></p>
-    <div id="uploadPreview" style="display:none"></div>
-    <div class="upload-actions">
-      <button id="btnPreviewRecipes" class="btn-preview" onclick="previewRecipes()">Preview Recipes</button>
-      <button class="btn-cancel" onclick="closeUpload()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── Data ──
-const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-const MEAL_TYPES = ["breakfast","lunch","dinner","snacks"];
-
-const MEAL_IDEAS = {
-  breakfast: ["Overnight Oats","Scrambled Eggs & Toast","Pancakes","Yogurt Parfait","Breakfast Burritos","Smoothie Bowls","French Toast"],
-  lunch: ["Turkey Wraps","Mac & Cheese","Grilled Cheese + Soup","Quesadillas","PB&J + Fruit","Pasta Salad","Rice Bowls"],
-  dinner: ["Spaghetti & Meatballs","Sheet Pan Chicken","Taco Night","Slow Cooker Chili","Stir Fry","Baked Ziti","BBQ Chicken"],
-  snacks: ["Apple Slices + PB","Cheese & Crackers","Veggies + Hummus","Trail Mix","Fruit Cups","Popcorn","Yogurt Tubes"]
-};
-
-const PREP_TASKS = {
-  "Overnight Oats": ["Measure oats","Add milk & yogurt","Portion into jars","Refrigerate"],
-  "Pancakes": ["Mix dry ingredients","Prep wet ingredients","Cook & stack","Freeze extras"],
-  "Sheet Pan Chicken": ["Marinate chicken","Chop vegetables","Line pans","Season & arrange"],
-  "Slow Cooker Chili": ["Brown meat","Drain beans","Chop onion & peppers","Load slow cooker"],
-  "Baked Ziti": ["Cook pasta al dente","Make sauce","Layer in dish","Cover & refrigerate"],
-  "Pasta Salad": ["Cook pasta","Chop veggies","Mix dressing","Combine & chill"],
-};
-const DEFAULT_TASKS = ["Gather ingredients","Prep & chop","Cook/assemble","Portion & store"];
-
-const BUDGET_TIPS = [
-  "Buy proteins in bulk & freeze in meal-size portions",
-  "Shop store-brand staples: pasta, rice, canned goods",
-  "Plan around weekly sales & seasonal produce",
-  "Prep double batches — freeze half for next week",
-  "Use leftover proteins across multiple meals",
-  "Eggs are your best friend: cheap, fast, versatile",
-];
-
-const GROCERY_MAP = {
-  "Overnight Oats": ["Rolled oats","Milk","Greek yogurt","Honey","Berries"],
-  "Scrambled Eggs & Toast": ["Eggs (x2 dozen)","Bread","Butter"],
-  "Pancakes": ["Pancake mix","Eggs","Milk","Syrup"],
-  "Spaghetti & Meatballs": ["Spaghetti (2 lbs)","Ground beef","Marinara sauce","Parmesan"],
-  "Sheet Pan Chicken": ["Chicken thighs (3 lbs)","Potatoes","Broccoli","Olive oil","Garlic"],
-  "Taco Night": ["Ground beef","Taco shells","Cheese","Lettuce","Salsa","Sour cream"],
-  "Slow Cooker Chili": ["Ground beef","Kidney beans","Diced tomatoes","Onion","Bell pepper","Chili powder"],
-  "Baked Ziti": ["Ziti pasta","Ricotta","Mozzarella","Marinara sauce"],
-  "Quesadillas": ["Flour tortillas","Cheddar cheese","Chicken (cooked)"],
-  "Turkey Wraps": ["Flour tortillas","Deli turkey","Lettuce","Tomato","Mayo"],
-  "Mac & Cheese": ["Elbow pasta","Cheddar cheese","Milk","Butter"],
-  "Grilled Cheese + Soup": ["Bread","American cheese","Butter","Canned tomato soup"],
-  "Apple Slices + PB": ["Apples (bag)","Peanut butter"],
-  "Cheese & Crackers": ["Crackers","Cheese block"],
-  "Veggies + Hummus": ["Baby carrots","Celery","Cucumber","Hummus (large)"],
-};
-
-const RECIPES = {
-  "Overnight Oats": { tag:"breakfast", time:"5 min + overnight", servings:5, steps:["Measure ½ cup rolled oats per jar (7 jars total).","Add ½ cup milk and ¼ cup Greek yogurt to each jar.","Stir in 1 tsp honey and a pinch of salt.","Seal jars and refrigerate overnight (at least 6 hours).","In the morning, top with fresh berries and serve cold."] },
-  "Scrambled Eggs & Toast": { tag:"breakfast", time:"10 min", servings:4, steps:["Crack 2 eggs per person into a bowl, season with salt & pepper, and whisk until combined.","Melt ½ tbsp butter in a non-stick skillet over medium-low heat.","Pour in eggs and let sit 10 seconds, then gently fold with a spatula every few seconds.","Remove from heat just before fully set — residual heat finishes them.","While eggs cook, toast bread and spread with butter. Plate together and serve immediately."] },
-  "Pancakes": { tag:"breakfast", time:"25 min", servings:5, steps:["Combine 2 cups pancake mix, 1½ cups milk, and 2 eggs in a large bowl. Stir until just combined — lumps are okay.","Heat a griddle or non-stick pan over medium heat; lightly butter the surface.","Pour ¼ cup batter per pancake. Cook until bubbles form on the surface and edges look set, about 2–3 min.","Flip and cook another 1–2 min until golden. Repeat with remaining batter.","Stack cooled extras between sheets of parchment, place in a zip bag, and freeze for quick weekday breakfasts."] },
-  "Yogurt Parfait": { tag:"breakfast", time:"5 min", servings:4, steps:["Spoon ½ cup Greek yogurt into the bottom of each cup or jar.","Add a layer of granola (about 3 tbsp per cup) on top of the yogurt.","Layer fresh or thawed berries over the granola.","Repeat yogurt and granola layers if the container is tall enough.","Drizzle with honey and serve immediately, or refrigerate (un-topped) for up to 2 days."] },
-  "Breakfast Burritos": { tag:"breakfast", time:"20 min", servings:5, steps:["Scramble 10 eggs in a large skillet with salt, pepper, and a splash of milk. Set aside.","Cook ½ lb breakfast sausage or bacon in the same pan; crumble and drain excess fat.","Warm flour tortillas one at a time in a dry skillet for 20 seconds per side.","Layer eggs, meat, shredded cheese, and salsa down the center of each tortilla.","Fold sides in, then roll tightly. Wrap individually in foil and refrigerate or freeze.","Reheat from frozen: unwrap foil, microwave 2–3 min, flipping halfway through."] },
-  "Smoothie Bowls": { tag:"breakfast", time:"10 min", servings:4, steps:["Blend 2 cups frozen berries, 1 frozen banana, and ½ cup Greek yogurt until thick and smooth — use minimal liquid.","Pour into bowls; the consistency should be thick enough to hold toppings.","Top with granola, fresh fruit slices, coconut flakes, and a drizzle of honey.","Serve immediately — smoothie bowls melt quickly!"] },
-  "French Toast": { tag:"breakfast", time:"20 min", servings:6, steps:["Whisk together 4 eggs, ½ cup milk, 1 tsp vanilla, 1 tsp cinnamon, and a pinch of salt in a shallow dish.","Melt 1 tbsp butter in a large skillet over medium heat.","Dip bread slices in the egg mixture, letting each side soak for 10–15 seconds.","Cook in batches, 2–3 min per side, until golden brown. Add more butter between batches.","Serve with maple syrup and powdered sugar, or freeze extras for quick reheating."] },
-  "Turkey Wraps": { tag:"lunch", time:"10 min", servings:5, steps:["Lay a large flour tortilla flat on a cutting board.","Spread a thin layer of mayo across the center.","Layer 3–4 slices deli turkey, a handful of lettuce, and 2–3 tomato slices.","Season with salt, pepper, and any other desired condiments.","Fold the sides in and roll tightly from the bottom. Slice diagonally and serve, or wrap in parchment for packing."] },
-  "Mac & Cheese": { tag:"lunch", time:"20 min", servings:5, steps:["Bring a large pot of salted water to a boil. Add elbow pasta and cook per package directions until al dente.","Drain pasta, reserving ¼ cup pasta water, and return to the pot over low heat.","Add 2 tbsp butter and stir until melted.","Pour in ½ cup milk and 2 cups shredded cheddar. Stir continuously until smooth and creamy.","If sauce is too thick, add reserved pasta water a splash at a time. Season with salt & pepper and serve."] },
-  "Grilled Cheese + Soup": { tag:"lunch", time:"15 min", servings:4, steps:["Butter one side of each bread slice generously.","Heat a skillet over medium heat. Place bread butter-side down, add 2 slices of cheese, and top with second slice butter-side up.","Cook 3–4 min until golden brown, then flip carefully. Cook another 2–3 min until the other side is golden and cheese is melted.","While sandwiches cook, heat canned tomato soup per label instructions. Add a splash of milk for creaminess.","Serve sandwich alongside a bowl of soup. Cut diagonally for dipping!"] },
-  "Quesadillas": { tag:"lunch", time:"15 min", servings:5, steps:["Shred or dice pre-cooked chicken into small pieces.","Sprinkle a generous layer of shredded cheddar on one half of a flour tortilla.","Add chicken on top of the cheese, then fold the tortilla in half.","Heat a dry skillet over medium heat. Cook quesadilla 2–3 min per side until golden and crispy.","Slice into wedges and serve with salsa and sour cream."] },
-  "PB&J + Fruit": { tag:"lunch", time:"5 min", servings:5, steps:["Spread a generous layer of peanut butter on one slice of bread.","Spread your favorite jam or jelly on the second slice.","Press slices together and cut in half (diagonal or straight — you know your kids!).","Wash and slice fruit — apples, grapes, or strawberries all work great.","Pack in a container with a small ice pack to keep fresh."] },
-  "Pasta Salad": { tag:"lunch", time:"25 min + chill", servings:5, steps:["Cook 1 lb pasta (rotini or penne work best) in salted water per package. Drain and rinse under cold water to stop cooking.","Chop 1 bell pepper, 1 cucumber, ½ red onion, and halve 1 cup cherry tomatoes.","In a large bowl, whisk together ¼ cup olive oil, 3 tbsp red wine vinegar, 1 tsp Italian seasoning, salt and pepper.","Combine cooled pasta and veggies in the bowl; toss well to coat in dressing.","Refrigerate at least 1 hour before serving. Keeps well for 4–5 days — great for batch prep!"] },
-  "Rice Bowls": { tag:"lunch", time:"30 min", servings:5, steps:["Cook 3 cups dry rice per package directions (makes ~6 cups cooked). Season with salt and a drizzle of sesame oil if desired.","Prepare your protein: bake or pan-cook chicken, or use canned beans for a quick option.","Roast or sauté vegetables — broccoli, carrots, and snap peas all work well at 400°F for 20 min.","Portion rice into bowls or meal prep containers.","Top with protein and veggies. Add soy sauce, teriyaki, or any sauce on the side to keep things fresh."] },
-  "Spaghetti & Meatballs": { tag:"dinner", time:"45 min", servings:5, steps:["Mix 1½ lbs ground beef with ½ cup breadcrumbs, 1 egg, 2 minced garlic cloves, salt, pepper, and Italian seasoning. Roll into golf ball–sized meatballs.","Brown meatballs in a large skillet with olive oil over medium-high heat, about 2 min per side. They don't need to be fully cooked through.","Pour 2 jars marinara sauce into a large pot over medium heat. Nestle meatballs in the sauce, cover, and simmer 20–25 min.","Meanwhile, bring a large pot of salted water to a boil. Cook spaghetti per package directions until al dente.","Drain pasta and serve topped with meatballs and sauce. Finish with grated Parmesan."] },
-  "Sheet Pan Chicken": { tag:"dinner", time:"50 min", servings:5, steps:["Preheat oven to 425°F. Line two large sheet pans with foil and spray with cooking spray.","In a large bowl, toss 3 lbs chicken thighs with olive oil, garlic powder, paprika, salt, and pepper.","Cube potatoes and cut broccoli into florets. Toss veggies separately with olive oil, salt, and pepper.","Arrange chicken on one pan and vegetables on the second. Don't crowd the pans — space = crispiness.","Roast 35–40 min, flipping chicken halfway, until chicken reaches 165°F and veggies are caramelized."] },
-  "Taco Night": { tag:"dinner", time:"25 min", servings:5, steps:["Brown 1½ lbs ground beef in a large skillet over medium-high heat, breaking it apart as it cooks. Drain excess fat.","Add 1 packet taco seasoning and ⅔ cup water. Stir and simmer 3–5 min until sauce thickens.","Set up a taco bar: warm shells in the oven at 350°F for 5 min, and set out toppings — cheese, lettuce, salsa, sour cream, diced tomato.","Let everyone build their own tacos!","Leftover taco meat keeps 4 days refrigerated — great for nachos or taco salads later in the week."] },
-  "Slow Cooker Chili": { tag:"dinner", time:"20 min prep + 6–8 hrs", servings:8, steps:["Brown 1½ lbs ground beef in a skillet. Drain fat and transfer to slow cooker.","Drain and rinse 2 cans kidney beans; add to slow cooker.","Add 2 cans diced tomatoes (with liquid), 1 diced onion, 1 diced bell pepper, and 1 cup beef broth.","Season with 2 tbsp chili powder, 1 tsp cumin, 1 tsp garlic powder, salt, and pepper. Stir everything together.","Cover and cook on LOW 6–8 hours or HIGH 3–4 hours. Taste and adjust seasoning before serving.","Serve with shredded cheese, sour cream, and cornbread. Freezes beautifully for up to 3 months!"] },
-  "Stir Fry": { tag:"dinner", time:"20 min", servings:5, steps:["Cook 2 cups dry rice or noodles per package directions. Keep warm.","Slice chicken, beef, or tofu into thin strips. Season with salt and pepper.","Heat 2 tbsp oil in a wok or large skillet over high heat until shimmering.","Add protein and cook 3–4 min without moving too much, until browned. Remove and set aside.","Add veggies (broccoli, snap peas, carrots, bell pepper) to the same pan. Stir-fry 3–4 min until tender-crisp.","Return protein to pan, pour in ¼ cup stir-fry sauce, and toss to coat. Serve over rice or noodles."] },
-  "Baked Ziti": { tag:"dinner", time:"55 min", servings:8, steps:["Preheat oven to 375°F. Cook 1 lb ziti 2 min less than package directions (it finishes in the oven). Drain.","Mix pasta with 1 jar marinara sauce, 1 cup ricotta, half the mozzarella, salt, and pepper.","Transfer to a greased 9×13 baking dish. Top with remaining mozzarella and a drizzle of olive oil.","Cover with foil and bake 25 min. Remove foil and bake another 10–15 min until bubbly and golden.","Let rest 5–10 min before serving. Cover and refrigerate leftovers up to 4 days."] },
-  "BBQ Chicken": { tag:"dinner", time:"40 min", servings:5, steps:["Preheat oven to 400°F or heat grill to medium-high.","Pat chicken pieces dry and season both sides with salt, pepper, and garlic powder.","Brush a generous layer of BBQ sauce on each piece.","Bake on a foil-lined sheet pan 30–35 min (or grill 6–8 min per side), brushing with more sauce halfway through.","Chicken is done when it reaches 165°F internally. Let rest 5 min before serving.","Serve with corn on the cob, coleslaw, or baked beans for a complete meal."] },
-  "Apple Slices + PB": { tag:"snacks", time:"5 min", servings:5, steps:["Wash apples thoroughly under running water.","Core and slice apples into wedges (a slicer tool makes this fast for a big family!).","To prevent browning, toss slices in a bowl with a squeeze of lemon juice.","Portion into snack containers with 2–3 tbsp peanut butter per container.","Refrigerate and consume within 2 days for best freshness."] },
-  "Cheese & Crackers": { tag:"snacks", time:"5 min", servings:5, steps:["Slice a cheese block into bite-sized cubes or thin slices — about 1 oz per person.","Portion crackers (about 10–12 per serving) into snack bags or small containers.","Pack cheese and crackers separately to keep crackers crisp.","Optional add-ins: grapes, deli meat slices, or a small pickle on the side.","Refrigerate cheese portions; crackers can stay at room temperature."] },
-  "Veggies + Hummus": { tag:"snacks", time:"10 min", servings:5, steps:["Wash and dry all vegetables thoroughly.","Peel and cut carrots into sticks; slice celery into 3-inch pieces; cut cucumber into rounds or spears.","Portion veggies into individual containers or a large serving platter.","Scoop 3–4 tbsp hummus per person into small cups or directly into the container.","Keep refrigerated. Prepped veggies stay crisp for 4–5 days when stored in an airtight container with a damp paper towel."] },
-  "Trail Mix": { tag:"snacks", time:"5 min", servings:5, steps:["In a large bowl, combine 2 cups nuts (peanuts, almonds, or cashews), 1 cup pretzels or cereal, 1 cup dried fruit (raisins, cranberries), and ½ cup chocolate chips.","Stir well to distribute ingredients evenly.","Portion into snack-sized zip bags or small containers — about ¼ cup per serving for kids.","Store at room temperature for up to 2 weeks."] },
-  "Fruit Cups": { tag:"snacks", time:"10 min", servings:5, steps:["Wash all fruit thoroughly.","Cut melon into cubes, halve grapes, quarter strawberries, and slice any larger fruit into bite-sized pieces.","Toss with a squeeze of lime juice to keep fruit bright and add a subtle flavor boost.","Portion into small cups or containers with lids.","Refrigerate and consume within 3 days. Add a small fork or toothpick for easy eating."] },
-  "Popcorn": { tag:"snacks", time:"10 min", servings:5, steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."] },
-  "Yogurt Tubes": { tag:"snacks", time:"2 min", servings:5, steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."] },
-};
-
-const TAG_COLORS = {
-  breakfast: { bg:"#fef3c7", text:"#b45309" },
-  lunch:     { bg:"#e0f2fe", text:"#0369a1" },
-  dinner:    { bg:"#ffe4e6", text:"#be123c" },
-  snacks:    { bg:"#dcfce7", text:"#15803d" },
-};
-
-// ── State ──
-let weekOffset = 0;
-let meals = {};
-let customMeals = { breakfast:[], lunch:[], dinner:[], snacks:[] };
-let pickerState = null;
-let prepChecked = {};
-let groceryChecked = {};
-let recipeFilter = "all";
-let recipeOpen = {};
-let uploadedRecipes = {};
-let uploadPreviewData = null;
-let historySelectedKey = null;
-let historyWeekData = {};
-let saveTimer = null;
-
-// ── Week helpers ──
-function getWeekLabel(offset=0) {
-  const now = new Date();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - ((now.getDay()+6)%7) + offset*7);
-  const end = new Date(monday);
-  end.setDate(monday.getDate()+6);
-  const fmt = d => d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-  return `${fmt(monday)} – ${fmt(end)}`;
-}
-function getWeekKey(offset=0) {
-  const now = new Date();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - ((now.getDay()+6)%7) + offset*7);
-  return monday.toISOString().slice(0,10);
-}
-function getWeekLabelName(offset) {
-  if(offset===0) return "This Week";
-  if(offset===1) return "Next Week";
-  if(offset===-1) return "Last Week";
-  return `Week of ${getWeekLabel(offset).split("–")[0].trim()}`;
+  </div>`;
 }
 
-// ── Storage helpers ──
-async function saveWeek(key, data) {
-  try { await window.storage.set(`week:${key}`, JSON.stringify(data)); } catch(e) {}
-}
-async function loadWeek(key) {
-  try { const r = await window.storage.get(`week:${key}`); return r ? JSON.parse(r.value) : {}; } catch { return {}; }
-}
-async function saveCustomMealsStore(data) {
-  try { await window.storage.set("customMeals", JSON.stringify(data)); } catch(e) {}
-}
-async function loadCustomMealsStore() {
-  try { const r = await window.storage.get("customMeals"); return r ? JSON.parse(r.value) : {breakfast:[],lunch:[],dinner:[],snacks:[]}; } catch { return {breakfast:[],lunch:[],dinner:[],snacks:[]}; }
-}
-async function listAllWeeks() {
-  try { const r = await window.storage.list("week:"); return r ? r.keys : []; } catch { return []; }
-}
-async function saveUploadedRecipesStore(data) {
-  try { await window.storage.set("uploadedRecipes", JSON.stringify(data)); } catch(e) {}
-}
-async function loadUploadedRecipesStore() {
-  try { const r = await window.storage.get("uploadedRecipes"); return r ? JSON.parse(r.value) : {}; } catch { return {}; }
-}
-
-// ── Init ──
-async function init() {
-  const weekKey = getWeekKey(weekOffset);
-  meals = await loadWeek(weekKey);
-  customMeals = await loadCustomMealsStore();
-  uploadedRecipes = await loadUploadedRecipesStore();
-  updateHeader();
-  renderPlanner();
-  renderPrep();
-  renderGrocery();
-  renderRecipes();
-}
-
-// ── Tab switching ──
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  btn.classList.add('active');
-  if(id==='prep') renderPrep();
-  if(id==='grocery') renderGrocery();
-  if(id==='recipes') renderRecipes();
-}
-
-// ── Week navigation ──
-async function changeWeek(delta) {
-  weekOffset += delta;
-  const weekKey = getWeekKey(weekOffset);
-  meals = await loadWeek(weekKey);
-  updateHeader();
-  renderPlanner();
-  renderPrep();
-  renderGrocery();
-}
-function updateHeader() {
-  document.getElementById('weekLabel').textContent = getWeekLabelName(weekOffset);
-  document.getElementById('weekRange').textContent = getWeekLabel(weekOffset);
-  const allMeals = Object.values(meals).flatMap(d => Object.values(d)).filter(Boolean);
-  const total = allMeals.length;
-  const slots = DAYS.length * 4;
-  document.getElementById('progressFill').style.width = `${(total/slots)*100}%`;
-  document.getElementById('progressLabel').textContent = `${total}/${slots} meals`;
-}
-
-// ── Auto-save ──
-function triggerSave() {
-  document.getElementById('savingIndicator').style.display = 'inline';
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    await saveWeek(getWeekKey(weekOffset), meals);
-    document.getElementById('savingIndicator').style.display = 'none';
-  }, 600);
-}
-
-// ── Planner ──
-function renderPlanner() {
-  const grid = document.getElementById('plannerGrid');
-  grid.innerHTML = '';
-  DAYS.forEach(day => {
-    const card = document.createElement('div');
-    card.className = 'day-card';
-    card.innerHTML = `<h3 class="day-name">${day}</h3><div class="meal-grid" id="mealGrid-${day}"></div>`;
-    grid.appendChild(card);
-    const mealGrid = document.getElementById(`mealGrid-${day}`);
-    MEAL_TYPES.forEach(mt => {
-      const meal = (meals[day] && meals[day][mt]) || '';
-      const tc = TAG_COLORS[mt];
-      const cell = document.createElement('div');
-      cell.className = 'meal-cell' + (meal ? ' filled' : '');
-      cell.style.borderColor = meal ? tc.bg : '#e7e0d6';
-      cell.innerHTML = `
-        <span class="meal-tag" style="background:${tc.bg};color:${tc.text}">${mt}</span>
-        ${meal ? `<span class="meal-name">${meal}</span>` : `<span class="meal-empty">+ Add</span>`}
-      `;
-      cell.onclick = () => openPicker(day, mt, meal);
-      mealGrid.appendChild(cell);
+// ── PARSE RECIPE TEXT ─────────────────────────────────────────────────────
+function parseRecipes(text){
+  const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
+  const out={};
+  blocks.forEach(block=>{
+    const lines=block.split("\n").map(l=>l.trim()).filter(Boolean);
+    if(lines.length<2)return;
+    const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];
+    lines.slice(1).forEach(line=>{
+      const lo=line.toLowerCase();
+      if(lo.startsWith("time:")){time=line.split(":").slice(1).join(":").trim();return;}
+      if(lo.startsWith("serves:")||lo.startsWith("servings:")){servings=parseInt(line.split(":")[1])||5;return;}
+      if(lo.startsWith("category:")||lo.startsWith("type:")||lo.startsWith("meal:")){
+        const v=line.split(":")[1].trim().toLowerCase();
+        if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
+      }
+      const sm=line.match(/^\d+[\.\)]\s+(.+)/);if(sm){steps.push(sm[1]);return;}
+      if(line.startsWith("-")||line.startsWith("•")){steps.push(line.replace(/^[-•]\s*/,""));return;}
     });
+    if(steps.length>0)out[name]={tag,time,servings,steps,_uploaded:true};
   });
-  updateHeader();
+  return out;
 }
 
-// ── Picker Modal ──
-function openPicker(day, mt, currentMeal) {
-  pickerState = { day, mt, currentMeal };
-  document.getElementById('pickerDay').textContent = day;
-  document.getElementById('pickerMealType').textContent = mt;
-  document.getElementById('pickerInput').value = '';
-  document.getElementById('btnRemoveMeal').style.display = currentMeal ? 'block' : 'none';
-  renderSuggestions('');
-  document.getElementById('pickerModal').style.display = 'flex';
-  setTimeout(() => document.getElementById('pickerInput').focus(), 50);
-}
-function closePicker() {
-  document.getElementById('pickerModal').style.display = 'none';
-  pickerState = null;
-}
-function filterSuggestions() {
-  const val = document.getElementById('pickerInput').value;
-  renderSuggestions(val);
-}
-function renderSuggestions(input) {
-  if(!pickerState) return;
-  const { mt, currentMeal } = pickerState;
-  const suggestions = [...new Set([...(MEAL_IDEAS[mt]||[]), ...(customMeals[mt]||[])])];
-  const filtered = input.trim() ? suggestions.filter(s => s.toLowerCase().includes(input.toLowerCase())) : suggestions;
-  document.getElementById('suggestionsLabel').textContent = input ? 'Matching meals' : 'All suggestions';
-  const list = document.getElementById('suggestionsList');
-  list.innerHTML = '';
-  if(filtered.length === 0) {
-    list.innerHTML = `<p style="font-size:12px;color:#a8a29e;margin:0">No matches — hit + to add "${input}"</p>`;
-    return;
+// ── BIND EVENTS ───────────────────────────────────────────────────────────
+function bind(){
+  // Tabs
+  document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{S.tab=b.dataset.tab;lsSet("s_tab",S.tab);render();}));
+  // Week nav
+  q("btnPrev",()=>{S.weekOffset--;lsSet("s_weekOffset",S.weekOffset);loadMeals();render();});
+  q("btnNext",()=>{S.weekOffset++;lsSet("s_weekOffset",S.weekOffset);loadMeals();render();});
+  // History
+  q("btnHist",()=>{S.showHistory=true;render();});
+  q("btnHistClose",()=>{S.showHistory=false;render();});
+  ov("histOv",()=>{S.showHistory=false;render();});
+  document.querySelectorAll("[data-hk]").forEach(el=>el.addEventListener("click",()=>{S.historyOpen[el.dataset.hk]=!S.historyOpen[el.dataset.hk];render();}));
+  // Meal cells
+  document.querySelectorAll(".meal-cell").forEach(cell=>cell.addEventListener("click",()=>{
+    const day=cell.dataset.day,mt=cell.dataset.mt,current=(S.meals[day]||{})[mt]||"";
+    S.picker={day,mealType:mt,currentMeal:current};S.pickerInput="";render();
+    setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.select();}},30);
+  }));
+  // Picker
+  ov("pickerOv",()=>{S.picker=null;S.pickerInput="";render();});
+  q("btnPickClose",()=>{S.picker=null;S.pickerInput="";render();});
+  const pi=document.getElementById("pickerInp");
+  if(pi){
+    pi.addEventListener("input",()=>{S.pickerInput=pi.value;reRenderPicker();});
+    pi.addEventListener("keydown",e=>{if(e.key==="Enter")addAndSelect();});
   }
-  filtered.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'suggestion-btn' + (currentMeal===opt ? ' selected' : '');
-    btn.textContent = (currentMeal===opt ? '✓ ' : '') + opt;
-    btn.onclick = () => selectMeal(opt);
-    list.appendChild(btn);
+  q("btnPickAdd",addAndSelect);
+  document.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>selectMeal(b.dataset.pick)));
+  q("btnPickRm",()=>{const{day,mealType}=S.picker;if(S.meals[day])S.meals[day][mealType]="";saveMeals();S.picker=null;S.pickerInput="";render();});
+  // Prep
+  document.querySelectorAll("[data-pk]").forEach(r=>r.addEventListener("click",()=>{S.prepChecked[r.dataset.pk]=!S.prepChecked[r.dataset.pk];lsSet("s_prepChecked",S.prepChecked);render();}));
+  // Grocery
+  document.querySelectorAll("[data-gi]").forEach(r=>r.addEventListener("click",()=>{S.groceryChecked[r.dataset.gi]=!S.groceryChecked[r.dataset.gi];lsSet("s_groceryChecked",S.groceryChecked);render();}));
+  q("btnResetGroc",()=>{S.groceryChecked={};lsSet("s_groceryChecked",{});render();});
+  // Recipe filters
+  document.querySelectorAll("[data-rf]").forEach(b=>b.addEventListener("click",()=>{S.recipeFilter=b.dataset.rf;lsSet("s_recipeFilter",S.recipeFilter);render();}));
+  // Recipe cards
+  document.querySelectorAll("[data-rn]").forEach(h=>h.addEventListener("click",e=>{
+    if(e.target.closest("[data-dr]"))return;
+    S.recipeOpen[h.dataset.rn]=!S.recipeOpen[h.dataset.rn];lsSet("s_recipeOpen",S.recipeOpen);render();
+  }));
+  document.querySelectorAll("[data-dr]").forEach(b=>b.addEventListener("click",e=>{
+    e.stopPropagation();delete S.uploadedRecipes[b.dataset.dr];lsSet("uploadedRecipes",S.uploadedRecipes);render();
+  }));
+  // Upload
+  q("btnShowUpload",()=>{S.showUpload=true;S.uploadText="";S.uploadPreview=null;S.uploadError="";render();});
+  q("btnUploadClose",()=>{S.showUpload=false;render();});
+  ov("uploadOv",()=>{S.showUpload=false;render();});
+  q("btnChooseFile",()=>{const fi=document.getElementById("fileInp");if(fi)fi.click();});
+  const fi=document.getElementById("fileInp");
+  if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
+  const ta=document.getElementById("uploadTA");
+  if(ta)ta.addEventListener("input",()=>{S.uploadText=ta.value;S.uploadPreview=null;S.uploadError="";});
+  q("btnPreview",()=>{
+    const result=parseRecipes(S.uploadText);
+    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe has a name on the first line, followed by numbered steps (1. 2. 3.)";S.uploadPreview=null;}
+    else{S.uploadPreview=result;S.uploadError="";}
+    render();
+  });
+  q("btnSaveUp",()=>{
+    S.uploadedRecipes=Object.assign({},S.uploadedRecipes,S.uploadPreview);
+    lsSet("uploadedRecipes",S.uploadedRecipes);
+    S.showUpload=false;S.uploadPreview=null;S.uploadText="";render();
   });
 }
-function selectMeal(val) {
-  if(!pickerState) return;
-  const { day, mt } = pickerState;
-  if(!meals[day]) meals[day] = {};
-  meals[day][mt] = val;
-  renderPlanner();
-  triggerSave();
-  closePicker();
-}
-function addCustomAndSelect() {
-  const val = document.getElementById('pickerInput').value.trim();
-  if(!val) return;
-  const mt = pickerState.mt;
-  if(!customMeals[mt]) customMeals[mt] = [];
-  if(!customMeals[mt].includes(val)) {
-    customMeals[mt].push(val);
-    saveCustomMealsStore(customMeals);
-  }
+
+function q(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",fn);}
+function ov(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",e=>{if(e.target===el)fn();});}
+
+function addAndSelect(){
+  const val=(S.pickerInput||"").trim();if(!val)return;
+  const mt=S.picker.mealType,list=S.customMeals[mt]||[];
+  if(!list.includes(val)){S.customMeals[mt]=[...list,val];lsSet("customMeals",S.customMeals);}
   selectMeal(val);
 }
-function removeMeal() {
-  if(!pickerState) return;
-  const { day, mt } = pickerState;
-  if(meals[day]) meals[day][mt] = '';
-  renderPlanner();
-  triggerSave();
-  closePicker();
+function selectMeal(val){
+  const{day,mealType}=S.picker;
+  if(!S.meals[day])S.meals[day]={};
+  S.meals[day][mealType]=val;saveMeals();
+  S.picker=null;S.pickerInput="";render();
+}
+function reRenderPicker(){
+  // Re-render just the picker suggestions without full page re-render for smooth typing
+  const{day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
+  const custom=S.customMeals[mealType]||[];
+  const all=[...new Set([...MEAL_IDEAS[mealType],...custom])];
+  const sugg=inp.trim()?all.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):all;
+  // update suggestions div
+  const box=document.getElementById("pickerBox");if(!box)return;
+  const divs=box.querySelectorAll(".sugg-btn,[data-pick],.sugg-lbl");divs.forEach(d=>d.remove());
+  // Just do a full render, it's fast enough
+  render();
+  setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.setSelectionRange(inp.length,inp.length);}},0);
 }
 
-// ── Prep Checklist ──
-function renderPrep() {
-  const container = document.getElementById('prepChecklist');
-  const allMeals = Object.values(meals).flatMap(d => Object.values(d)).filter(Boolean);
-  const unique = [...new Set(allMeals)];
-  if(!unique.length) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p class="empty-text">Add meals to your plan to generate a prep checklist.</p></div>`;
-    return;
-  }
-  container.innerHTML = `<p style="font-size:13px;color:#78716c;margin:0 0 14px">Check off tasks as you prep. Based on this week's meal plan.</p>`;
-  unique.forEach(meal => {
-    const tasks = PREP_TASKS[meal] || DEFAULT_TASKS;
-    const card = document.createElement('div');
-    card.className = 'prep-meal-card';
-    card.innerHTML = `<div class="prep-meal-name">${meal}</div><div class="task-list"></div>`;
-    const taskList = card.querySelector('.task-list');
-    tasks.forEach((task, i) => {
-      const key = `${meal}-${i}`;
-      const item = document.createElement('div');
-      item.className = 'task-item';
-      item.innerHTML = `
-        <div class="task-checkbox${prepChecked[key]?' checked':''}" id="chk-${CSS.escape(key)}">
-          <span class="check-mark">✓</span>
-        </div>
-        <span class="task-label${prepChecked[key]?' checked':''}" id="lbl-${CSS.escape(key)}">${task}</span>
-      `;
-      item.onclick = () => togglePrepTask(key);
-      taskList.appendChild(item);
-    });
-    container.appendChild(card);
-  });
-}
-function togglePrepTask(key) {
-  prepChecked[key] = !prepChecked[key];
-  const chk = document.getElementById(`chk-${CSS.escape(key)}`);
-  const lbl = document.getElementById(`lbl-${CSS.escape(key)}`);
-  if(chk) { if(prepChecked[key]) chk.classList.add('checked'); else chk.classList.remove('checked'); }
-  if(lbl) { if(prepChecked[key]) lbl.classList.add('checked'); else lbl.classList.remove('checked'); }
-}
-
-// ── Grocery List ──
-function renderGrocery() {
-  const container = document.getElementById('groceryList');
-  const allMeals = Object.values(meals).flatMap(d => Object.values(d)).filter(Boolean);
-  const unique = [...new Set(allMeals)];
-  const items = [...new Set(unique.flatMap(m => GROCERY_MAP[m] || [`Ingredients for ${m}`]))];
-  if(!items.length) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><p class="empty-text">Add meals to your plan to generate a grocery list.</p></div>`;
-    return;
-  }
-  const remaining = items.filter(i => !groceryChecked[i]).length;
-  const tip = BUDGET_TIPS[Math.floor(Math.random()*BUDGET_TIPS.length)];
-  container.innerHTML = `
-    <div class="grocery-header">
-      <p class="grocery-count" id="groceryCount">${remaining} of ${items.length} items remaining</p>
-      <button class="btn-reset" onclick="resetGrocery()">Reset</button>
-    </div>
-    <div class="grocery-list" id="groceryItems"></div>
-    <div class="budget-tip">
-      <p class="budget-tip-label">💡 Budget Tip</p>
-      <p class="budget-tip-text">${tip}</p>
-    </div>
-  `;
-  renderGroceryItems(items);
-}
-function renderGroceryItems(items) {
-  const container = document.getElementById('groceryItems');
-  if(!container) return;
-  container.innerHTML = '';
-  items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'grocery-item' + (groceryChecked[item]?' checked':'');
-    div.innerHTML = `
-      <div class="task-checkbox${groceryChecked[item]?' checked':''}">
-        <span class="check-mark">✓</span>
-      </div>
-      <span class="task-label${groceryChecked[item]?' checked':''}">${item}</span>
-    `;
-    div.onclick = () => toggleGrocery(item);
-    container.appendChild(div);
-  });
-}
-function toggleGrocery(item) {
-  groceryChecked[item] = !groceryChecked[item];
-  renderGrocery();
-}
-function resetGrocery() {
-  groceryChecked = {};
-  renderGrocery();
-}
-
-// ── Recipes ──
-function renderRecipes() {
-  const allRecipes = { ...RECIPES, ...uploadedRecipes };
-  const uploadedCount = Object.keys(uploadedRecipes).length;
-
-  // Pills
-  const pills = document.getElementById('recipePills');
-  const categories = [
-    {id:"all",label:"All"},
-    {id:"breakfast",label:"🌅 Breakfast"},
-    {id:"lunch",label:"☀️ Lunch"},
-    {id:"dinner",label:"🍽 Dinner"},
-    {id:"snacks",label:"🍎 Snacks"},
-    {id:"upload",label:"📤 Upload",isAction:true},
-  ];
-  pills.innerHTML = '';
-  categories.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'pill-btn' + (c.isAction ? ' upload-pill' : (recipeFilter===c.id ? ' active' : ''));
-    btn.textContent = c.label;
-    btn.onclick = () => { if(c.isAction) openUpload(); else { recipeFilter=c.id; renderRecipes(); } };
-    pills.appendChild(btn);
-  });
-
-  // Entries
-  const entries = Object.entries(allRecipes).filter(([,r]) => recipeFilter==='all' || r.tag===recipeFilter);
-  document.getElementById('recipesCount').textContent = `${entries.length} recipe${entries.length!==1?'s':''}. Tap any meal to expand the steps.`;
-  const badge = document.getElementById('uploadedBadge');
-  if(uploadedCount > 0) { badge.style.display='inline'; badge.textContent=`📤 ${uploadedCount} uploaded`; } else badge.style.display='none';
-
-  const list = document.getElementById('recipesList');
-  list.innerHTML = '';
-  if(entries.length===0) {
-    list.innerHTML = `<div class="recipes-empty"><div class="recipes-empty-icon">📖</div><p class="recipes-empty-text">No recipes yet in this category.</p><button onclick="openUpload()" style="margin-top:8px;padding:10px 20px;border-radius:12px;border:1.5px dashed #d97706;background:white;color:#d97706;font-size:13px;font-weight:700;cursor:pointer;font-family:Georgia,serif">📤 Upload your recipes</button></div>`;
-    return;
-  }
-  entries.forEach(([name, recipe]) => {
-    const isOpen = !!recipeOpen[name];
-    const tc = TAG_COLORS[recipe.tag] || TAG_COLORS.dinner;
-    const isUploaded = !!uploadedRecipes[name];
-    const card = document.createElement('div');
-    card.className = 'recipe-card' + (isOpen?' open':'');
-    card.innerHTML = `
-      <div class="recipe-header" onclick="toggleRecipe('${name.replace(/'/g,"\\'")}')">
-        <div class="recipe-arrow-box">
-          <span class="recipe-arrow">▶</span>
-        </div>
-        <div class="recipe-info">
-          <div class="recipe-name-row">
-            <p class="recipe-name">${name}</p>
-            ${isUploaded ? '<span class="recipe-uploaded-badge">Uploaded</span>' : ''}
-          </div>
-          <div class="recipe-meta-row">
-            <span class="meal-tag" style="background:${tc.bg};color:${tc.text};font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;text-transform:capitalize">${recipe.tag}</span>
-            <span class="recipe-time">⏱ ${recipe.time}</span>
-            <span class="recipe-serves">👨‍👩‍👧‍👦 Serves ${recipe.servings}</span>
-          </div>
-        </div>
-        ${isUploaded ? `<button class="btn-delete-recipe" onclick="event.stopPropagation();deleteUploadedRecipe('${name.replace(/'/g,"\\'")}')">🗑</button>` : ''}
-      </div>
-      <div class="recipe-steps">
-        <ol class="steps-list">
-          ${recipe.steps.map((step,i) => `<li class="step-item"><span class="step-num">${i+1}</span><p class="step-text">${step}</p></li>`).join('')}
-        </ol>
-      </div>
-    `;
-    list.appendChild(card);
-  });
-}
-function toggleRecipe(name) {
-  recipeOpen[name] = !recipeOpen[name];
-  renderRecipes();
-}
-function deleteUploadedRecipe(name) {
-  delete uploadedRecipes[name];
-  saveUploadedRecipesStore(uploadedRecipes);
-  renderRecipes();
-}
-
-// ── History ──
-function openHistory() {
-  document.getElementById('historyPanel').style.display = 'flex';
-  loadHistoryContent();
-}
-function closeHistory() {
-  document.getElementById('historyPanel').style.display = 'none';
-  historySelectedKey = null;
-}
-async function loadHistoryContent() {
-  const container = document.getElementById('historyContent');
-  container.innerHTML = '<p style="color:#a8a29e;font-size:13px">Loading...</p>';
-  const keys = (await listAllWeeks()).sort().reverse();
-  if(!keys.length) {
-    container.innerHTML = '<p style="color:#a8a29e;font-size:13px">No saved weeks yet. Start planning and your data will appear here!</p>';
-    return;
-  }
-  container.innerHTML = '';
-  keys.forEach(key => {
-    const dateKey = key.replace("week:","");
-    const weekStart = new Date(dateKey + "T12:00:00");
-    const weekEnd = new Date(weekStart); weekEnd.setDate(weekStart.getDate()+6);
-    const fmt = d => d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-    const label = `${fmt(weekStart)} – ${fmt(weekEnd)}`;
-    const card = document.createElement('div');
-    card.className = 'history-week-card';
-    card.id = `hwk-${dateKey}`;
-    card.innerHTML = `
-      <div class="history-week-header" onclick="toggleHistoryWeek('${dateKey}', this)">
-        <p class="history-week-label">${label}</p>
-        <span class="history-week-arrow">▼</span>
-      </div>
-      <div class="history-week-body" id="hwkBody-${dateKey}" style="display:none"></div>
-    `;
-    container.appendChild(card);
-  });
-}
-async function toggleHistoryWeek(dateKey, headerEl) {
-  const card = document.getElementById(`hwk-${dateKey}`);
-  const body = document.getElementById(`hwkBody-${dateKey}`);
-  const isOpen = card.classList.contains('open');
-  if(isOpen) {
-    card.classList.remove('open');
-    body.style.display='none';
-    headerEl.querySelector('.history-week-arrow').textContent='▼';
-    return;
-  }
-  card.classList.add('open');
-  headerEl.querySelector('.history-week-arrow').textContent='▲';
-  body.style.display='block';
-  body.innerHTML = '<p style="font-size:12px;color:#a8a29e;padding:10px 0">Loading...</p>';
-  const data = await loadWeek(dateKey);
-  body.innerHTML = '';
-  DAYS.forEach(day => {
-    const dayMeals = data[day] || {};
-    const entries = MEAL_TYPES.map(mt => ({mt,val:dayMeals[mt]})).filter(x=>x.val);
-    if(!entries.length) return;
-    const sec = document.createElement('div');
-    sec.className = 'history-day-section';
-    sec.innerHTML = `<p class="history-day-name">${day}</p><div class="history-meals-row">${entries.map(({mt,val}) => `<span class="meal-tag" style="font-size:12px;padding:4px 10px;border-radius:99px;background:${TAG_COLORS[mt].bg};color:${TAG_COLORS[mt].text};font-weight:700">${val}</span>`).join('')}</div>`;
-    body.appendChild(sec);
-  });
-}
-
-// ── Upload Modal ──
-function openUpload() {
-  document.getElementById('uploadModal').style.display = 'flex';
-  document.getElementById('uploadTextarea').value = '';
-  document.getElementById('uploadError').style.display = 'none';
-  document.getElementById('uploadPreview').style.display = 'none';
-  uploadPreviewData = null;
-  resetUploadActions();
-}
-function closeUpload() {
-  document.getElementById('uploadModal').style.display = 'none';
-}
-function handleFileUpload(e) {
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => { document.getElementById('uploadTextarea').value = ev.target.result; clearUploadPreview(); };
-  reader.readAsText(file);
-}
-function clearUploadPreview() {
-  uploadPreviewData = null;
-  document.getElementById('uploadPreview').style.display = 'none';
-  document.getElementById('uploadError').style.display = 'none';
-  resetUploadActions();
-}
-function resetUploadActions() {
-  const actions = document.querySelector('.upload-actions');
-  actions.innerHTML = `
-    <button class="btn-preview" id="btnPreviewRecipes" onclick="previewRecipes()">Preview Recipes</button>
-    <button class="btn-cancel" onclick="closeUpload()">Cancel</button>
-  `;
-}
-function parseRecipeText(text) {
-  const blocks = text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
-  const parsed = {};
-  blocks.forEach(block => {
-    const lines = block.split("\n").map(l=>l.trim()).filter(Boolean);
-    if(lines.length < 2) return;
-    const name = lines[0];
-    let time="—", servings=5, tag="dinner";
-    const steps = [];
-    lines.slice(1).forEach(line => {
-      const lower = line.toLowerCase();
-      if(lower.startsWith("time:")) { time=line.split(":").slice(1).join(":").trim(); return; }
-      if(lower.startsWith("serves:")||lower.startsWith("servings:")) { servings=parseInt(line.split(":")[1])||5; return; }
-      if(lower.startsWith("category:")||lower.startsWith("type:")||lower.startsWith("meal:")) {
-        const val=line.split(":")[1].trim().toLowerCase();
-        if(["breakfast","lunch","dinner","snacks"].includes(val)) tag=val;
-        return;
-      }
-      const stepMatch=line.match(/^\d+[\.\)]\s+(.+)/);
-      if(stepMatch) { steps.push(stepMatch[1]); return; }
-      if(line.startsWith("-")||line.startsWith("•")) { steps.push(line.replace(/^[-•]\s*/,"")); return; }
-    });
-    if(steps.length>0) parsed[name]={tag,time,servings,steps,_uploaded:true};
-  });
-  return parsed;
-}
-function previewRecipes() {
-  const text = document.getElementById('uploadTextarea').value;
-  const errEl = document.getElementById('uploadError');
-  errEl.style.display='none';
-  const result = parseRecipeText(text);
-  if(Object.keys(result).length===0) {
-    errEl.textContent="Couldn't find any recipes. Make sure each recipe has a name on the first line, followed by numbered steps.";
-    errEl.style.display='block';
-    return;
-  }
-  uploadPreviewData = result;
-  const preview = document.getElementById('uploadPreview');
-  preview.style.display='block';
-  const names = Object.entries(result);
-  preview.innerHTML = `
-    <div class="preview-box">
-      <p class="preview-label">✓ Found ${names.length} recipe${names.length!==1?'s':''}</p>
-      ${names.map(([name,r]) => `<div class="preview-item"><span class="preview-item-name">${name}</span><span class="preview-item-meta">${r.steps.length} steps · ${r.tag}</span></div>`).join('')}
-    </div>
-  `;
-  const actions = document.querySelector('.upload-actions');
-  actions.innerHTML = `
-    <button class="btn-save-recipes" onclick="saveUploadedRecipesAction()">✓ Save ${names.length} Recipe${names.length!==1?'s':''}</button>
-    <button class="btn-cancel" onclick="closeUpload()">Cancel</button>
-  `;
-}
-function saveUploadedRecipesAction() {
-  if(!uploadPreviewData) return;
-  uploadedRecipes = { ...uploadedRecipes, ...uploadPreviewData };
-  saveUploadedRecipesStore(uploadedRecipes);
-  closeUpload();
-  renderRecipes();
-}
-
-// ── Boot ──
-init();
+render();
 </script>
 </body>
 </html>
