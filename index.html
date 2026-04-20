@@ -71,6 +71,11 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .cat-tag{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;text-transform:capitalize;}
 .up-badge{font-size:9px;padding:2px 6px;border-radius:99px;background:#ede9fe;color:#7c3aed;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
 .rec-steps{padding:0 16px 18px;border-top:1px solid #f0ebe3;}
+.no-recipe-section{background:#fff7ed;border:1.5px solid #fed7aa;border-radius:14px;padding:12px 14px;margin-bottom:14px;}
+.no-recipe-lbl{font-size:11px;font-weight:800;color:#c2410c;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.no-recipe-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
+.no-recipe-name{font-size:13px;font-weight:700;color:#292524;}
+.no-recipe-pill{font-size:10px;font-weight:800;padding:3px 10px;border-radius:99px;background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;white-space:nowrap;}
 .rec-section-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#b45309;margin:14px 0 8px;}
 .ingr-list{display:flex;flex-direction:column;gap:5px;margin-bottom:4px;}
 .ingr-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#44403c;line-height:1.5;}
@@ -153,23 +158,6 @@ const BUDGET_TIPS=[
   "Use leftover proteins across multiple meals",
   "Eggs are your best friend: cheap, fast, versatile"
 ];
-const GROCERY_MAP={
-  "Overnight Oats":["Rolled oats","Milk","Greek yogurt","Honey","Berries"],
-  "Scrambled Eggs & Toast":["Eggs (x2 dozen)","Bread","Butter"],
-  "Pancakes":["Pancake mix","Eggs","Milk","Syrup"],
-  "Spaghetti & Meatballs":["Spaghetti (2 lbs)","Ground beef","Marinara sauce","Parmesan"],
-  "Sheet Pan Chicken":["Chicken thighs (3 lbs)","Potatoes","Broccoli","Olive oil","Garlic"],
-  "Taco Night":["Ground beef","Taco shells","Cheese","Lettuce","Salsa","Sour cream"],
-  "Slow Cooker Chili":["Ground beef","Kidney beans","Diced tomatoes","Onion","Bell pepper","Chili powder"],
-  "Baked Ziti":["Ziti pasta","Ricotta","Mozzarella","Marinara sauce"],
-  "Quesadillas":["Flour tortillas","Cheddar cheese","Chicken (cooked)"],
-  "Turkey Wraps":["Flour tortillas","Deli turkey","Lettuce","Tomato","Mayo"],
-  "Mac & Cheese":["Elbow pasta","Cheddar cheese","Milk","Butter"],
-  "Grilled Cheese + Soup":["Bread","American cheese","Butter","Canned tomato soup"],
-  "Apple Slices + PB":["Apples (bag)","Peanut butter"],
-  "Cheese & Crackers":["Crackers","Cheese block"],
-  "Veggies + Hummus":["Baby carrots","Celery","Cucumber","Hummus (large)"]
-};
 const TC={breakfast:{bg:"#fef3c7",text:"#b45309"},lunch:{bg:"#e0f2fe",text:"#0369a1"},dinner:{bg:"#ffe4e6",text:"#be123c"},snacks:{bg:"#dcfce7",text:"#15803d"}};
 const RECIPES={
   "Overnight Oats":{tag:"breakfast",time:"5 min + overnight",servings:5,ingredients:["2½ cups rolled oats","2½ cups milk","1¼ cups Greek yogurt","5 tsp honey","Pinch of salt","Fresh berries (for topping)"],steps:["Measure ½ cup rolled oats per jar (5 jars total).","Add ½ cup milk and ¼ cup Greek yogurt to each jar.","Stir in 1 tsp honey and a pinch of salt.","Seal jars and refrigerate overnight (at least 6 hours).","In the morning, top with fresh berries and serve cold."]},
@@ -289,18 +277,207 @@ function buildPlanner(){
   }).join("");
 }
 
+// ── INGREDIENT AGGREGATION ────────────────────────────────────────────────
+// Maps unicode/word fractions to decimal
+const FRAC={
+  "½":0.5,"⅓":1/3,"⅔":2/3,"¼":0.25,"¾":0.75,
+  "⅛":0.125,"⅜":0.375,"⅝":0.625,"⅞":0.875,
+  "1/2":0.5,"1/3":1/3,"2/3":2/3,"1/4":0.25,"3/4":0.75,
+  "1/8":0.125,"3/8":0.375,"5/8":0.625,"7/8":0.875
+};
+// Canonical unit aliases → standard label
+const UNIT_ALIAS={
+  cup:"cup",cups:"cup",c:"cup",
+  tablespoon:"tbsp",tablespoons:"tbsp",tbsp:"tbsp",tbs:"tbsp",tb:"tbsp",
+  teaspoon:"tsp",teaspoons:"tsp",tsp:"tsp",
+  pound:"lb",pounds:"lb",lb:"lb",lbs:"lb",
+  ounce:"oz",ounces:"oz",oz:"oz",
+  clove:"clove",cloves:"clove",
+  slice:"slice",slices:"slice",
+  can:"can",cans:"can",
+  jar:"jar",jars:"jar",
+  packet:"packet",packets:"packet",
+  stalk:"stalk",stalks:"stalk",
+  bag:"bag",bags:"bag",
+  container:"container",containers:"container",
+  multipack:"multipack",
+  head:"head",heads:"head",
+  bunch:"bunch",bunches:"bunch",
+};
+// Words that are notes/qualifiers, not ingredient names
+const STOP=new Set(["to","taste","optional","for","topping","serving","as","needed","divided","of","cooked","shredded","diced","sliced","minced","cubed","halved","chopped","frozen","thawed","warm","large","medium","small","extra","fresh","dry","dried","bonein","boneless","lean","low","fat","sodium","free","or","and","plus","little","a","an","the","approximately","approx"]);
+
+function parseFrac(s){
+  // returns numeric value for a string like "1½", "2/3", "1 1/2", "½", "3", etc.
+  if(!s)return null;
+  s=s.trim();
+  // try direct frac lookup
+  if(FRAC[s]!==undefined)return FRAC[s];
+  // whole number
+  if(/^\d+$/.test(s))return parseFloat(s);
+  // decimal
+  if(/^\d+\.\d+$/.test(s))return parseFloat(s);
+  // "1½" or "2⅓" — whole + unicode frac
+  const muf=s.match(/^(\d+)\s*([\u00BC-\u00BE\u2150-\u215E½⅓⅔¼¾⅛⅜⅝⅞]+)$/);
+  if(muf&&FRAC[muf[2]]!==undefined)return parseInt(muf[1])+FRAC[muf[2]];
+  // "1 1/2" — whole + slash frac
+  const msf=s.match(/^(\d+)\s+(\d+\/\d+)$/);
+  if(msf&&FRAC[msf[2]]!==undefined)return parseInt(msf[1])+FRAC[msf[2]];
+  // plain slash frac
+  const sf=s.match(/^(\d+)\/(\d+)$/);
+  if(sf)return parseInt(sf[1])/parseInt(sf[2]);
+  return null;
+}
+
+function formatQty(n){
+  if(n===null||n===undefined)return"";
+  const FRAC_STRS={"0.5":"½","0.3333":"⅓","0.6667":"⅔","0.25":"¼","0.75":"¾","0.125":"⅛","0.375":"⅜","0.625":"⅝","0.875":"⅞"};
+  const FRAC_VALS=[0.5,1/3,2/3,0.25,0.75,0.125,0.375,0.625,0.875];
+  const whole=Math.floor(n);const rem=n-whole;
+  for(const v of FRAC_VALS){
+    if(Math.abs(rem-v)<0.02){
+      const key=v===1/3?"0.3333":v===2/3?"0.6667":String(v);
+      const fracStr=FRAC_STRS[key];
+      if(fracStr)return whole>0?`${whole}${fracStr}`:fracStr;
+    }
+  }
+  if(Number.isInteger(n))return String(n);
+  return parseFloat(n.toFixed(2)).toString();
+}
+
+function normalizeIngredientName(raw){
+  // strip leading quantity+unit tokens to get just the ingredient name
+  let s=raw.trim();
+  // remove range like "1–2" or "2-3"
+  s=s.replace(/^\d+[\–\-]\d+\s*/,"");
+  // remove leading qty (incl fractions)
+  s=s.replace(/^([\d½⅓⅔¼¾⅛⅜⅝⅞][0-9\s\/½⅓⅔¼¾⅛⅜⅝⅞]*)\s*/,"");
+  // remove leading unit
+  const unitRe=new RegExp("^("+Object.keys(UNIT_ALIAS).join("|")+")[s]?\\b\\.?\\s*","i");
+  s=s.replace(unitRe,"");
+  // remove parenthetical notes like "(10.75 oz each)" or "(for serving)"
+  s=s.replace(/\(.*?\)/g,"").trim();
+  // remove trailing comma-separated qualifiers like ", diced" ", minced"
+  s=s.replace(/,.*$/,"").trim();
+  // lowercase, collapse spaces
+  s=s.toLowerCase().replace(/\s+/g," ").trim();
+  // remove stop words that appear at start
+  s=s.replace(/^(of|for|the|a|an)\s+/i,"");
+  return s;
+}
+
+function parseIngredientLine(line){
+  // Returns {qty, unit, name, raw} or null
+  // Patterns: "1½ cups rolled oats" | "10 eggs" | "Salt & pepper to taste" | "Butter (for griddle)"
+  let s=line.trim();
+  // Remove leading bullet if any
+  s=s.replace(/^[-•]\s*/,"");
+  if(!s)return null;
+
+  let qty=null,unit=null;
+
+  // Try to extract leading number/fraction
+  // Matches: "1½", "2½", "½", "1 1/2", "2/3", "1", "3.5"
+  const qtyRe=/^([\d½⅓⅔¼¾⅛⅜⅝⅞]+(?:\s*[\d\/½⅓⅔¼¾⅛⅜⅝⅞]+)?)\s*/;
+  const qm=s.match(qtyRe);
+  if(qm){
+    const parsed=parseFrac(qm[1].trim());
+    if(parsed!==null){qty=parsed;s=s.slice(qm[0].length);}
+  }
+
+  // Try to extract unit
+  const unitRe=new RegExp("^("+Object.keys(UNIT_ALIAS).join("|")+")s?\\b\\.?\\s*","i");
+  const um=s.match(unitRe);
+  if(um){unit=UNIT_ALIAS[um[1].toLowerCase()]||um[1].toLowerCase();s=s.slice(um[0].length);}
+
+  // Rest is ingredient name — clean it
+  const raw=s.trim();
+  // Remove parenthetical notes
+  let name=raw.replace(/\(.*?\)/g,"").trim();
+  // Remove trailing qualifiers after comma
+  name=name.replace(/,.*$/,"").trim().toLowerCase();
+  // Remove leading articles
+  name=name.replace(/^(of|for|the|a|an)\s+/i,"").trim();
+
+  if(!name)return null;
+  return{qty,unit,name,raw:line.trim()};
+}
+
+function aggregateIngredients(mealNames){
+  const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
+  // Map: normalizedName → {qty, unit, display, recipes[]}
+  const map={};
+
+  mealNames.forEach(mealName=>{
+    const recipe=allRecipes[mealName];
+    if(!recipe||!recipe.ingredients)return;
+    recipe.ingredients.forEach(line=>{
+      const parsed=parseIngredientLine(line);
+      if(!parsed)return;
+      const key=parsed.name;
+      if(!map[key]){
+        map[key]={name:parsed.name,qty:null,unit:parsed.unit,rawLines:[],recipes:[]};
+      }
+      const entry=map[key];
+      // Only add quantities if units are compatible (same unit or both unitless)
+      if(parsed.qty!==null){
+        const sameUnit=(entry.unit||null)===(parsed.unit||null);
+        if(sameUnit){
+          entry.qty=(entry.qty||0)+parsed.qty;
+        } else if(entry.qty===null){
+          entry.qty=parsed.qty;entry.unit=parsed.unit;
+        } else {
+          // Different units — just flag as "see recipes"
+          entry.qty=null;entry.unit=null;entry.ambiguous=true;
+        }
+      }
+      entry.rawLines.push(line);
+      if(!entry.recipes.includes(mealName))entry.recipes.push(mealName);
+    });
+  });
+
+  // Build display strings
+  return Object.values(map).map(e=>{
+    let display;
+    if(e.ambiguous||e.qty===null){
+      // Show the original lines joined, or just the name capitalized
+      display=capitalize(e.name)+(e.rawLines.length>1?" (see recipes)":"");
+    } else {
+      const qStr=formatQty(e.qty);
+      const uStr=e.unit?(e.qty>1&&e.unit!=="oz"&&e.unit!=="lb"?pluralUnit(e.unit):e.unit):"";
+      display=(qStr?qStr+" ":"")+(uStr?uStr+" ":"")+capitalize(e.name);
+    }
+    return{key:e.name,display,recipes:e.recipes};
+  }).sort((a,b)=>a.display.localeCompare(b.display));
+}
+
+function pluralUnit(u){
+  const map={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz",clove:"cloves",slice:"slices",can:"cans",jar:"jars",packet:"packets",stalk:"stalks",bag:"bags",container:"containers",head:"heads",bunch:"bunches"};
+  return map[u]||u;
+}
+function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+
 // ── GROCERY ───────────────────────────────────────────────────────────────
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
-  const items=[...new Set(meals.flatMap(m=>GROCERY_MAP[m]||["Ingredients for "+m]))];
-  if(!items.length)return`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">Add meals to your plan to generate a grocery list.</p></div>`;
-  const rem=items.filter(i=>!S.groceryChecked[i]).length;
+  if(!meals.length)return`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">Add meals to your plan to generate a grocery list.</p></div>`;
+  const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
+  const missingRecipes=meals.filter(m=>!allRecipes[m]);
+  const knownMeals=meals.filter(m=>!!allRecipes[m]);
+  const items=aggregateIngredients(knownMeals);
+  const rem=items.filter(i=>!S.groceryChecked[i.key]).length;
   const tip=BUDGET_TIPS[Math.floor(Math.random()*BUDGET_TIPS.length)];
-  return`<div class="groc-hdr"><span class="groc-cnt">${rem} of ${items.length} items remaining</span><button class="btn-rst" id="btnResetGroc">Reset</button></div>`+
-  items.map(item=>{const on=!!S.groceryChecked[item];
-    return`<div class="groc-item${on?" on":""}" data-gi="${esc(item)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="groc-lbl${on?" on":""}">${esc(item)}</span></div>`;
-  }).join("")+
-  `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`;
+  return(missingRecipes.length?`<div class="no-recipe-section">
+    <div class="no-recipe-lbl">⚠️ Missing Recipes — ingredients not included</div>`+
+    missingRecipes.map(m=>`<div class="no-recipe-row"><span class="no-recipe-name">${esc(m)}</span><span class="no-recipe-pill">No recipe uploaded</span></div>`).join("")+
+  `</div>`:"")+
+  (items.length?
+    `<div class="groc-hdr"><span class="groc-cnt">${rem} of ${items.length} items remaining</span><button class="btn-rst" id="btnResetGroc">Reset</button></div>`+
+    items.map(item=>{const on=!!S.groceryChecked[item.key];
+      return`<div class="groc-item${on?" on":""}" data-gi="${esc(item.key)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="groc-lbl${on?" on":""}">${esc(item.display)}</span></div>`;
+    }).join("")+
+    `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`
+  :`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">No ingredients found. Upload recipes for your planned meals.</p></div>`);
 }
 
 // ── RECIPES ───────────────────────────────────────────────────────────────
