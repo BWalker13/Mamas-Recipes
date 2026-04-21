@@ -544,8 +544,13 @@ function buildRecipes(){
 function buildPicker(){
   const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
   const custom=S.customMeals[mealType]||[];
-  const all=[...new Set([...MEAL_IDEAS[mealType],...custom])];
-  const sugg=inp.trim()?all.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):all;
+  const uploaded=Object.entries(S.uploadedRecipes).filter(([,r])=>r.tag===mealType).map(([n])=>n);
+  const base=[...new Set([...MEAL_IDEAS[mealType],...custom])];
+  const isSearch=inp.trim().length>0;
+  const fBase=isSearch?base.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):base;
+  const fUp=isSearch?uploaded.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):uploaded;
+  const noResults=fBase.length===0&&fUp.length===0;
+  const btn=(o,isUp)=>`<button class="sugg-btn${currentMeal===o?" on":""}" data-pick="${esc(o)}"${isUp?` style="border-color:#ede9fe;background:${currentMeal===o?"#ede9fe":"#faf5ff"}"`:""}>${currentMeal===o?"✓ ":""}${esc(o)}${isUp?`<span style="font-size:9px;font-weight:800;color:#7c3aed;margin-left:6px">UPLOADED</span>`:""}</button>`;
   return`<div class="overlay" id="pickerOv">
     <div class="modal" id="pickerBox">
       <div><div class="picker-eyebrow">${esc(day)}</div><div class="picker-title">${esc(mealType)}</div></div>
@@ -558,9 +563,10 @@ function buildPicker(){
         <div class="search-hint">Press Enter or + to add your own meal.</div>
       </div>
       <div>
-        <div class="sugg-lbl">${inp?"Matching meals":"All suggestions"}</div>
-        ${sugg.length===0?`<p style="font-size:12px;color:#a8a29e">No matches — hit + to add "${esc(inp)}"</p>`:""}
-        ${sugg.map(o=>`<button class="sugg-btn${currentMeal===o?" on":""}" data-pick="${esc(o)}">${currentMeal===o?"✓ ":""}${esc(o)}</button>`).join("")}
+        ${`${uploaded.length>0&&fUp.length>0?`<div class="sugg-lbl" style="color:#7c3aed">📤 Your uploaded recipes</div>${fUp.map(o=>btn(o,true)).join("")}<div style="height:6px"></div>`:""}`}
+        <div class="sugg-lbl">${isSearch?"Matching meals":"All suggestions"}</div>
+        ${noResults?`<p style="font-size:12px;color:#a8a29e">No matches — hit + to add "${esc(inp)}"</p>`:""}
+        ${fBase.map(o=>btn(o,false)).join("")}
       </div>
       ${currentMeal?`<button class="btn-remove" id="btnPickRm">🗑 Remove current meal</button>`:""}
       <button class="btn-close-sm" id="btnPickClose">Close</button>
