@@ -86,6 +86,20 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#fffbeb;border:1.5px solid #fde68a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#b45309;}
 .step-txt{font-size:13px;color:#44403c;line-height:1.6;padding-top:2px;}
 .btn-del{padding:4px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:white;color:#ef4444;font-size:11px;font-weight:700;flex-shrink:0;}
+.btn-edit{padding:4px 10px;border-radius:8px;border:1.5px solid #fed7aa;background:white;color:#d97706;font-size:11px;font-weight:700;flex-shrink:0;}
+.rec-btn-group{display:flex;gap:6px;flex-shrink:0;}
+.edit-modal{background:white;border-radius:24px;padding:24px;width:min(520px,calc(100vw - 32px));max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
+.edit-field-lbl{font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+.edit-inp{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:13px;font-family:Georgia,serif;outline:none;color:#292524;background:white;transition:border-color .2s;}
+.edit-inp:focus{border-color:#d97706;}
+.edit-select{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:13px;font-family:Georgia,serif;outline:none;color:#292524;background:white;cursor:pointer;}
+.edit-ta{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:12px;font-family:Georgia,serif;outline:none;color:#292524;background:white;resize:vertical;line-height:1.7;transition:border-color .2s;}
+.edit-ta:focus{border-color:#d97706;}
+.edit-hint{font-size:11px;color:#a8a29e;margin-top:4px;}
+.edit-title{font-size:20px;font-weight:800;color:#292524;}
+.edit-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.edit-name-warn{font-size:11px;color:#d97706;margin-top:3px;display:none;}
+.edit-name-warn.show{display:block;}
 .empty{text-align:center;padding:48px 0;color:#a8a29e;}
 .empty-icon{font-size:40px;margin-bottom:12px;}
 .empty-txt{font-size:13px;}
@@ -212,7 +226,8 @@ const S={
   showUpload:false, uploadText:"", uploadPreview:null, uploadError:"",
   recipeOpen:   lsGet("s_recipeOpen",{}),
   recipeFilter: lsGet("s_recipeFilter","all"),
-  groceryChecked: lsGet("s_groceryChecked",{})
+  groceryChecked: lsGet("s_groceryChecked",{}),
+  showEdit: false, editRecipeName: null, editForm: null
 };
 function loadMeals(){S.meals=lsGet("week:"+weekKey(S.weekOffset),{});}
 function saveMeals(){lsSet("week:"+weekKey(S.weekOffset),S.meals);}
@@ -258,7 +273,8 @@ function buildApp(){
   </div>
   ${S.picker?buildPicker():""}
   ${S.showHistory?buildHistory():""}
-  ${S.showUpload?buildUpload():""}`;
+  ${S.showUpload?buildUpload():""}
+  ${S.showEdit?buildEditModal():""}`;
 }
 
 // ── PLANNER ───────────────────────────────────────────────────────────────
@@ -508,8 +524,10 @@ function buildRecipes(){
             <span class="rec-meta-txt">👨‍👩‍👧‍👦 Serves ${recipe.servings}</span>
           </div>
         </div>
-        ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
-      </div>
+        <div class="rec-btn-group">
+          <button class="btn-edit" data-er="${esc(name)}" title="Edit recipe">✏️ Edit</button>
+          ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
+        </div>
       ${isOpen?`<div class="rec-steps">
         ${recipe.ingredients&&recipe.ingredients.length?`<div class="rec-section-lbl">Ingredients</div><div class="ingr-list">`+
           recipe.ingredients.map(i=>`<div class="ingr-row"><div class="ingr-dot"></div><span>${esc(i)}</span></div>`).join("")+
@@ -631,6 +649,59 @@ Ingredients
   </div>`;
 }
 
+// ── EDIT RECIPE MODAL ─────────────────────────────────────────────────────
+function buildEditModal(){
+  const f=S.editForm;
+  if(!f)return"";
+  const isBuiltin=!S.uploadedRecipes[S.editRecipeName]&&RECIPES[S.editRecipeName];
+  return`<div class="overlay" id="editOv">
+    <div class="edit-modal">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="edit-title">✏️ Edit Recipe</div>
+        <button class="btn-x" id="btnEditClose">×</button>
+      </div>
+      ${isBuiltin?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e">
+        <strong>Built-in recipe:</strong> Your edits will be saved as a custom version and override the original.
+      </div>`:""}
+      <div>
+        <div class="edit-field-lbl">Recipe Name</div>
+        <input class="edit-inp" id="editName" value="${esc(f.name)}" placeholder="e.g. Chicken Alfredo"/>
+        <div class="edit-name-warn${f.name!==S.editRecipeName&&(Object.assign({},RECIPES,S.uploadedRecipes)[f.name])?" show":""}" id="editNameWarn">⚠️ A recipe with this name already exists</div>
+      </div>
+      <div class="edit-row">
+        <div>
+          <div class="edit-field-lbl">Category</div>
+          <select class="edit-select" id="editTag">
+            ${["breakfast","lunch","dinner","snacks"].map(t=>`<option value="${t}"${f.tag===t?" selected":""}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`).join("")}
+          </select>
+        </div>
+        <div>
+          <div class="edit-field-lbl">Cook Time</div>
+          <input class="edit-inp" id="editTime" value="${esc(f.time)}" placeholder="e.g. 30 min"/>
+        </div>
+      </div>
+      <div>
+        <div class="edit-field-lbl">Servings</div>
+        <input class="edit-inp" id="editServings" type="number" min="1" max="50" value="${esc(f.servings)}" style="width:100px"/>
+      </div>
+      <div>
+        <div class="edit-field-lbl">Ingredients</div>
+        <textarea class="edit-ta" id="editIngredients" rows="7" placeholder="One ingredient per line, e.g.:\n2 cups flour\n1 tsp salt\n3 eggs">${esc((f.ingredients||[]).join("\n"))}</textarea>
+        <div class="edit-hint">One ingredient per line</div>
+      </div>
+      <div>
+        <div class="edit-field-lbl">Preparation Steps</div>
+        <textarea class="edit-ta" id="editSteps" rows="8" placeholder="One step per line, e.g.:\nPreheat oven to 375°F\nMix dry ingredients\nBake for 25 minutes">${esc((f.steps||[]).join("\n"))}</textarea>
+        <div class="edit-hint">One step per line — numbers are added automatically</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="btnEditSave">✓ Save Changes</button>
+        <button class="btn-secondary" id="btnEditCancel">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 // ── PARSE RECIPE TEXT ─────────────────────────────────────────────────────
 function parseRecipes(text){
   const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
@@ -700,12 +771,64 @@ function bind(){
   document.querySelectorAll("[data-rf]").forEach(b=>b.addEventListener("click",()=>{S.recipeFilter=b.dataset.rf;lsSet("s_recipeFilter",S.recipeFilter);render();}));
   // Recipe cards
   document.querySelectorAll("[data-rn]").forEach(h=>h.addEventListener("click",e=>{
-    if(e.target.closest("[data-dr]"))return;
+    if(e.target.closest("[data-dr]")||e.target.closest("[data-er]"))return;
     S.recipeOpen[h.dataset.rn]=!S.recipeOpen[h.dataset.rn];lsSet("s_recipeOpen",S.recipeOpen);render();
   }));
   document.querySelectorAll("[data-dr]").forEach(b=>b.addEventListener("click",e=>{
     e.stopPropagation();delete S.uploadedRecipes[b.dataset.dr];lsSet("uploadedRecipes",S.uploadedRecipes);render();
   }));
+  // Edit recipe
+  document.querySelectorAll("[data-er]").forEach(b=>b.addEventListener("click",e=>{
+    e.stopPropagation();
+    const name=b.dataset.er;
+    const allR=Object.assign({},RECIPES,S.uploadedRecipes);
+    const r=allR[name];if(!r)return;
+    S.editRecipeName=name;
+    S.editForm={name,tag:r.tag,time:r.time,servings:r.servings,ingredients:[...(r.ingredients||[])],steps:[...(r.steps||[])]};
+    S.showEdit=true;render();
+  }));
+  // Edit modal events
+  ov("editOv",()=>{S.showEdit=false;S.editForm=null;render();});
+  q("btnEditClose",()=>{S.showEdit=false;S.editForm=null;render();});
+  q("btnEditCancel",()=>{S.showEdit=false;S.editForm=null;render();});
+  // Live name-conflict warning
+  const enEl=document.getElementById("editName");
+  if(enEl)enEl.addEventListener("input",()=>{
+    const v=enEl.value.trim();
+    const allR=Object.assign({},RECIPES,S.uploadedRecipes);
+    const conflict=v&&v!==S.editRecipeName&&allR[v];
+    document.getElementById("editNameWarn").classList.toggle("show",!!conflict);
+  });
+  q("btnEditSave",()=>{
+    const name=(document.getElementById("editName").value||"").trim();
+    const tag=document.getElementById("editTag").value;
+    const time=(document.getElementById("editTime").value||"").trim()||"—";
+    const servings=parseInt(document.getElementById("editServings").value)||5;
+    const ingredients=document.getElementById("editIngredients").value.split("\n").map(l=>l.trim()).filter(Boolean);
+    const steps=document.getElementById("editSteps").value.split("\n").map(l=>l.trim()).filter(Boolean);
+    if(!name)return;
+    const allR=Object.assign({},RECIPES,S.uploadedRecipes);
+    if(name!==S.editRecipeName&&allR[name])return; // conflict
+    const updated={tag,time,servings,ingredients,steps,_uploaded:true};
+    // Remove old entry if renamed
+    if(name!==S.editRecipeName){
+      // Remove from uploadedRecipes if it existed there
+      delete S.uploadedRecipes[S.editRecipeName];
+      // Update any meal plan cells that used the old name
+      Object.keys(S.meals).forEach(day=>{
+        Object.keys(S.meals[day]||{}).forEach(mt=>{
+          if(S.meals[day][mt]===S.editRecipeName)S.meals[day][mt]=name;
+        });
+      });
+      saveMeals();
+      // Update recipeOpen
+      if(S.recipeOpen[S.editRecipeName]){delete S.recipeOpen[S.editRecipeName];S.recipeOpen[name]=true;}
+    }
+    S.uploadedRecipes[name]=updated;
+    lsSet("uploadedRecipes",S.uploadedRecipes);
+    S.showEdit=false;S.editForm=null;S.editRecipeName=null;
+    render();
+  });
   // Upload
   q("btnShowUpload",()=>{S.showUpload=true;S.uploadText="";S.uploadPreview=null;S.uploadError="";render();});
   q("btnUploadClose",()=>{S.showUpload=false;render();});
