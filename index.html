@@ -13,7 +13,12 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;}
 .hdr-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;opacity:.7;margin-bottom:3px;}
 .hdr-title{font-size:24px;font-weight:800;line-height:1.2;}
-.btn-hist{background:rgba(255,255,255,.2);border:none;border-radius:12px;padding:8px 14px;color:white;font-size:12px;font-weight:700;white-space:nowrap;margin-top:2px;}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.btn-hist{background:rgba(255,255,255,.2);border:none;border-radius:12px;padding:8px 14px;color:white;font-size:12px;font-weight:700;white-space:nowrap;}
+.sync-badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap;}
+.sync-badge.ok{background:rgba(255,255,255,.2);color:white;}
+.sync-badge.err{background:rgba(239,68,68,.3);color:#fecaca;}
+.sync-badge.loading{background:rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
 .week-nav{margin-top:14px;display:flex;align-items:center;gap:10px;}
 .btn-wk{background:rgba(255,255,255,.2);border:none;border-radius:10px;width:32px;height:32px;color:white;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .wk-lbl{background:rgba(255,255,255,.15);border-radius:12px;padding:8px 14px;flex:1;text-align:center;}
@@ -51,7 +56,7 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .budget-lbl{font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
 .budget-txt{font-size:12px;color:#92400e;}
 .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-.pill{padding:6px 14px;border-radius:99px;border:none;font-size:12px;font-weight:700;background:#f0ebe3;color:#78716c;transition:all .15s;}
+.pill{padding:6px 14px;border-radius:99px;border:none;font-size:12px;font-weight:700;background:#f0ebe3;color:#78716c;transition:all .15px;}
 .pill.on{background:#d97706;color:white;}
 .pill-upload{background:white;border:1.5px dashed #d97706;color:#d97706;padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;transition:all .15s;}
 .rec-count-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -86,27 +91,13 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .step-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:#fffbeb;border:1.5px solid #fde68a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#b45309;}
 .step-txt{font-size:13px;color:#44403c;line-height:1.6;padding-top:2px;}
 .btn-del{padding:4px 10px;border-radius:8px;border:1.5px solid #fca5a5;background:white;color:#ef4444;font-size:11px;font-weight:700;flex-shrink:0;}
-.btn-edit{padding:4px 10px;border-radius:8px;border:1.5px solid #fed7aa;background:white;color:#d97706;font-size:11px;font-weight:700;flex-shrink:0;}
-.rec-btn-group{display:flex;gap:6px;flex-shrink:0;}
-.edit-modal{background:white;border-radius:24px;padding:24px;width:min(520px,calc(100vw - 32px));max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
-.edit-field-lbl{font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
-.edit-inp{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:13px;font-family:Georgia,serif;outline:none;color:#292524;background:white;transition:border-color .2s;}
-.edit-inp:focus{border-color:#d97706;}
-.edit-select{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:13px;font-family:Georgia,serif;outline:none;color:#292524;background:white;cursor:pointer;}
-.edit-ta{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:12px;font-family:Georgia,serif;outline:none;color:#292524;background:white;resize:vertical;line-height:1.7;transition:border-color .2s;}
-.edit-ta:focus{border-color:#d97706;}
-.edit-hint{font-size:11px;color:#a8a29e;margin-top:4px;}
-.edit-title{font-size:20px;font-weight:800;color:#292524;}
-.edit-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.edit-name-warn{font-size:11px;color:#d97706;margin-top:3px;display:none;}
-.edit-name-warn.show{display:block;}
 .empty{text-align:center;padding:48px 0;color:#a8a29e;}
 .empty-icon{font-size:40px;margin-bottom:12px;}
 .empty-txt{font-size:13px;}
 .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);}
 .overlay.bottom{align-items:flex-end;}
-.modal{background:white;border-radius:24px;padding:24px;width:340px;max-height:88vh;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
-.modal.wide{width:390px;max-height:92vh;}
+.modal{background:white;border-radius:24px;padding:24px;width:340px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
+.modal.wide{width:390px;}
 .modal.sheet{border-radius:24px 24px 0 0;width:100%;max-width:900px;max-height:85vh;box-shadow:0 -8px 40px rgba(0,0,0,.2);}
 .picker-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#a8a29e;margin-bottom:2px;}
 .picker-title{font-size:20px;font-weight:800;color:#292524;text-transform:capitalize;}
@@ -126,7 +117,7 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .fmt-pre{font-size:11px;color:#92400e;line-height:1.7;font-family:monospace;white-space:pre-wrap;}
 .btn-file{width:100%;padding:10px 14px;border-radius:12px;border:1.5px dashed #d6d3d1;background:#faf9f6;color:#78716c;font-size:13px;font-weight:700;}
 .divider{font-size:11px;color:#a8a29e;text-align:center;margin:4px 0;}
-.upload-ta{width:100%;min-height:260px;height:260px;max-height:50vh;padding:10px 12px;border-radius:12px;border:1.5px solid #e7e0d6;font-size:12px;font-family:monospace;resize:vertical;outline:none;color:#292524;line-height:1.6;overflow-y:auto;box-sizing:border-box;}
+.upload-ta{width:100%;height:160px;padding:10px 12px;border-radius:12px;border:1.5px solid #e7e0d6;font-size:12px;font-family:monospace;resize:vertical;outline:none;color:#292524;line-height:1.6;}
 .err-txt{font-size:12px;color:#ef4444;font-weight:600;}
 .preview-box{background:#f0fdf4;border-radius:14px;padding:12px;border:1px solid #bbf7d0;}
 .preview-lbl{font-size:11px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
@@ -149,12 +140,68 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .hist-day-lbl{font-size:11px;font-weight:800;color:#78716c;text-transform:uppercase;letter-spacing:1px;margin:14px 0 6px;}
 .hist-tags{display:flex;flex-wrap:wrap;gap:6px;}
 .hist-tag{font-size:12px;padding:4px 10px;border-radius:99px;font-weight:700;}
+/* Loading overlay */
+.init-overlay{position:fixed;inset:0;background:#faf9f6;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.init-spinner{width:40px;height:40px;border:3px solid #fde68a;border-top-color:#d97706;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.init-txt{font-size:14px;color:#92400e;font-weight:700;}
+.init-sub{font-size:12px;color:#a8a29e;}
 @media(max-width:480px){.modal,.modal.wide{width:calc(100vw - 32px);}}
 </style>
 </head>
 <body>
 <div id="app"></div>
+ 
 <script>
+// ── SUPABASE CONFIG ───────────────────────────────────────────────────────
+const SUPABASE_URL = "https://opvvejvazvmvcqsewiyo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_DSzFpVLLpF_To2vYcBNLfw_sCnNPQms";
+ 
+// ── SUPABASE CLIENT (no npm needed — raw fetch) ───────────────────────────
+const sb = {
+  async from(table) {
+    const base = `${SUPABASE_URL}/rest/v1/${table}`;
+    const headers = {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=representation"
+    };
+    return {
+      async select(query="*") {
+        const r = await fetch(`${base}?select=${query}`, { headers });
+        if (!r.ok) throw new Error(await r.text());
+        return r.json();
+      },
+      async upsert(data, onConflict) {
+        const h = {...headers, "Prefer": `resolution=merge-duplicates,return=representation`};
+        const url = onConflict ? `${base}?on_conflict=${onConflict}` : base;
+        const r = await fetch(url, { method:"POST", headers:h, body:JSON.stringify(data) });
+        if (!r.ok) throw new Error(await r.text());
+        return r.json();
+      },
+      async delete(filters) {
+        let url = base + "?";
+        for (const [k,v] of Object.entries(filters)) url += `${k}=eq.${encodeURIComponent(v)}&`;
+        const r = await fetch(url, { method:"DELETE", headers });
+        if (!r.ok) throw new Error(await r.text());
+        return true;
+      }
+    };
+  }
+};
+ 
+// Convenience wrappers
+async function dbSelect(table, query="*") {
+  return (await sb.from(table)).then(t => t.select(query));
+}
+async function dbUpsert(table, data, onConflict) {
+  return (await sb.from(table)).then(t => t.upsert(data, onConflict));
+}
+async function dbDelete(table, filters) {
+  return (await sb.from(table)).then(t => t.delete(filters));
+}
+ 
 // ── DATA ──────────────────────────────────────────────────────────────────
 const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const MEAL_TYPES=["breakfast","lunch","dinner","snacks"];
@@ -203,34 +250,213 @@ const RECIPES={
   "Popcorn":{tag:"snacks",time:"10 min",servings:5,ingredients:["½ cup popcorn kernels","2 tbsp vegetable or coconut oil","2 tbsp melted butter","Salt to taste"],steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
   "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,ingredients:["1 multipack (12–16 count) yogurt tubes"],steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
 };
-
-// ── STORAGE ───────────────────────────────────────────────────────────────
+ 
+// ── LOCAL STORAGE FALLBACK ────────────────────────────────────────────────
 function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
-
+ 
 // ── WEEK HELPERS ──────────────────────────────────────────────────────────
 function getMonday(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-((n.getDay()+6)%7)+off*7);m.setHours(0,0,0,0);return m;}
 function weekKey(off){return getMonday(off).toISOString().slice(0,10);}
 function weekLabel(off){const m=getMonday(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
 function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week";if(off===-1)return"Last Week";return"Week of "+weekLabel(off).split("–")[0].trim();}
-
+ 
 // ── STATE ─────────────────────────────────────────────────────────────────
 const S={
-  tab:          lsGet("s_tab","planner")==="prep"?"planner":lsGet("s_tab","planner"),
+  tab:          lsGet("s_tab","planner"),
   weekOffset:   lsGet("s_weekOffset",0),
   meals:{},
+  allWeekMeals:{}, // cache of all weeks loaded from supabase for history
   customMeals:  lsGet("customMeals",{breakfast:[],lunch:[],dinner:[],snacks:[]}),
-  uploadedRecipes: lsGet("uploadedRecipes",{}),
+  uploadedRecipes: {},  // loaded from Supabase on init
   picker:null, pickerInput:"",
   showHistory:false, historyOpen:{},
   showUpload:false, uploadText:"", uploadPreview:null, uploadError:"",
   recipeOpen:   lsGet("s_recipeOpen",{}),
   recipeFilter: lsGet("s_recipeFilter","all"),
   groceryChecked: lsGet("s_groceryChecked",{}),
-  showEdit: false, editRecipeName: null, editForm: null
+  syncStatus: "loading", // "loading" | "ok" | "error"
+  syncMsg: "Connecting…"
 };
-function loadMeals(){S.meals=lsGet("week:"+weekKey(S.weekOffset),{});}
-function saveMeals(){lsSet("week:"+weekKey(S.weekOffset),S.meals);}
+ 
+// ── SUPABASE SYNC FUNCTIONS ───────────────────────────────────────────────
+ 
+// Load all uploaded recipes from Supabase
+async function loadRecipesFromDB() {
+  try {
+    const rows = await dbSelect("recipes");
+    const result = {};
+    for (const row of rows) {
+      result[row.name] = {
+        tag: row.tag,
+        time: row.time,
+        servings: row.servings,
+        ingredients: row.ingredients || [],
+        steps: row.steps || [],
+        _uploaded: true
+      };
+    }
+    S.uploadedRecipes = result;
+    // Also mirror to localStorage as fallback
+    lsSet("uploadedRecipes", result);
+  } catch(e) {
+    console.warn("Supabase recipe load failed, using localStorage fallback:", e);
+    S.uploadedRecipes = lsGet("uploadedRecipes", {});
+  }
+}
+ 
+// Save a recipe to Supabase
+async function saveRecipeToDB(name, recipe) {
+  try {
+    await dbUpsert("recipes", {
+      name,
+      tag: recipe.tag,
+      time: recipe.time,
+      servings: recipe.servings,
+      ingredients: recipe.ingredients,
+      steps: recipe.steps
+    }, "name");
+    setSyncOk();
+  } catch(e) {
+    console.warn("Recipe save failed:", e);
+    setSyncErr("Recipe save failed — saved locally only");
+  }
+}
+ 
+// Delete a recipe from Supabase
+async function deleteRecipeFromDB(name) {
+  try {
+    await dbDelete("recipes", { name });
+    setSyncOk();
+  } catch(e) {
+    console.warn("Recipe delete failed:", e);
+    setSyncErr("Delete failed — refresh to re-sync");
+  }
+}
+ 
+// Load meals for current week from Supabase
+async function loadMealsFromDB() {
+  const wk = weekKey(S.weekOffset);
+  try {
+    const rows = await dbSelect("meal_plans");
+    // Rebuild allWeekMeals from all rows
+    S.allWeekMeals = {};
+    for (const row of rows) {
+      if (!S.allWeekMeals[row.week_key]) S.allWeekMeals[row.week_key] = {};
+      if (!S.allWeekMeals[row.week_key][row.day]) S.allWeekMeals[row.week_key][row.day] = {};
+      S.allWeekMeals[row.week_key][row.day][row.meal_type] = row.meal_name || "";
+    }
+    S.meals = S.allWeekMeals[wk] || {};
+    // Mirror to localStorage
+    lsSet("week:"+wk, S.meals);
+    setSyncOk();
+  } catch(e) {
+    console.warn("Meal plan load failed, using localStorage:", e);
+    S.meals = lsGet("week:"+wk, {});
+  }
+}
+ 
+// Save a single meal slot to Supabase
+async function saveMealToDB(day, mealType, mealName) {
+  const wk = weekKey(S.weekOffset);
+  try {
+    if (mealName) {
+      await dbUpsert("meal_plans", {
+        week_key: wk,
+        day,
+        meal_type: mealType,
+        meal_name: mealName,
+        updated_at: new Date().toISOString()
+      }, "week_key,day,meal_type");
+    } else {
+      // Empty meal — delete the row
+      await dbDelete("meal_plans", {
+        week_key: wk,
+        day,
+        meal_type: mealType
+      });
+    }
+    setSyncOk();
+  } catch(e) {
+    console.warn("Meal save failed:", e);
+    setSyncErr("Meal save failed — saved locally only");
+  }
+}
+ 
+// Load custom meals from Supabase
+async function loadCustomMealsFromDB() {
+  try {
+    const rows = await dbSelect("custom_meals");
+    const result = {breakfast:[],lunch:[],dinner:[],snacks:[]};
+    for (const row of rows) {
+      if (result[row.meal_type]) result[row.meal_type].push(row.name);
+    }
+    S.customMeals = result;
+    lsSet("customMeals", result);
+  } catch(e) {
+    console.warn("Custom meals load failed, using localStorage:", e);
+    S.customMeals = lsGet("customMeals", {breakfast:[],lunch:[],dinner:[],snacks:[]});
+  }
+}
+ 
+// Save a custom meal to Supabase
+async function saveCustomMealToDB(mealType, name) {
+  try {
+    await dbUpsert("custom_meals", { meal_type: mealType, name }, "meal_type,name");
+  } catch(e) {
+    console.warn("Custom meal save failed:", e);
+  }
+}
+ 
+function setSyncOk() {
+  S.syncStatus = "ok";
+  S.syncMsg = "☁️ Synced";
+  updateSyncBadge();
+}
+function setSyncErr(msg) {
+  S.syncStatus = "error";
+  S.syncMsg = "⚠️ " + msg;
+  updateSyncBadge();
+}
+function updateSyncBadge() {
+  const el = document.getElementById("syncBadge");
+  if (!el) return;
+  el.className = "sync-badge " + S.syncStatus;
+  el.textContent = S.syncMsg;
+}
+ 
+// ── INIT ──────────────────────────────────────────────────────────────────
+async function init() {
+  // Show loading screen
+  document.getElementById("app").innerHTML = `
+    <div class="init-overlay">
+      <div class="init-spinner"></div>
+      <div class="init-txt">Loading your meal planner…</div>
+      <div class="init-sub">Syncing with cloud ☁️</div>
+    </div>`;
+ 
+  try {
+    await Promise.all([
+      loadRecipesFromDB(),
+      loadMealsFromDB(),
+      loadCustomMealsFromDB()
+    ]);
+    S.syncStatus = "ok";
+    S.syncMsg = "☁️ Synced";
+  } catch(e) {
+    S.syncStatus = "error";
+    S.syncMsg = "⚠️ Offline mode";
+  }
+  render();
+}
+ 
+// ── SAVE FUNCTIONS (dual-write: Supabase + localStorage) ──────────────────
+function saveMeals() {
+  const wk = weekKey(S.weekOffset);
+  lsSet("week:"+wk, S.meals);
+  // Supabase saves happen per-slot in selectMeal / removeMeal
+}
+ 
 function saveUIState(){
   lsSet("s_tab",S.tab);
   lsSet("s_weekOffset",S.weekOffset);
@@ -238,20 +464,22 @@ function saveUIState(){
   lsSet("s_recipeOpen",S.recipeOpen);
   lsSet("s_groceryChecked",S.groceryChecked);
 }
-loadMeals();
-
+ 
 // ── RENDER ────────────────────────────────────────────────────────────────
 function render(){saveUIState();document.getElementById("app").innerHTML=buildApp();bind();}
-
+ 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-
+ 
 function buildApp(){
   const total=DAYS.length*4;
   const planned=Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean).length;
   return`<div class="hdr"><div class="hdr-inner">
     <div class="hdr-top">
       <div><div class="hdr-eyebrow">Family of 5 · Weekly System</div><div class="hdr-title">Mama's Meal Prep Planner</div></div>
-      <button class="btn-hist" id="btnHist">📚 History</button>
+      <div class="hdr-right">
+        <button class="btn-hist" id="btnHist">📚 History</button>
+        <span id="syncBadge" class="sync-badge ${S.syncStatus}">${esc(S.syncMsg)}</span>
+      </div>
     </div>
     <div class="week-nav">
       <button class="btn-wk" id="btnPrev">‹</button>
@@ -273,13 +501,12 @@ function buildApp(){
   </div>
   ${S.picker?buildPicker():""}
   ${S.showHistory?buildHistory():""}
-  ${S.showUpload?buildUpload():""}
-  ${S.showEdit?buildEditModal():""}`;
+  ${S.showUpload?buildUpload():""}`;
 }
-
+ 
 // ── PLANNER ───────────────────────────────────────────────────────────────
 function buildPlanner(){
-  return`<p class="hint">Tap any cell to pick a meal. Everything saves automatically. ✨</p>`+
+  return`<p class="hint">Tap any cell to pick a meal. Everything syncs to the cloud automatically. ☁️</p>`+
   DAYS.map(day=>{
     const dm=S.meals[day]||{};
     return`<div class="day-card"><div class="day-name">${day}</div><div class="meal-grid">`+
@@ -292,187 +519,75 @@ function buildPlanner(){
     }).join("")+`</div></div>`;
   }).join("");
 }
-
+ 
 // ── INGREDIENT AGGREGATION ────────────────────────────────────────────────
-// Maps unicode/word fractions to decimal
-const FRAC={
-  "½":0.5,"⅓":1/3,"⅔":2/3,"¼":0.25,"¾":0.75,
-  "⅛":0.125,"⅜":0.375,"⅝":0.625,"⅞":0.875,
-  "1/2":0.5,"1/3":1/3,"2/3":2/3,"1/4":0.25,"3/4":0.75,
-  "1/8":0.125,"3/8":0.375,"5/8":0.625,"7/8":0.875
-};
-// Canonical unit aliases → standard label
-const UNIT_ALIAS={
-  cup:"cup",cups:"cup",c:"cup",
-  tablespoon:"tbsp",tablespoons:"tbsp",tbsp:"tbsp",tbs:"tbsp",tb:"tbsp",
-  teaspoon:"tsp",teaspoons:"tsp",tsp:"tsp",
-  pound:"lb",pounds:"lb",lb:"lb",lbs:"lb",
-  ounce:"oz",ounces:"oz",oz:"oz",
-  clove:"clove",cloves:"clove",
-  slice:"slice",slices:"slice",
-  can:"can",cans:"can",
-  jar:"jar",jars:"jar",
-  packet:"packet",packets:"packet",
-  stalk:"stalk",stalks:"stalk",
-  bag:"bag",bags:"bag",
-  container:"container",containers:"container",
-  multipack:"multipack",
-  head:"head",heads:"head",
-  bunch:"bunch",bunches:"bunch",
-};
-// Words that are notes/qualifiers, not ingredient names
-const STOP=new Set(["to","taste","optional","for","topping","serving","as","needed","divided","of","cooked","shredded","diced","sliced","minced","cubed","halved","chopped","frozen","thawed","warm","large","medium","small","extra","fresh","dry","dried","bonein","boneless","lean","low","fat","sodium","free","or","and","plus","little","a","an","the","approximately","approx"]);
-
+const FRAC={"½":0.5,"⅓":1/3,"⅔":2/3,"¼":0.25,"¾":0.75,"⅛":0.125,"⅜":0.375,"⅝":0.625,"⅞":0.875,"1/2":0.5,"1/3":1/3,"2/3":2/3,"1/4":0.25,"3/4":0.75,"1/8":0.125,"3/8":0.375,"5/8":0.625,"7/8":0.875};
+const UNIT_ALIAS={cup:"cup",cups:"cup",c:"cup",tablespoon:"tbsp",tablespoons:"tbsp",tbsp:"tbsp",tbs:"tbsp",tb:"tbsp",teaspoon:"tsp",teaspoons:"tsp",tsp:"tsp",pound:"lb",pounds:"lb",lb:"lb",lbs:"lb",ounce:"oz",ounces:"oz",oz:"oz",clove:"clove",cloves:"clove",slice:"slice",slices:"slice",can:"can",cans:"can",jar:"jar",jars:"jar",packet:"packet",packets:"packet",stalk:"stalk",stalks:"stalk",bag:"bag",bags:"bag",container:"container",containers:"container",multipack:"multipack",head:"head",heads:"head",bunch:"bunch",bunches:"bunch"};
+ 
 function parseFrac(s){
-  // returns numeric value for a string like "1½", "2/3", "1 1/2", "½", "3", etc.
-  if(!s)return null;
-  s=s.trim();
-  // try direct frac lookup
+  if(!s)return null;s=s.trim();
   if(FRAC[s]!==undefined)return FRAC[s];
-  // whole number
   if(/^\d+$/.test(s))return parseFloat(s);
-  // decimal
   if(/^\d+\.\d+$/.test(s))return parseFloat(s);
-  // "1½" or "2⅓" — whole + unicode frac
   const muf=s.match(/^(\d+)\s*([\u00BC-\u00BE\u2150-\u215E½⅓⅔¼¾⅛⅜⅝⅞]+)$/);
   if(muf&&FRAC[muf[2]]!==undefined)return parseInt(muf[1])+FRAC[muf[2]];
-  // "1 1/2" — whole + slash frac
   const msf=s.match(/^(\d+)\s+(\d+\/\d+)$/);
   if(msf&&FRAC[msf[2]]!==undefined)return parseInt(msf[1])+FRAC[msf[2]];
-  // plain slash frac
   const sf=s.match(/^(\d+)\/(\d+)$/);
   if(sf)return parseInt(sf[1])/parseInt(sf[2]);
   return null;
 }
-
 function formatQty(n){
   if(n===null||n===undefined)return"";
-  const FRAC_STRS={"0.5":"½","0.3333":"⅓","0.6667":"⅔","0.25":"¼","0.75":"¾","0.125":"⅛","0.375":"⅜","0.625":"⅝","0.875":"⅞"};
-  const FRAC_VALS=[0.5,1/3,2/3,0.25,0.75,0.125,0.375,0.625,0.875];
+  const FV=[0.5,1/3,2/3,0.25,0.75,0.125,0.375,0.625,0.875];
+  const FS={"0.5":"½","0.3333":"⅓","0.6667":"⅔","0.25":"¼","0.75":"¾","0.125":"⅛","0.375":"⅜","0.625":"⅝","0.875":"⅞"};
   const whole=Math.floor(n);const rem=n-whole;
-  for(const v of FRAC_VALS){
-    if(Math.abs(rem-v)<0.02){
-      const key=v===1/3?"0.3333":v===2/3?"0.6667":String(v);
-      const fracStr=FRAC_STRS[key];
-      if(fracStr)return whole>0?`${whole}${fracStr}`:fracStr;
-    }
-  }
+  for(const v of FV){if(Math.abs(rem-v)<0.02){const k=v===1/3?"0.3333":v===2/3?"0.6667":String(v);const f=FS[k];if(f)return whole>0?`${whole}${f}`:f;}}
   if(Number.isInteger(n))return String(n);
   return parseFloat(n.toFixed(2)).toString();
 }
-
-function normalizeIngredientName(raw){
-  // strip leading quantity+unit tokens to get just the ingredient name
-  let s=raw.trim();
-  // remove range like "1–2" or "2-3"
-  s=s.replace(/^\d+[\–\-]\d+\s*/,"");
-  // remove leading qty (incl fractions)
-  s=s.replace(/^([\d½⅓⅔¼¾⅛⅜⅝⅞][0-9\s\/½⅓⅔¼¾⅛⅜⅝⅞]*)\s*/,"");
-  // remove leading unit
-  const unitRe=new RegExp("^("+Object.keys(UNIT_ALIAS).join("|")+")[s]?\\b\\.?\\s*","i");
-  s=s.replace(unitRe,"");
-  // remove parenthetical notes like "(10.75 oz each)" or "(for serving)"
-  s=s.replace(/\(.*?\)/g,"").trim();
-  // remove trailing comma-separated qualifiers like ", diced" ", minced"
-  s=s.replace(/,.*$/,"").trim();
-  // lowercase, collapse spaces
-  s=s.toLowerCase().replace(/\s+/g," ").trim();
-  // remove stop words that appear at start
-  s=s.replace(/^(of|for|the|a|an)\s+/i,"");
-  return s;
-}
-
 function parseIngredientLine(line){
-  // Returns {qty, unit, name, raw} or null
-  // Patterns: "1½ cups rolled oats" | "10 eggs" | "Salt & pepper to taste" | "Butter (for griddle)"
-  let s=line.trim();
-  // Remove leading bullet if any
-  s=s.replace(/^[-•]\s*/,"");
-  if(!s)return null;
-
+  let s=line.trim().replace(/^[-•]\s*/,"");if(!s)return null;
   let qty=null,unit=null;
-
-  // Try to extract leading number/fraction
-  // Matches: "1½", "2½", "½", "1 1/2", "2/3", "1", "3.5"
-  const qtyRe=/^([\d½⅓⅔¼¾⅛⅜⅝⅞]+(?:\s*[\d\/½⅓⅔¼¾⅛⅜⅝⅞]+)?)\s*/;
-  const qm=s.match(qtyRe);
-  if(qm){
-    const parsed=parseFrac(qm[1].trim());
-    if(parsed!==null){qty=parsed;s=s.slice(qm[0].length);}
-  }
-
-  // Try to extract unit
+  const qm=s.match(/^([\d½⅓⅔¼¾⅛⅜⅝⅞]+(?:\s*[\d\/½⅓⅔¼¾⅛⅜⅝⅞]+)?)\s*/);
+  if(qm){const p=parseFrac(qm[1].trim());if(p!==null){qty=p;s=s.slice(qm[0].length);}}
   const unitRe=new RegExp("^("+Object.keys(UNIT_ALIAS).join("|")+")s?\\b\\.?\\s*","i");
   const um=s.match(unitRe);
   if(um){unit=UNIT_ALIAS[um[1].toLowerCase()]||um[1].toLowerCase();s=s.slice(um[0].length);}
-
-  // Rest is ingredient name — clean it
-  const raw=s.trim();
-  // Remove parenthetical notes
-  let name=raw.replace(/\(.*?\)/g,"").trim();
-  // Remove trailing qualifiers after comma
-  name=name.replace(/,.*$/,"").trim().toLowerCase();
-  // Remove leading articles
-  name=name.replace(/^(of|for|the|a|an)\s+/i,"").trim();
-
+  let name=s.trim().replace(/\(.*?\)/g,"").trim().replace(/,.*$/,"").trim().toLowerCase().replace(/^(of|for|the|a|an)\s+/i,"").trim();
   if(!name)return null;
   return{qty,unit,name,raw:line.trim()};
 }
-
 function aggregateIngredients(mealNames){
   const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
-  // Map: normalizedName → {qty, unit, display, recipes[]}
   const map={};
-
   mealNames.forEach(mealName=>{
-    const recipe=allRecipes[mealName];
-    if(!recipe||!recipe.ingredients)return;
+    const recipe=allRecipes[mealName];if(!recipe||!recipe.ingredients)return;
     recipe.ingredients.forEach(line=>{
-      const parsed=parseIngredientLine(line);
-      if(!parsed)return;
+      const parsed=parseIngredientLine(line);if(!parsed)return;
       const key=parsed.name;
-      if(!map[key]){
-        map[key]={name:parsed.name,qty:null,unit:parsed.unit,rawLines:[],recipes:[]};
-      }
+      if(!map[key])map[key]={name:parsed.name,qty:null,unit:parsed.unit,rawLines:[],recipes:[]};
       const entry=map[key];
-      // Only add quantities if units are compatible (same unit or both unitless)
       if(parsed.qty!==null){
         const sameUnit=(entry.unit||null)===(parsed.unit||null);
-        if(sameUnit){
-          entry.qty=(entry.qty||0)+parsed.qty;
-        } else if(entry.qty===null){
-          entry.qty=parsed.qty;entry.unit=parsed.unit;
-        } else {
-          // Different units — just flag as "see recipes"
-          entry.qty=null;entry.unit=null;entry.ambiguous=true;
-        }
+        if(sameUnit){entry.qty=(entry.qty||0)+parsed.qty;}
+        else if(entry.qty===null){entry.qty=parsed.qty;entry.unit=parsed.unit;}
+        else{entry.qty=null;entry.unit=null;entry.ambiguous=true;}
       }
       entry.rawLines.push(line);
       if(!entry.recipes.includes(mealName))entry.recipes.push(mealName);
     });
   });
-
-  // Build display strings
   return Object.values(map).map(e=>{
     let display;
-    if(e.ambiguous||e.qty===null){
-      // Show the original lines joined, or just the name capitalized
-      display=capitalize(e.name)+(e.rawLines.length>1?" (see recipes)":"");
-    } else {
-      const qStr=formatQty(e.qty);
-      const uStr=e.unit?(e.qty>1&&e.unit!=="oz"&&e.unit!=="lb"?pluralUnit(e.unit):e.unit):"";
-      display=(qStr?qStr+" ":"")+(uStr?uStr+" ":"")+capitalize(e.name);
-    }
+    if(e.ambiguous||e.qty===null){display=capitalize(e.name)+(e.rawLines.length>1?" (see recipes)":"");}
+    else{const q=formatQty(e.qty);const u=e.unit?(e.qty>1&&e.unit!=="oz"&&e.unit!=="lb"?pluralUnit(e.unit):e.unit):"";display=(q?q+" ":"")+(u?u+" ":"")+capitalize(e.name);}
     return{key:e.name,display,recipes:e.recipes};
   }).sort((a,b)=>a.display.localeCompare(b.display));
 }
-
-function pluralUnit(u){
-  const map={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz",clove:"cloves",slice:"slices",can:"cans",jar:"jars",packet:"packets",stalk:"stalks",bag:"bags",container:"containers",head:"heads",bunch:"bunches"};
-  return map[u]||u;
-}
+function pluralUnit(u){const m={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz",clove:"cloves",slice:"slices",can:"cans",jar:"jars",packet:"packets",stalk:"stalks",bag:"bags",container:"containers",head:"heads",bunch:"bunches"};return m[u]||u;}
 function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
-
+ 
 // ── GROCERY ───────────────────────────────────────────────────────────────
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
@@ -483,10 +598,8 @@ function buildGrocery(){
   const items=aggregateIngredients(knownMeals);
   const rem=items.filter(i=>!S.groceryChecked[i.key]).length;
   const tip=BUDGET_TIPS[Math.floor(Math.random()*BUDGET_TIPS.length)];
-  return(missingRecipes.length?`<div class="no-recipe-section">
-    <div class="no-recipe-lbl">⚠️ Missing Recipes — ingredients not included</div>`+
-    missingRecipes.map(m=>`<div class="no-recipe-row"><span class="no-recipe-name">${esc(m)}</span><span class="no-recipe-pill">No recipe uploaded</span></div>`).join("")+
-  `</div>`:"")+
+  return(missingRecipes.length?`<div class="no-recipe-section"><div class="no-recipe-lbl">⚠️ Missing Recipes — ingredients not included</div>`+
+    missingRecipes.map(m=>`<div class="no-recipe-row"><span class="no-recipe-name">${esc(m)}</span><span class="no-recipe-pill">No recipe uploaded</span></div>`).join("")+`</div>`:"")+
   (items.length?
     `<div class="groc-hdr"><span class="groc-cnt">${rem} of ${items.length} items remaining</span><button class="btn-rst" id="btnResetGroc">Reset</button></div>`+
     items.map(item=>{const on=!!S.groceryChecked[item.key];
@@ -495,7 +608,7 @@ function buildGrocery(){
     `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`
   :`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">No ingredients found. Upload recipes for your planned meals.</p></div>`);
 }
-
+ 
 // ── RECIPES ───────────────────────────────────────────────────────────────
 function buildRecipes(){
   const all=Object.assign({},RECIPES,S.uploadedRecipes);
@@ -508,7 +621,7 @@ function buildRecipes(){
   </div>
   <div class="rec-count-row">
     <span class="rec-count-txt">${entries.length} recipe${entries.length!==1?"s":""}. Tap to expand steps.</span>
-    ${upCount?`<span class="rec-up-badge">📤 ${upCount} uploaded</span>`:""}
+    ${upCount?`<span class="rec-up-badge">☁️ ${upCount} saved to cloud</span>`:""}
   </div>`+
   (entries.length===0?`<div class="empty"><div class="empty-icon">📖</div><p class="empty-txt">No recipes in this category.</p></div>`:"")+
   entries.map(([name,recipe])=>{
@@ -517,21 +630,18 @@ function buildRecipes(){
       <div class="rec-hdr" data-rn="${esc(name)}">
         <div class="rec-arrow">▶</div>
         <div class="rec-info">
-          <div class="rec-name-row"><span class="rec-name">${esc(name)}</span>${isUp?`<span class="up-badge">Uploaded</span>`:""}</div>
+          <div class="rec-name-row"><span class="rec-name">${esc(name)}</span>${isUp?`<span class="up-badge">☁️ Saved</span>`:""}</div>
           <div class="rec-meta">
             <span class="cat-tag" style="background:${c.bg};color:${c.text}">${recipe.tag}</span>
             <span class="rec-meta-txt">⏱ ${esc(recipe.time)}</span>
             <span class="rec-meta-txt">👨‍👩‍👧‍👦 Serves ${recipe.servings}</span>
           </div>
         </div>
-        <div class="rec-btn-group">
-          <button class="btn-edit" data-er="${esc(name)}" title="Edit recipe">✏️ Edit</button>
-          ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
-        </div>
+        ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
+      </div>
       ${isOpen?`<div class="rec-steps">
         ${recipe.ingredients&&recipe.ingredients.length?`<div class="rec-section-lbl">Ingredients</div><div class="ingr-list">`+
-          recipe.ingredients.map(i=>`<div class="ingr-row"><div class="ingr-dot"></div><span>${esc(i)}</span></div>`).join("")+
-        `</div><hr class="ingr-divider">`:""}
+          recipe.ingredients.map(i=>`<div class="ingr-row"><div class="ingr-dot"></div><span>${esc(i)}</span></div>`).join("")+`</div><hr class="ingr-divider">`:""}
         <div class="rec-section-lbl">Preparation</div>
         <div class="steps-list">`+
         recipe.steps.map((s,i)=>`<div class="step-row"><div class="step-num">${i+1}</div><div class="step-txt">${esc(s)}</div></div>`).join("")+
@@ -539,18 +649,13 @@ function buildRecipes(){
     </div>`;
   }).join("");
 }
-
+ 
 // ── PICKER MODAL ──────────────────────────────────────────────────────────
 function buildPicker(){
   const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
   const custom=S.customMeals[mealType]||[];
-  const uploaded=Object.entries(S.uploadedRecipes).filter(([,r])=>r.tag===mealType).map(([n])=>n);
-  const base=[...new Set([...MEAL_IDEAS[mealType],...custom])];
-  const isSearch=inp.trim().length>0;
-  const fBase=isSearch?base.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):base;
-  const fUp=isSearch?uploaded.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):uploaded;
-  const noResults=fBase.length===0&&fUp.length===0;
-  const btn=(o,isUp)=>`<button class="sugg-btn${currentMeal===o?" on":""}" data-pick="${esc(o)}"${isUp?` style="border-color:#ede9fe;background:${currentMeal===o?"#ede9fe":"#faf5ff"}"`:""}>${currentMeal===o?"✓ ":""}${esc(o)}${isUp?`<span style="font-size:9px;font-weight:800;color:#7c3aed;margin-left:6px">UPLOADED</span>`:""}</button>`;
+  const all=[...new Set([...MEAL_IDEAS[mealType],...custom])];
+  const sugg=inp.trim()?all.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):all;
   return`<div class="overlay" id="pickerOv">
     <div class="modal" id="pickerBox">
       <div><div class="picker-eyebrow">${esc(day)}</div><div class="picker-title">${esc(mealType)}</div></div>
@@ -563,31 +668,33 @@ function buildPicker(){
         <div class="search-hint">Press Enter or + to add your own meal.</div>
       </div>
       <div>
-        ${`${uploaded.length>0&&fUp.length>0?`<div class="sugg-lbl" style="color:#7c3aed">📤 Your uploaded recipes</div>${fUp.map(o=>btn(o,true)).join("")}<div style="height:6px"></div>`:""}`}
-        <div class="sugg-lbl">${isSearch?"Matching meals":"All suggestions"}</div>
-        ${noResults?`<p style="font-size:12px;color:#a8a29e">No matches — hit + to add "${esc(inp)}"</p>`:""}
-        ${fBase.map(o=>btn(o,false)).join("")}
+        <div class="sugg-lbl">${inp?"Matching meals":"All suggestions"}</div>
+        ${sugg.length===0?`<p style="font-size:12px;color:#a8a29e">No matches — hit + to add "${esc(inp)}"</p>`:""}
+        ${sugg.map(o=>`<button class="sugg-btn${currentMeal===o?" on":""}" data-pick="${esc(o)}">${currentMeal===o?"✓ ":""}${esc(o)}</button>`).join("")}
       </div>
       ${currentMeal?`<button class="btn-remove" id="btnPickRm">🗑 Remove current meal</button>`:""}
       <button class="btn-close-sm" id="btnPickClose">Close</button>
     </div>
   </div>`;
 }
-
+ 
 // ── HISTORY SHEET ─────────────────────────────────────────────────────────
 function buildHistory(){
-  const keys=[];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("week:"))keys.push(k);}
-  keys.sort().reverse();
+  // Use allWeekMeals from Supabase + localStorage fallback
+  const sbKeys = Object.keys(S.allWeekMeals);
+  const lsKeys = [];
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("week:"))lsKeys.push(k.replace("week:",""));}
+  const allKeys = [...new Set([...sbKeys, ...lsKeys])].sort().reverse();
+ 
   return`<div class="overlay bottom" id="histOv">
     <div class="modal sheet">
       <div class="hist-top"><div class="hist-title">📚 Saved Weeks</div><button class="btn-x" id="btnHistClose">×</button></div>
-      ${keys.length===0?`<p style="color:#a8a29e;font-size:13px">No saved weeks yet. Start planning!</p>`:""}
-      ${keys.map(k=>{
-        const dateKey=k.replace("week:","");const isOpen=!!S.historyOpen[k];
+      ${allKeys.length===0?`<p style="color:#a8a29e;font-size:13px">No saved weeks yet. Start planning!</p>`:""}
+      ${allKeys.map(dateKey=>{
+        const k="week:"+dateKey;const isOpen=!!S.historyOpen[k];
         const mon=new Date(dateKey+"T12:00:00");const sun=new Date(mon);sun.setDate(mon.getDate()+6);
         const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
-        const weekMeals=lsGet(k,{});
+        const weekMeals = S.allWeekMeals[dateKey] || lsGet(k, {});
         return`<div class="hist-week${isOpen?" open":""}">
           <div class="hist-wk-hdr" data-hk="${k}"><span class="hist-wk-lbl">${f(mon)} – ${f(sun)}</span><span>${isOpen?"▲":"▼"}</span></div>
           ${isOpen?`<div class="hist-wk-body">`+
@@ -595,22 +702,21 @@ function buildHistory(){
               const dm=weekMeals[day]||{};const entries=MEAL_TYPES.map(mt=>({mt,val:dm[mt]})).filter(x=>x.val);
               if(!entries.length)return"";
               return`<div class="hist-day-lbl">${day}</div><div class="hist-tags">`+
-                entries.map(({mt,val})=>{const c=TC[mt];return`<span class="hist-tag" style="background:${c.bg};color:${c.text}">${esc(val)}</span>`;}).join("")+
-              `</div>`;
+                entries.map(({mt,val})=>{const c=TC[mt];return`<span class="hist-tag" style="background:${c.bg};color:${c.text}">${esc(val)}</span>`;}).join("")+`</div>`;
             }).join("")+`</div>`:""}
         </div>`;
       }).join("")}
     </div>
   </div>`;
 }
-
+ 
 // ── UPLOAD MODAL ──────────────────────────────────────────────────────────
 function buildUpload(){
   const prev=S.uploadPreview;
   return`<div class="overlay" id="uploadOv">
     <div class="modal wide">
       <div><div style="font-size:20px;font-weight:800;color:#292524;margin-bottom:4px">📤 Upload Recipes</div>
-      <div style="font-size:12px;color:#78716c">Paste your recipes below, or upload a <strong>.txt</strong> file exported from Google Docs.</div></div>
+      <div style="font-size:12px;color:#78716c">Paste your recipes below, or upload a <strong>.txt</strong> file. They'll be saved to the cloud permanently. ☁️</div></div>
       <div class="fmt-guide"><div class="fmt-lbl">Format guide</div>
       <pre class="fmt-pre">Chicken Alfredo
 Time: 35 min
@@ -624,18 +730,7 @@ Ingredients
 Preparation
 1. Boil pasta until al dente
 2. Make Alfredo sauce
-3. Combine and serve
-
-Banana Muffins
-Time: 40 min
-Category: breakfast
-Ingredients
-- 3 ripe bananas
-- 2 cups flour
-- ¾ cup sugar
-1. Mash bananas
-2. Mix batter
-3. Bake at 375°F</pre></div>
+3. Combine and serve</pre></div>
       <div>
         <input type="file" id="fileInp" accept=".txt,.text" style="display:none"/>
         <button class="btn-file" id="btnChooseFile">📁 Choose .txt file from your computer</button>
@@ -643,160 +738,64 @@ Ingredients
       </div>
       <textarea class="upload-ta" id="uploadTA" placeholder="Paste your recipes here...">${esc(S.uploadText)}</textarea>
       ${S.uploadError?`<div class="err-txt">${esc(S.uploadError)}</div>`:""}
-      ${prev?`<div class="preview-box"><div class="preview-lbl">✓ Found ${Object.keys(prev).length} recipe${Object.keys(prev).length!==1?"s":""}</div>`+
-        Object.entries(prev).map(([n,r])=>`<div class="preview-row"><span class="preview-name">${esc(n)}</span><span class="preview-meta">${r.steps.length} steps · ${r.tag}</span></div>`).join("")+
-      `</div>`:""}
+      ${prev?`<div class="preview-box"><div class="preview-lbl">✓ Found ${Object.keys(prev).length} recipe${Object.keys(prev).length!==1?"s":""} — will save to cloud</div>`+
+        Object.entries(prev).map(([n,r])=>`<div class="preview-row"><span class="preview-name">${esc(n)}</span><span class="preview-meta">${r.steps.length} steps · ${r.tag}</span></div>`).join("")+`</div>`:""}
       <div class="btn-row">
         ${!prev?`<button class="btn-primary" id="btnPreview" ${!S.uploadText.trim()?"disabled":""}>Preview Recipes</button>`
-              :`<button class="btn-primary" id="btnSaveUp">✓ Save ${Object.keys(prev).length} Recipes</button>`}
+              :`<button class="btn-primary" id="btnSaveUp">☁️ Save ${Object.keys(prev).length} Recipes to Cloud</button>`}
         <button class="btn-secondary" id="btnUploadClose">Cancel</button>
       </div>
     </div>
   </div>`;
 }
-
-// ── EDIT RECIPE MODAL ─────────────────────────────────────────────────────
-function buildEditModal(){
-  const f=S.editForm;
-  if(!f)return"";
-  const isBuiltin=!S.uploadedRecipes[S.editRecipeName]&&RECIPES[S.editRecipeName];
-  return`<div class="overlay" id="editOv">
-    <div class="edit-modal">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="edit-title">✏️ Edit Recipe</div>
-        <button class="btn-x" id="btnEditClose">×</button>
-      </div>
-      ${isBuiltin?`<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;font-size:12px;color:#92400e">
-        <strong>Built-in recipe:</strong> Your edits will be saved as a custom version and override the original.
-      </div>`:""}
-      <div>
-        <div class="edit-field-lbl">Recipe Name</div>
-        <input class="edit-inp" id="editName" value="${esc(f.name)}" placeholder="e.g. Chicken Alfredo"/>
-        <div class="edit-name-warn${f.name!==S.editRecipeName&&(Object.assign({},RECIPES,S.uploadedRecipes)[f.name])?" show":""}" id="editNameWarn">⚠️ A recipe with this name already exists</div>
-      </div>
-      <div class="edit-row">
-        <div>
-          <div class="edit-field-lbl">Category</div>
-          <select class="edit-select" id="editTag">
-            ${["breakfast","lunch","dinner","snacks"].map(t=>`<option value="${t}"${f.tag===t?" selected":""}>${t.charAt(0).toUpperCase()+t.slice(1)}</option>`).join("")}
-          </select>
-        </div>
-        <div>
-          <div class="edit-field-lbl">Cook Time</div>
-          <input class="edit-inp" id="editTime" value="${esc(f.time)}" placeholder="e.g. 30 min"/>
-        </div>
-      </div>
-      <div>
-        <div class="edit-field-lbl">Servings</div>
-        <input class="edit-inp" id="editServings" type="number" min="1" max="50" value="${esc(f.servings)}" style="width:100px"/>
-      </div>
-      <div>
-        <div class="edit-field-lbl">Ingredients</div>
-        <textarea class="edit-ta" id="editIngredients" rows="7" placeholder="One ingredient per line, e.g.:\n2 cups flour\n1 tsp salt\n3 eggs">${esc((f.ingredients||[]).join("\n"))}</textarea>
-        <div class="edit-hint">One ingredient per line</div>
-      </div>
-      <div>
-        <div class="edit-field-lbl">Preparation Steps</div>
-        <textarea class="edit-ta" id="editSteps" rows="8" placeholder="One step per line, e.g.:\nPreheat oven to 375°F\nMix dry ingredients\nBake for 25 minutes">${esc((f.steps||[]).join("\n"))}</textarea>
-        <div class="edit-hint">One step per line — numbers are added automatically</div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" id="btnEditSave">✓ Save Changes</button>
-        <button class="btn-secondary" id="btnEditCancel">Cancel</button>
-      </div>
-    </div>
-  </div>`;
-}
-
+ 
 // ── PARSE RECIPE TEXT ─────────────────────────────────────────────────────
 function parseRecipes(text){
-  const META_RE=/^(time|serves|servings|category|type|meal):/i;
-  const SECTION_RE=/^(ingredients|preparation|prep|directions|steps|notes):?$/i;
-  const BULLET_RE=/^[-\u2013\u2014\u2022]/;
-  const NUMBERED_RE=/^\d+[.)]/;
-  function isNameLine(l){
-    if(!l.trim())return false;
-    if(META_RE.test(l))return false;
-    if(SECTION_RE.test(l))return false;
-    if(BULLET_RE.test(l))return false;
-    if(NUMBERED_RE.test(l))return false;
-    return true;
-  }
-  const rawLines=text.split("\n").map(l=>l.trim());
-  const recipes=[];
-  let cur=null;
-  rawLines.forEach((line,i)=>{
-    if(!line)return;
-    const lo=line.toLowerCase();
-    // Detect metadata/section lines — always belong to current recipe
-    if(cur&&META_RE.test(lo)){
-      if(lo.startsWith("time:"))cur.time=line.split(":").slice(1).join(":").trim();
-      else if(lo.startsWith("serves:")||lo.startsWith("servings:"))cur.servings=parseInt(line.split(":")[1])||5;
-      else if(lo.startsWith("category:")||lo.startsWith("type:")||lo.startsWith("meal:")){
+  const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
+  const out={};
+  blocks.forEach(block=>{
+    const lines=block.split("\n").map(l=>l.trim()).filter(Boolean);
+    if(lines.length<2)return;
+    const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];const ingredients=[];
+    let inIngredients=false;
+    lines.slice(1).forEach(line=>{
+      const lo=line.toLowerCase();
+      if(lo.startsWith("time:")){time=line.split(":").slice(1).join(":").trim();return;}
+      if(lo.startsWith("serves:")||lo.startsWith("servings:")){servings=parseInt(line.split(":")[1])||5;return;}
+      if(lo.startsWith("category:")||lo.startsWith("type:")||lo.startsWith("meal:")){
         const v=line.split(":")[1].trim().toLowerCase();
-        if(["breakfast","lunch","dinner","snacks"].includes(v))cur.tag=v;
+        if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
       }
-      return;
-    }
-    if(cur&&SECTION_RE.test(lo)){
-      cur.inIngr=/^(ingredients)/i.test(lo);
-      cur.inSteps=/^(preparation|prep|directions|steps)/i.test(lo);
-      return;
-    }
-    // Numbered step
-    const sm=line.match(/^\d+[.)]\s*(.+)/);
-    if(sm&&cur){cur.inIngr=false;cur.inSteps=true;cur.steps.push(sm[1]);return;}
-    // Bullet line
-    if(BULLET_RE.test(line)&&cur){
-      const val=line.replace(/^[-\u2013\u2014\u2022]\s*/,"");
-      if(cur.inIngr)cur.ingredients.push(val);
-      else if(cur.inSteps)cur.steps.push(val);
-      else if(!cur.steps.length)cur.ingredients.push(val);
-      else cur.steps.push(val);
-      return;
-    }
-    // Name line: starts a new recipe if there was a blank line before it (or it's the first)
-    if(isNameLine(line)){
-      const prevLine=rawLines[i-1];
-      const blankBefore=(prevLine===undefined||prevLine==="");
-      if(!cur||blankBefore){
-        if(cur&&cur.name)recipes.push(cur);
-        cur={name:line,time:"—",servings:5,tag:"dinner",ingredients:[],steps:[],inIngr:false,inSteps:false};
+      if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;return;}
+      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
+      const sm=line.match(/^\d+[\.\)]\s+(.+)/);
+      if(sm){inIngredients=false;steps.push(sm[1]);return;}
+      if(line.startsWith("-")||line.startsWith("•")){
+        const val=line.replace(/^[-•]\s*/,"");
+        if(inIngredients||!steps.length)ingredients.push(val);
+        else steps.push(val);
         return;
       }
-    }
-    // Plain line belonging to current recipe
-    if(cur){
-      if(cur.inSteps)cur.steps.push(line);
-      else if(cur.inIngr)cur.ingredients.push(line);
-      else cur.steps.push(line);
-    }
+    });
+    if(steps.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
   });
-  if(cur&&cur.name)recipes.push(cur);
-  const out={};
-  recipes.forEach(r=>{if(r.name)out[r.name]={tag:r.tag,time:r.time,servings:r.servings,ingredients:r.ingredients,steps:r.steps,_uploaded:true};});
   return out;
 }
-
+ 
 // ── BIND EVENTS ───────────────────────────────────────────────────────────
 function bind(){
-  // Tabs
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{S.tab=b.dataset.tab;lsSet("s_tab",S.tab);render();}));
-  // Week nav
-  q("btnPrev",()=>{S.weekOffset--;lsSet("s_weekOffset",S.weekOffset);loadMeals();render();});
-  q("btnNext",()=>{S.weekOffset++;lsSet("s_weekOffset",S.weekOffset);loadMeals();render();});
-  // History
+  q("btnPrev",async ()=>{S.weekOffset--;lsSet("s_weekOffset",S.weekOffset);await loadMealsFromDB();render();});
+  q("btnNext",async ()=>{S.weekOffset++;lsSet("s_weekOffset",S.weekOffset);await loadMealsFromDB();render();});
   q("btnHist",()=>{S.showHistory=true;render();});
   q("btnHistClose",()=>{S.showHistory=false;render();});
   ov("histOv",()=>{S.showHistory=false;render();});
   document.querySelectorAll("[data-hk]").forEach(el=>el.addEventListener("click",()=>{S.historyOpen[el.dataset.hk]=!S.historyOpen[el.dataset.hk];render();}));
-  // Meal cells
   document.querySelectorAll(".meal-cell").forEach(cell=>cell.addEventListener("click",()=>{
     const day=cell.dataset.day,mt=cell.dataset.mt,current=(S.meals[day]||{})[mt]||"";
     S.picker={day,mealType:mt,currentMeal:current};S.pickerInput="";render();
     setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.select();}},30);
   }));
-  // Picker
   ov("pickerOv",()=>{S.picker=null;S.pickerInput="";render();});
   q("btnPickClose",()=>{S.picker=null;S.pickerInput="";render();});
   const pi=document.getElementById("pickerInp");
@@ -806,73 +805,28 @@ function bind(){
   }
   q("btnPickAdd",addAndSelect);
   document.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>selectMeal(b.dataset.pick)));
-  q("btnPickRm",()=>{const{day,mealType}=S.picker;if(S.meals[day])S.meals[day][mealType]="";saveMeals();S.picker=null;S.pickerInput="";render();});
-  // Grocery
+  q("btnPickRm",()=>{
+    const{day,mealType}=S.picker;
+    if(S.meals[day])S.meals[day][mealType]="";
+    saveMeals();
+    saveMealToDB(day, mealType, ""); // async, non-blocking
+    S.picker=null;S.pickerInput="";render();
+  });
   document.querySelectorAll("[data-gi]").forEach(r=>r.addEventListener("click",()=>{S.groceryChecked[r.dataset.gi]=!S.groceryChecked[r.dataset.gi];lsSet("s_groceryChecked",S.groceryChecked);render();}));
   q("btnResetGroc",()=>{S.groceryChecked={};lsSet("s_groceryChecked",{});render();});
-  // Recipe filters
   document.querySelectorAll("[data-rf]").forEach(b=>b.addEventListener("click",()=>{S.recipeFilter=b.dataset.rf;lsSet("s_recipeFilter",S.recipeFilter);render();}));
-  // Recipe cards
   document.querySelectorAll("[data-rn]").forEach(h=>h.addEventListener("click",e=>{
-    if(e.target.closest("[data-dr]")||e.target.closest("[data-er]"))return;
+    if(e.target.closest("[data-dr]"))return;
     S.recipeOpen[h.dataset.rn]=!S.recipeOpen[h.dataset.rn];lsSet("s_recipeOpen",S.recipeOpen);render();
   }));
   document.querySelectorAll("[data-dr]").forEach(b=>b.addEventListener("click",e=>{
-    e.stopPropagation();delete S.uploadedRecipes[b.dataset.dr];lsSet("uploadedRecipes",S.uploadedRecipes);render();
-  }));
-  // Edit recipe
-  document.querySelectorAll("[data-er]").forEach(b=>b.addEventListener("click",e=>{
     e.stopPropagation();
-    const name=b.dataset.er;
-    const allR=Object.assign({},RECIPES,S.uploadedRecipes);
-    const r=allR[name];if(!r)return;
-    S.editRecipeName=name;
-    S.editForm={name,tag:r.tag,time:r.time,servings:r.servings,ingredients:[...(r.ingredients||[])],steps:[...(r.steps||[])]};
-    S.showEdit=true;render();
-  }));
-  // Edit modal events
-  ov("editOv",()=>{S.showEdit=false;S.editForm=null;render();});
-  q("btnEditClose",()=>{S.showEdit=false;S.editForm=null;render();});
-  q("btnEditCancel",()=>{S.showEdit=false;S.editForm=null;render();});
-  // Live name-conflict warning
-  const enEl=document.getElementById("editName");
-  if(enEl)enEl.addEventListener("input",()=>{
-    const v=enEl.value.trim();
-    const allR=Object.assign({},RECIPES,S.uploadedRecipes);
-    const conflict=v&&v!==S.editRecipeName&&allR[v];
-    document.getElementById("editNameWarn").classList.toggle("show",!!conflict);
-  });
-  q("btnEditSave",()=>{
-    const name=(document.getElementById("editName").value||"").trim();
-    const tag=document.getElementById("editTag").value;
-    const time=(document.getElementById("editTime").value||"").trim()||"—";
-    const servings=parseInt(document.getElementById("editServings").value)||5;
-    const ingredients=document.getElementById("editIngredients").value.split("\n").map(l=>l.trim()).filter(Boolean);
-    const steps=document.getElementById("editSteps").value.split("\n").map(l=>l.trim()).filter(Boolean);
-    if(!name)return;
-    const allR=Object.assign({},RECIPES,S.uploadedRecipes);
-    if(name!==S.editRecipeName&&allR[name])return; // conflict
-    const updated={tag,time,servings,ingredients,steps,_uploaded:true};
-    // Remove old entry if renamed
-    if(name!==S.editRecipeName){
-      // Remove from uploadedRecipes if it existed there
-      delete S.uploadedRecipes[S.editRecipeName];
-      // Update any meal plan cells that used the old name
-      Object.keys(S.meals).forEach(day=>{
-        Object.keys(S.meals[day]||{}).forEach(mt=>{
-          if(S.meals[day][mt]===S.editRecipeName)S.meals[day][mt]=name;
-        });
-      });
-      saveMeals();
-      // Update recipeOpen
-      if(S.recipeOpen[S.editRecipeName]){delete S.recipeOpen[S.editRecipeName];S.recipeOpen[name]=true;}
-    }
-    S.uploadedRecipes[name]=updated;
+    const name = b.dataset.dr;
+    delete S.uploadedRecipes[name];
     lsSet("uploadedRecipes",S.uploadedRecipes);
-    S.showEdit=false;S.editForm=null;S.editRecipeName=null;
+    deleteRecipeFromDB(name); // async, non-blocking
     render();
-  });
-  // Upload
+  }));
   q("btnShowUpload",()=>{S.showUpload=true;S.uploadText="";S.uploadPreview=null;S.uploadError="";render();});
   q("btnUploadClose",()=>{S.showUpload=false;render();});
   ov("uploadOv",()=>{S.showUpload=false;render();});
@@ -880,50 +834,58 @@ function bind(){
   const fi=document.getElementById("fileInp");
   if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
   const ta=document.getElementById("uploadTA");
-  if(ta)ta.addEventListener("input",()=>{S.uploadText=ta.value;S.uploadPreview=null;S.uploadError="";const btn=document.getElementById("btnPreview");if(btn)btn.disabled=!ta.value.trim();});
+  if(ta)ta.addEventListener("input",()=>{S.uploadText=ta.value;S.uploadPreview=null;S.uploadError="";});
   q("btnPreview",()=>{
     const result=parseRecipes(S.uploadText);
-    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe starts with a name on its own line (e.g. \"Chicken Soup\"), followed by any ingredients or steps.";S.uploadPreview=null;}
+    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe has a name on the first line, followed by numbered steps (1. 2. 3.)";S.uploadPreview=null;}
     else{S.uploadPreview=result;S.uploadError="";}
     render();
   });
-  q("btnSaveUp",()=>{
-    S.uploadedRecipes=Object.assign({},S.uploadedRecipes,S.uploadPreview);
+  q("btnSaveUp",async ()=>{
+    const prev = S.uploadPreview;
+    // Optimistic update
+    S.uploadedRecipes=Object.assign({},S.uploadedRecipes,prev);
     lsSet("uploadedRecipes",S.uploadedRecipes);
-    S.showUpload=false;S.uploadPreview=null;S.uploadText="";render();
+    S.showUpload=false;S.uploadPreview=null;S.uploadText="";
+    render();
+    // Save each recipe to Supabase
+    for (const [name, recipe] of Object.entries(prev)) {
+      await saveRecipeToDB(name, recipe);
+    }
+    updateSyncBadge();
   });
 }
-
+ 
 function q(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",fn);}
 function ov(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",e=>{if(e.target===el)fn();});}
-
+ 
 function addAndSelect(){
   const val=(S.pickerInput||"").trim();if(!val)return;
   const mt=S.picker.mealType,list=S.customMeals[mt]||[];
-  if(!list.includes(val)){S.customMeals[mt]=[...list,val];lsSet("customMeals",S.customMeals);}
+  if(!list.includes(val)){
+    S.customMeals[mt]=[...list,val];
+    lsSet("customMeals",S.customMeals);
+    saveCustomMealToDB(mt, val); // async, non-blocking
+  }
   selectMeal(val);
 }
+ 
 function selectMeal(val){
   const{day,mealType}=S.picker;
   if(!S.meals[day])S.meals[day]={};
-  S.meals[day][mealType]=val;saveMeals();
+  S.meals[day][mealType]=val;
+  saveMeals();
+  saveMealToDB(day, mealType, val); // async, non-blocking
   S.picker=null;S.pickerInput="";render();
 }
+ 
 function reRenderPicker(){
-  // Re-render just the picker suggestions without full page re-render for smooth typing
-  const{day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
-  const custom=S.customMeals[mealType]||[];
-  const all=[...new Set([...MEAL_IDEAS[mealType],...custom])];
-  const sugg=inp.trim()?all.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):all;
-  // update suggestions div
-  const box=document.getElementById("pickerBox");if(!box)return;
-  const divs=box.querySelectorAll(".sugg-btn,[data-pick],.sugg-lbl");divs.forEach(d=>d.remove());
-  // Just do a full render, it's fast enough
   render();
-  setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.setSelectionRange(inp.length,inp.length);}},0);
+  setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.setSelectionRange(S.pickerInput.length,S.pickerInput.length);}},0);
 }
-
-render();
+ 
+// ── START ─────────────────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>
