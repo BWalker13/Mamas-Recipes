@@ -860,7 +860,10 @@ function buildRecipes(){
 function buildPicker(){
   const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
   const custom=S.customMeals[mealType]||[];
-  const all=[...new Set([...MEAL_IDEAS[mealType],...custom])];
+  const uploadedForType=Object.entries(allRecipesMerged())
+    .filter(([name,r])=>r.tag===mealType&&S.uploadedRecipes[name]!==undefined)
+    .map(([name])=>name);
+  const all=[...new Set([...MEAL_IDEAS[mealType],...custom,...uploadedForType])];
   const sugg=inp.trim()?all.filter(s=>s.toLowerCase().includes(inp.toLowerCase())):all;
   return`<div class="overlay" id="pickerOv">
     <div class="modal" id="pickerBox">
