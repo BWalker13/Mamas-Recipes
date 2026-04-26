@@ -557,6 +557,11 @@ async function saveEditedRecipe() {
 // Load meals for current week from Supabase
 async function loadMealsFromDB() {
   const wk = weekKey(S.weekOffset);
+  if (!USER_ID) {
+    S.allWeekMeals = {};
+    S.meals = lsGet(weekLsKey(wk), {});
+    return;
+  }
   try {
     const rows = await dbSelect("meal_plans", "*", "user_id=eq." + encodeURIComponent(USER_ID));
     // Rebuild allWeekMeals from all rows
@@ -566,13 +571,24 @@ async function loadMealsFromDB() {
       if (!S.allWeekMeals[row.week_key][row.day]) S.allWeekMeals[row.week_key][row.day] = {};
       S.allWeekMeals[row.week_key][row.day][row.meal_type] = row.meal_name || "";
     }
-    S.meals = S.allWeekMeals[wk] || {};
+    let meals = S.allWeekMeals[wk] || {};
+    const anyRowForWeek = rows.some(r => r.week_key === wk);
+    if (!anyRowForWeek) {
+      const fromLs = lsGet(weekLsKey(wk), {});
+      if (fromLs && typeof fromLs === "object" && Object.keys(fromLs).length) {
+        meals = fromLs;
+        S.allWeekMeals[wk] = fromLs;
+      }
+    }
+    S.meals = meals;
     // Mirror to localStorage
     lsSet(weekLsKey(wk), S.meals);
     setSyncOk();
   } catch(e) {
     console.warn("Meal plan load failed, using localStorage:", e);
     S.meals = lsGet(weekLsKey(wk), {});
+    if (!S.allWeekMeals) S.allWeekMeals = {};
+    S.allWeekMeals[wk] = S.meals;
   }
 }
 
@@ -607,6 +623,10 @@ async function saveMealToDB(day, mealType, mealName, weekKeyOverride) {
 
 // Load custom meals from Supabase
 async function loadCustomMealsFromDB() {
+  if (!USER_ID) {
+    S.customMeals = lsGet(customMealsLsKey(), {breakfast:[],lunch:[],dinner:[],snacks:[]});
+    return;
+  }
   try {
     const rows = await dbSelect("custom_meals", "*", "user_id=eq." + encodeURIComponent(USER_ID));
     const result = {breakfast:[],lunch:[],dinner:[],snacks:[]};
