@@ -308,7 +308,7 @@ async function saveRecipeToDB(name, recipe) {
     // Preferred path when recipes.name has a unique constraint.
     await dbUpsert("recipes", payload, "name");
     setSyncOk();
-    return true;
+    return { ok: true };
   } catch(e) {
     const msg = String((e && e.message) || e || "");
     const missingConflictConstraint =
@@ -322,14 +322,17 @@ async function saveRecipeToDB(name, recipe) {
       try {
         await dbUpsert("recipes", payload);
         setSyncOk();
-        return true;
+        return { ok: true };
       } catch (fallbackErr) {
         console.warn("Recipe fallback save failed:", fallbackErr);
+        const fallbackMsg = String((fallbackErr && fallbackErr.message) || fallbackErr || "");
+        setSyncErr("Recipe save failed — saved locally only");
+        return { ok: false, error: fallbackMsg || "Unknown fallback error" };
       }
     }
     console.warn("Recipe save failed:", e);
     setSyncErr("Recipe save failed — saved locally only");
-    return false;
+    return { ok: false, error: msg || "Unknown save error" };
   }
 }
 
@@ -872,9 +875,9 @@ function bind(){
     const saved = {};
     const failed = [];
     for (const [name, recipe] of entries) {
-      const ok = await saveRecipeToDB(name, recipe);
-      if(ok) saved[name] = recipe;
-      else failed.push(name);
+      const result = await saveRecipeToDB(name, recipe);
+      if(result.ok) saved[name] = recipe;
+      else failed.push({ name, error: (result.error || "").replace(/\s+/g, " ").trim() });
     }
 
     if(Object.keys(saved).length){
@@ -889,7 +892,10 @@ function bind(){
       S.uploadText="";
       S.uploadError="";
     } else {
-      S.uploadError=`Saved ${Object.keys(saved).length} to cloud. ${failed.length} failed: ${failed.join(", ")}.`;
+      const first = failed[0];
+      const trimmedErr = first.error.length > 220 ? (first.error.slice(0,220) + "...") : first.error;
+      S.uploadError=`Saved ${Object.keys(saved).length} to cloud. ${failed.length} failed. First error (${first.name}): ${trimmedErr || "unknown Supabase error"}`;
+      console.warn("Recipe cloud save failures:", failed);
     }
     render();
     updateSyncBadge();
