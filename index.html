@@ -151,12 +151,12 @@ button{font-family:Georgia,serif;cursor:pointer;}
 </head>
 <body>
 <div id="app"></div>
- 
+
 <script>
 // ── SUPABASE CONFIG ───────────────────────────────────────────────────────
 const SUPABASE_URL = "https://opvvejvazvmvcqsewiyo.supabase.co";
-const SUPABASE_KEY = "sb_publishable_DSzFpVLLpF_To2vYcBNLfw_sCnNPQms";
- 
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wdnZlanZhenZtdmNxc2V3aXlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNTM4OTQsImV4cCI6MjA5MjcyOTg5NH0.R7Yfm2gIH7SmiMtt01hNOe8UAdH3rzLWBKgTSKAhMMM";
+
 // ── SUPABASE CLIENT (no npm needed — raw fetch) ───────────────────────────
 const sb = {
   async from(table) {
@@ -190,7 +190,7 @@ const sb = {
     };
   }
 };
- 
+
 // Convenience wrappers
 async function dbSelect(table, query="*") {
   return (await sb.from(table)).then(t => t.select(query));
@@ -201,7 +201,7 @@ async function dbUpsert(table, data, onConflict) {
 async function dbDelete(table, filters) {
   return (await sb.from(table)).then(t => t.delete(filters));
 }
- 
+
 // ── DATA ──────────────────────────────────────────────────────────────────
 const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const MEAL_TYPES=["breakfast","lunch","dinner","snacks"];
@@ -250,17 +250,17 @@ const RECIPES={
   "Popcorn":{tag:"snacks",time:"10 min",servings:5,ingredients:["½ cup popcorn kernels","2 tbsp vegetable or coconut oil","2 tbsp melted butter","Salt to taste"],steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
   "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,ingredients:["1 multipack (12–16 count) yogurt tubes"],steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
 };
- 
+
 // ── LOCAL STORAGE FALLBACK ────────────────────────────────────────────────
 function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
- 
+
 // ── WEEK HELPERS ──────────────────────────────────────────────────────────
 function getMonday(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-((n.getDay()+6)%7)+off*7);m.setHours(0,0,0,0);return m;}
 function weekKey(off){return getMonday(off).toISOString().slice(0,10);}
 function weekLabel(off){const m=getMonday(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
 function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week";if(off===-1)return"Last Week";return"Week of "+weekLabel(off).split("–")[0].trim();}
- 
+
 // ── STATE ─────────────────────────────────────────────────────────────────
 const S={
   tab:          lsGet("s_tab","planner"),
@@ -278,9 +278,9 @@ const S={
   syncStatus: "loading", // "loading" | "ok" | "error"
   syncMsg: "Connecting…"
 };
- 
+
 // ── SUPABASE SYNC FUNCTIONS ───────────────────────────────────────────────
- 
+
 // Load all uploaded recipes from Supabase
 async function loadRecipesFromDB() {
   try {
@@ -304,7 +304,7 @@ async function loadRecipesFromDB() {
     S.uploadedRecipes = lsGet("uploadedRecipes", {});
   }
 }
- 
+
 // Save a recipe to Supabase
 async function saveRecipeToDB(name, recipe) {
   try {
@@ -322,7 +322,7 @@ async function saveRecipeToDB(name, recipe) {
     setSyncErr("Recipe save failed — saved locally only");
   }
 }
- 
+
 // Delete a recipe from Supabase
 async function deleteRecipeFromDB(name) {
   try {
@@ -333,7 +333,7 @@ async function deleteRecipeFromDB(name) {
     setSyncErr("Delete failed — refresh to re-sync");
   }
 }
- 
+
 // Load meals for current week from Supabase
 async function loadMealsFromDB() {
   const wk = weekKey(S.weekOffset);
@@ -355,7 +355,7 @@ async function loadMealsFromDB() {
     S.meals = lsGet("week:"+wk, {});
   }
 }
- 
+
 // Save a single meal slot to Supabase
 async function saveMealToDB(day, mealType, mealName) {
   const wk = weekKey(S.weekOffset);
@@ -382,7 +382,7 @@ async function saveMealToDB(day, mealType, mealName) {
     setSyncErr("Meal save failed — saved locally only");
   }
 }
- 
+
 // Load custom meals from Supabase
 async function loadCustomMealsFromDB() {
   try {
@@ -398,7 +398,7 @@ async function loadCustomMealsFromDB() {
     S.customMeals = lsGet("customMeals", {breakfast:[],lunch:[],dinner:[],snacks:[]});
   }
 }
- 
+
 // Save a custom meal to Supabase
 async function saveCustomMealToDB(mealType, name) {
   try {
@@ -407,7 +407,7 @@ async function saveCustomMealToDB(mealType, name) {
     console.warn("Custom meal save failed:", e);
   }
 }
- 
+
 function setSyncOk() {
   S.syncStatus = "ok";
   S.syncMsg = "☁️ Synced";
@@ -424,7 +424,7 @@ function updateSyncBadge() {
   el.className = "sync-badge " + S.syncStatus;
   el.textContent = S.syncMsg;
 }
- 
+
 // ── INIT ──────────────────────────────────────────────────────────────────
 async function init() {
   // Show loading screen
@@ -434,7 +434,7 @@ async function init() {
       <div class="init-txt">Loading your meal planner…</div>
       <div class="init-sub">Syncing with cloud ☁️</div>
     </div>`;
- 
+
   try {
     await Promise.all([
       loadRecipesFromDB(),
@@ -449,14 +449,14 @@ async function init() {
   }
   render();
 }
- 
+
 // ── SAVE FUNCTIONS (dual-write: Supabase + localStorage) ──────────────────
 function saveMeals() {
   const wk = weekKey(S.weekOffset);
   lsSet("week:"+wk, S.meals);
   // Supabase saves happen per-slot in selectMeal / removeMeal
 }
- 
+
 function saveUIState(){
   lsSet("s_tab",S.tab);
   lsSet("s_weekOffset",S.weekOffset);
@@ -464,12 +464,12 @@ function saveUIState(){
   lsSet("s_recipeOpen",S.recipeOpen);
   lsSet("s_groceryChecked",S.groceryChecked);
 }
- 
+
 // ── RENDER ────────────────────────────────────────────────────────────────
 function render(){saveUIState();document.getElementById("app").innerHTML=buildApp();bind();}
- 
+
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
- 
+
 function buildApp(){
   const total=DAYS.length*4;
   const planned=Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean).length;
@@ -503,7 +503,7 @@ function buildApp(){
   ${S.showHistory?buildHistory():""}
   ${S.showUpload?buildUpload():""}`;
 }
- 
+
 // ── PLANNER ───────────────────────────────────────────────────────────────
 function buildPlanner(){
   return`<p class="hint">Tap any cell to pick a meal. Everything syncs to the cloud automatically. ☁️</p>`+
@@ -519,11 +519,11 @@ function buildPlanner(){
     }).join("")+`</div></div>`;
   }).join("");
 }
- 
+
 // ── INGREDIENT AGGREGATION ────────────────────────────────────────────────
 const FRAC={"½":0.5,"⅓":1/3,"⅔":2/3,"¼":0.25,"¾":0.75,"⅛":0.125,"⅜":0.375,"⅝":0.625,"⅞":0.875,"1/2":0.5,"1/3":1/3,"2/3":2/3,"1/4":0.25,"3/4":0.75,"1/8":0.125,"3/8":0.375,"5/8":0.625,"7/8":0.875};
 const UNIT_ALIAS={cup:"cup",cups:"cup",c:"cup",tablespoon:"tbsp",tablespoons:"tbsp",tbsp:"tbsp",tbs:"tbsp",tb:"tbsp",teaspoon:"tsp",teaspoons:"tsp",tsp:"tsp",pound:"lb",pounds:"lb",lb:"lb",lbs:"lb",ounce:"oz",ounces:"oz",oz:"oz",clove:"clove",cloves:"clove",slice:"slice",slices:"slice",can:"can",cans:"can",jar:"jar",jars:"jar",packet:"packet",packets:"packet",stalk:"stalk",stalks:"stalk",bag:"bag",bags:"bag",container:"container",containers:"container",multipack:"multipack",head:"head",heads:"head",bunch:"bunch",bunches:"bunch"};
- 
+
 function parseFrac(s){
   if(!s)return null;s=s.trim();
   if(FRAC[s]!==undefined)return FRAC[s];
@@ -587,7 +587,7 @@ function aggregateIngredients(mealNames){
 }
 function pluralUnit(u){const m={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz",clove:"cloves",slice:"slices",can:"cans",jar:"jars",packet:"packets",stalk:"stalks",bag:"bags",container:"containers",head:"heads",bunch:"bunches"};return m[u]||u;}
 function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
- 
+
 // ── GROCERY ───────────────────────────────────────────────────────────────
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
@@ -608,7 +608,7 @@ function buildGrocery(){
     `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`
   :`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">No ingredients found. Upload recipes for your planned meals.</p></div>`);
 }
- 
+
 // ── RECIPES ───────────────────────────────────────────────────────────────
 function buildRecipes(){
   const all=Object.assign({},RECIPES,S.uploadedRecipes);
@@ -649,7 +649,7 @@ function buildRecipes(){
     </div>`;
   }).join("");
 }
- 
+
 // ── PICKER MODAL ──────────────────────────────────────────────────────────
 function buildPicker(){
   const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
@@ -677,7 +677,7 @@ function buildPicker(){
     </div>
   </div>`;
 }
- 
+
 // ── HISTORY SHEET ─────────────────────────────────────────────────────────
 function buildHistory(){
   // Use allWeekMeals from Supabase + localStorage fallback
@@ -685,7 +685,7 @@ function buildHistory(){
   const lsKeys = [];
   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("week:"))lsKeys.push(k.replace("week:",""));}
   const allKeys = [...new Set([...sbKeys, ...lsKeys])].sort().reverse();
- 
+
   return`<div class="overlay bottom" id="histOv">
     <div class="modal sheet">
       <div class="hist-top"><div class="hist-title">📚 Saved Weeks</div><button class="btn-x" id="btnHistClose">×</button></div>
@@ -709,7 +709,7 @@ function buildHistory(){
     </div>
   </div>`;
 }
- 
+
 // ── UPLOAD MODAL ──────────────────────────────────────────────────────────
 function buildUpload(){
   const prev=S.uploadPreview;
@@ -748,7 +748,7 @@ Preparation
     </div>
   </div>`;
 }
- 
+
 // ── PARSE RECIPE TEXT ─────────────────────────────────────────────────────
 function parseRecipes(text){
   const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
@@ -781,7 +781,7 @@ function parseRecipes(text){
   });
   return out;
 }
- 
+
 // ── BIND EVENTS ───────────────────────────────────────────────────────────
 function bind(){
   document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{S.tab=b.dataset.tab;lsSet("s_tab",S.tab);render();}));
@@ -855,10 +855,10 @@ function bind(){
     updateSyncBadge();
   });
 }
- 
+
 function q(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",fn);}
 function ov(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",e=>{if(e.target===el)fn();});}
- 
+
 function addAndSelect(){
   const val=(S.pickerInput||"").trim();if(!val)return;
   const mt=S.picker.mealType,list=S.customMeals[mt]||[];
@@ -869,7 +869,7 @@ function addAndSelect(){
   }
   selectMeal(val);
 }
- 
+
 function selectMeal(val){
   const{day,mealType}=S.picker;
   if(!S.meals[day])S.meals[day]={};
@@ -878,12 +878,12 @@ function selectMeal(val){
   saveMealToDB(day, mealType, val); // async, non-blocking
   S.picker=null;S.pickerInput="";render();
 }
- 
+
 function reRenderPicker(){
   render();
   setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.setSelectionRange(S.pickerInput.length,S.pickerInput.length);}},0);
 }
- 
+
 // ── START ─────────────────────────────────────────────────────────────────
 init();
 </script>
