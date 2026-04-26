@@ -204,7 +204,7 @@ async function dbDelete(table, filters) {
 }
 
 // ── DATA ──────────────────────────────────────────────────────────────────
-const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const MEAL_TYPES=["breakfast","lunch","dinner","snacks"];
 const MEAL_IDEAS={
   breakfast:["Overnight Oats","Scrambled Eggs & Toast","Pancakes","Yogurt Parfait","Breakfast Burritos","Smoothie Bowls","French Toast"],
@@ -257,9 +257,9 @@ function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.pa
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
 // ── WEEK HELPERS ──────────────────────────────────────────────────────────
-function getMonday(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-((n.getDay()+6)%7)+off*7);m.setHours(0,0,0,0);return m;}
-function weekKey(off){return getMonday(off).toISOString().slice(0,10);}
-function weekLabel(off){const m=getMonday(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
+function getWeekStart(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-n.getDay()+off*7);m.setHours(0,0,0,0);return m;}
+function weekKey(off){return getWeekStart(off).toISOString().slice(0,10);}
+function weekLabel(off){const m=getWeekStart(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
 function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week";if(off===-1)return"Last Week";return"Week of "+weekLabel(off).split("–")[0].trim();}
 
 // ── STATE ─────────────────────────────────────────────────────────────────
