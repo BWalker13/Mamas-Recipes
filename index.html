@@ -157,6 +157,10 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .init-sub{font-size:12px;color:#a8a29e;}
 @media(max-width:480px){.modal,.modal.wide{width:calc(100vw - 32px);}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+</script>
 </head>
 <body>
 <div id="app"></div>
@@ -934,7 +938,7 @@ Preparation
 2. Make Alfredo sauce
 3. Combine and serve</pre></div>
       <div>
-        <input type="file" id="fileInp" accept=".txt,.text" style="display:none"/>
+        <input type="file" id="fileInp" accept=".txt,.text,.pdf" style="display:none"/>
         <button class="btn-file" id="btnChooseFile">📁 Choose .txt file from your computer</button>
         <div class="divider">— or paste text directly below —</div>
       </div>
@@ -1159,7 +1163,50 @@ function bind(){
   ov("uploadOv",()=>{if(S.uploadSaving)return;S.showUpload=false;S.uploadSaving=false;render();});
   q("btnChooseFile",()=>{const fi=document.getElementById("fileInp");if(fi)fi.click();});
   const fi=document.getElementById("fileInp");
-  if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
+  if(fi)fi.addEventListener("change",e=>{
+    const f=e.target.files[0];
+    if(!f)return;
+    const isPdf=f.type==="application/pdf"||f.name.toLowerCase().endsWith(".pdf");
+    if(isPdf){
+      S.uploadText="";
+      S.uploadPreview=null;
+      S.uploadError="Reading PDF…";
+      render();
+      (async ()=>{
+        try{
+          if(typeof pdfjsLib==="undefined")throw new Error("pdfjs missing");
+          const buf=await f.arrayBuffer();
+          const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+          const pageTexts=[];
+          for(let p=1;p<=pdf.numPages;p++){
+            const page=await pdf.getPage(p);
+            const tc=await page.getTextContent();
+            pageTexts.push(tc.items.map(it=>it.str).join(" "));
+          }
+          const fullText=pageTexts.join("\n");
+          if(!fullText.trim()){
+            S.uploadText="";
+            S.uploadPreview=null;
+            S.uploadError="Couldn't read this PDF. Try copying and pasting the text instead.";
+          }else{
+            S.uploadText=fullText;
+            S.uploadPreview=null;
+            S.uploadError="";
+          }
+        }catch(err){
+          S.uploadText="";
+          S.uploadPreview=null;
+          S.uploadError="Couldn't read this PDF. Try copying and pasting the text instead.";
+        }
+        render();
+      })();
+    }else{
+      const r=new FileReader();
+      r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};
+      r.readAsText(f);
+    }
+    fi.value="";
+  });
   const ta=document.getElementById("uploadTA");
   const fitUploadTA=()=>{
     if(!ta)return;
