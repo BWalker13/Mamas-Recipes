@@ -260,6 +260,7 @@ const S={
   picker:null, pickerInput:"",
   showHistory:false, historyOpen:{},
   showUpload:false, uploadText:"", uploadPreview:null, uploadError:"",
+  uploadSaving:false,
   recipeOpen:   lsGet("s_recipeOpen",{}),
   recipeFilter: lsGet("s_recipeFilter","all"),
   groceryChecked: lsGet("s_groceryChecked",{}),
@@ -295,19 +296,40 @@ async function loadRecipesFromDB() {
 
 // Save a recipe to Supabase
 async function saveRecipeToDB(name, recipe) {
+  const payload = {
+    name,
+    tag: recipe.tag,
+    time: recipe.time,
+    servings: recipe.servings,
+    ingredients: recipe.ingredients,
+    steps: recipe.steps
+  };
   try {
-    await dbUpsert("recipes", {
-      name,
-      tag: recipe.tag,
-      time: recipe.time,
-      servings: recipe.servings,
-      ingredients: recipe.ingredients,
-      steps: recipe.steps
-    }, "name");
+    // Preferred path when recipes.name has a unique constraint.
+    await dbUpsert("recipes", payload, "name");
     setSyncOk();
+    return true;
   } catch(e) {
+    const msg = String((e && e.message) || e || "");
+    const missingConflictConstraint =
+      msg.includes("42P10") ||
+      /no unique|no exclusion|on conflict/i.test(msg);
+    if (missingConflictConstraint) {
+      try {
+        // Fallback for schemas without unique(name): replace by name manually.
+        await dbDelete("recipes", { name });
+      } catch {}
+      try {
+        await dbUpsert("recipes", payload);
+        setSyncOk();
+        return true;
+      } catch (fallbackErr) {
+        console.warn("Recipe fallback save failed:", fallbackErr);
+      }
+    }
     console.warn("Recipe save failed:", e);
     setSyncErr("Recipe save failed — saved locally only");
+    return false;
   }
 }
 
@@ -730,7 +752,7 @@ Preparation
         Object.entries(prev).map(([n,r])=>`<div class="preview-row"><span class="preview-name">${esc(n)}</span><span class="preview-meta">${r.steps.length} steps · ${r.tag}</span></div>`).join("")+`</div>`:""}
       <div class="btn-row">
         ${!prev?`<button class="btn-primary" id="btnPreview" ${!S.uploadText.trim()?"disabled":""}>Preview Recipes</button>`
-              :`<button class="btn-primary" id="btnSaveUp">☁️ Save ${Object.keys(prev).length} Recipes to Cloud</button>`}
+              :`<button class="btn-primary" id="btnSaveUp" ${S.uploadSaving?"disabled":""}>${S.uploadSaving?"Saving...":"☁️ Save "+Object.keys(prev).length+" Recipes to Cloud"}</button>`}
         <button class="btn-secondary" id="btnUploadClose">Cancel</button>
       </div>
     </div>
@@ -758,11 +780,20 @@ function parseRecipes(text){
       if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
       const sm=line.match(/^\d+[\.\)]\s+(.+)/);
       if(sm){inIngredients=false;steps.push(sm[1]);return;}
+      if(/^\s*step\s*\d+\s*:/i.test(line)){
+        inIngredients=false;
+        steps.push(line.replace(/^\s*step\s*\d+\s*:\s*/i,""));
+        return;
+      }
       if(line.startsWith("-")||line.startsWith("•")){
         const val=line.replace(/^[-•]\s*/,"");
         if(inIngredients||!steps.length)ingredients.push(val);
         else steps.push(val);
         return;
+      }
+      // Typed recipes often have plain lines under Preparation without numbering.
+      if(!inIngredients) {
+        steps.push(line);
       }
     });
     if(steps.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
@@ -815,9 +846,9 @@ function bind(){
     deleteRecipeFromDB(name); // async, non-blocking
     render();
   }));
-  q("btnShowUpload",()=>{S.showUpload=true;S.uploadText="";S.uploadPreview=null;S.uploadError="";render();});
-  q("btnUploadClose",()=>{S.showUpload=false;render();});
-  ov("uploadOv",()=>{S.showUpload=false;render();});
+  q("btnShowUpload",()=>{S.showUpload=true;S.uploadText="";S.uploadPreview=null;S.uploadError="";S.uploadSaving=false;render();});
+  q("btnUploadClose",()=>{if(S.uploadSaving)return;S.showUpload=false;S.uploadSaving=false;render();});
+  ov("uploadOv",()=>{if(S.uploadSaving)return;S.showUpload=false;S.uploadSaving=false;render();});
   q("btnChooseFile",()=>{const fi=document.getElementById("fileInp");if(fi)fi.click();});
   const fi=document.getElementById("fileInp");
   if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
@@ -830,16 +861,37 @@ function bind(){
     render();
   });
   q("btnSaveUp",async ()=>{
-    const prev = S.uploadPreview;
-    // Optimistic update
-    S.uploadedRecipes=Object.assign({},S.uploadedRecipes,prev);
-    lsSet("uploadedRecipes",S.uploadedRecipes);
-    S.showUpload=false;S.uploadPreview=null;S.uploadText="";
+    if(S.uploadSaving)return;
+    const prev = S.uploadPreview || {};
+    const entries = Object.entries(prev);
+    if(!entries.length)return;
+    S.uploadSaving=true;
+    S.uploadError="";
     render();
-    // Save each recipe to Supabase
-    for (const [name, recipe] of Object.entries(prev)) {
-      await saveRecipeToDB(name, recipe);
+
+    const saved = {};
+    const failed = [];
+    for (const [name, recipe] of entries) {
+      const ok = await saveRecipeToDB(name, recipe);
+      if(ok) saved[name] = recipe;
+      else failed.push(name);
     }
+
+    if(Object.keys(saved).length){
+      S.uploadedRecipes=Object.assign({},S.uploadedRecipes,saved);
+      lsSet("uploadedRecipes",S.uploadedRecipes);
+    }
+
+    S.uploadSaving=false;
+    if(failed.length===0){
+      S.showUpload=false;
+      S.uploadPreview=null;
+      S.uploadText="";
+      S.uploadError="";
+    } else {
+      S.uploadError=`Saved ${Object.keys(saved).length} to cloud. ${failed.length} failed: ${failed.join(", ")}.`;
+    }
+    render();
     updateSyncBadge();
   });
 }
