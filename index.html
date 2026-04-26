@@ -155,6 +155,15 @@ button{font-family:Georgia,serif;cursor:pointer;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .init-txt{font-size:14px;color:#92400e;font-weight:700;}
 .init-sub{font-size:12px;color:#a8a29e;}
+.hdr-user-hint{font-size:11px;font-weight:700;color:rgba(255,255,255,.88);text-align:right;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#faf9f6;padding:24px;}
+.user-gate-card{max-width:380px;width:100%;background:white;border-radius:24px;padding:28px;box-shadow:0 8px 32px rgba(0,0,0,.08);border:1px solid #f0ebe3;}
+.user-gate-title{font-size:22px;font-weight:800;color:#292524;margin-bottom:6px;font-family:Georgia,serif;}
+.user-gate-sub{font-size:13px;color:#78716c;margin-bottom:20px;line-height:1.5;}
+.user-gate-lbl{font-size:11px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.user-gate-inp{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #fed7aa;font-size:15px;font-family:Georgia,serif;outline:none;color:#292524;margin-bottom:16px;box-sizing:border-box;}
+.user-gate-btn{width:100%;padding:14px;border-radius:12px;border:none;background:#d97706;color:white;font-size:15px;font-weight:800;font-family:Georgia,serif;cursor:pointer;}
+.user-gate-btn:disabled{background:#e7e0d6;cursor:default;}
 @media(max-width:480px){.modal,.modal.wide{width:calc(100vw - 32px);}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -177,9 +186,10 @@ const SB_HEADERS = {
   "Content-Type": "application/json"
 };
 
-async function dbSelect(table, query) {
+async function dbSelect(table, query, filterQuery) {
   query = query || "*";
-  const url = SUPABASE_URL + "/rest/v1/" + table + "?select=" + query;
+  let url = SUPABASE_URL + "/rest/v1/" + table + "?select=" + query;
+  if (filterQuery) url += "&" + filterQuery;
   const r = await fetch(url, { headers: SB_HEADERS });
   if (!r.ok) { const t = await r.text(); console.error("dbSelect failed:", r.status, t); throw new Error(t); }
   return r.json();
@@ -256,6 +266,13 @@ const RECIPES={
 function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
 
+// ── USER (query param) & namespaced meal storage ───────────────────────────
+const _userParam = new URLSearchParams(window.location.search).get("user");
+const USER_ID = (_userParam && _userParam.trim()) ? _userParam.trim() : null;
+function weekLsKey(wk) { return USER_ID ? ("week:" + USER_ID + ":" + wk) : "__week:nouser__:" + wk; }
+function customMealsLsKey() { return USER_ID ? ("customMeals:" + USER_ID) : "customMeals:__nouser__"; }
+function weekLsPrefix() { return USER_ID ? ("week:" + USER_ID + ":") : ""; }
+
 // ── WEEK HELPERS ──────────────────────────────────────────────────────────
 function getWeekStart(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-n.getDay()+off*7);m.setHours(0,0,0,0);return m;}
 function weekKey(off){return getWeekStart(off).toISOString().slice(0,10);}
@@ -268,7 +285,7 @@ const S={
   weekOffset:   lsGet("s_weekOffset",0),
   meals:{},
   allWeekMeals:{}, // cache of all weeks loaded from supabase for history
-  customMeals:  lsGet("customMeals",{breakfast:[],lunch:[],dinner:[],snacks:[]}),
+  customMeals:  lsGet(customMealsLsKey(),{breakfast:[],lunch:[],dinner:[],snacks:[]}),
   uploadedRecipes: {},  // loaded from Supabase on init
   picker:null, pickerInput:"",
   showHistory:false, historyOpen:{},
@@ -440,9 +457,10 @@ function replaceMealNameInLocalPlans(oldName, newName) {
       }
     }
   }
+  const wp = weekLsPrefix();
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith("week:")) {
+    if (k && wp && k.startsWith(wp)) {
       const data = lsGet(k, null);
       if (!data) continue;
       let ch = false;
@@ -460,7 +478,7 @@ function replaceMealNameInLocalPlans(oldName, newName) {
       S.customMeals[mt] = list.map(x => x === oldName ? newName : x);
     }
   }
-  lsSet("customMeals", S.customMeals);
+  lsSet(customMealsLsKey(), S.customMeals);
   if (S.recipeOpen[oldName]) {
     S.recipeOpen[newName] = S.recipeOpen[oldName];
     delete S.recipeOpen[oldName];
@@ -540,7 +558,7 @@ async function saveEditedRecipe() {
 async function loadMealsFromDB() {
   const wk = weekKey(S.weekOffset);
   try {
-    const rows = await dbSelect("meal_plans");
+    const rows = await dbSelect("meal_plans", "*", "user_id=eq." + encodeURIComponent(USER_ID));
     // Rebuild allWeekMeals from all rows
     S.allWeekMeals = {};
     for (const row of rows) {
@@ -550,11 +568,11 @@ async function loadMealsFromDB() {
     }
     S.meals = S.allWeekMeals[wk] || {};
     // Mirror to localStorage
-    lsSet("week:"+wk, S.meals);
+    lsSet(weekLsKey(wk), S.meals);
     setSyncOk();
   } catch(e) {
     console.warn("Meal plan load failed, using localStorage:", e);
-    S.meals = lsGet("week:"+wk, {});
+    S.meals = lsGet(weekLsKey(wk), {});
   }
 }
 
@@ -564,15 +582,17 @@ async function saveMealToDB(day, mealType, mealName, weekKeyOverride) {
   try {
     if (mealName) {
       await dbUpsert("meal_plans", {
+        user_id: USER_ID,
         week_key: wk,
         day,
         meal_type: mealType,
         meal_name: mealName,
         updated_at: new Date().toISOString()
-      }, "week_key,day,meal_type");
+      }, "user_id,week_key,day,meal_type");
     } else {
       // Empty meal — delete the row
       await dbDelete("meal_plans", {
+        user_id: USER_ID,
         week_key: wk,
         day,
         meal_type: mealType
@@ -588,23 +608,23 @@ async function saveMealToDB(day, mealType, mealName, weekKeyOverride) {
 // Load custom meals from Supabase
 async function loadCustomMealsFromDB() {
   try {
-    const rows = await dbSelect("custom_meals");
+    const rows = await dbSelect("custom_meals", "*", "user_id=eq." + encodeURIComponent(USER_ID));
     const result = {breakfast:[],lunch:[],dinner:[],snacks:[]};
     for (const row of rows) {
       if (result[row.meal_type]) result[row.meal_type].push(row.name);
     }
     S.customMeals = result;
-    lsSet("customMeals", result);
+    lsSet(customMealsLsKey(), result);
   } catch(e) {
     console.warn("Custom meals load failed, using localStorage:", e);
-    S.customMeals = lsGet("customMeals", {breakfast:[],lunch:[],dinner:[],snacks:[]});
+    S.customMeals = lsGet(customMealsLsKey(), {breakfast:[],lunch:[],dinner:[],snacks:[]});
   }
 }
 
 // Save a custom meal to Supabase
 async function saveCustomMealToDB(mealType, name) {
   try {
-    await dbUpsert("custom_meals", { meal_type: mealType, name }, "meal_type,name");
+    await dbUpsert("custom_meals", { user_id: USER_ID, meal_type: mealType, name }, "user_id,meal_type,name");
   } catch(e) {
     console.warn("Custom meal save failed:", e);
   }
@@ -625,6 +645,29 @@ function updateSyncBadge() {
   if (!el) return;
   el.className = "sync-badge " + S.syncStatus;
   el.textContent = S.syncMsg;
+}
+
+function showUserGate() {
+  document.getElementById("app").innerHTML = `
+    <div class="user-gate">
+      <div class="user-gate-card">
+        <div class="user-gate-title">Mama's Meal Prep Planner</div>
+        <div class="user-gate-sub">Who's planning this week? Enter a name to load your own meal plan (recipes stay shared for everyone).</div>
+        <div class="user-gate-lbl">What's your name?</div>
+        <input type="text" class="user-gate-inp" id="userNameInp" placeholder="e.g. Mama" maxlength="64" autocomplete="username"/>
+        <button type="button" class="user-gate-btn" id="btnUserGo">Let's go</button>
+      </div>
+    </div>`;
+  const go = () => {
+    const v = (document.getElementById("userNameInp") && document.getElementById("userNameInp").value || "").trim();
+    if (!v) return;
+    const u = new URL(window.location.href);
+    u.searchParams.set("user", v);
+    window.location.href = u.toString();
+  };
+  document.getElementById("btnUserGo").addEventListener("click", go);
+  document.getElementById("userNameInp").addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  setTimeout(() => { const i = document.getElementById("userNameInp"); if (i) i.focus(); }, 0);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
@@ -655,7 +698,7 @@ async function init() {
 // ── SAVE FUNCTIONS (dual-write: Supabase + localStorage) ──────────────────
 function saveMeals() {
   const wk = weekKey(S.weekOffset);
-  lsSet("week:"+wk, S.meals);
+  lsSet(weekLsKey(wk), S.meals);
   // Supabase saves happen per-slot in selectMeal / removeMeal
 }
 
@@ -679,8 +722,11 @@ function buildApp(){
     <div class="hdr-top">
       <div style="min-width:0;flex:1"><div class="hdr-eyebrow">Family of 5 · Weekly System</div><div class="hdr-title">Mama's Meal Prep Planner</div></div>
       <div class="hdr-right">
+        <div class="hdr-user-hint" title="${esc(USER_ID)}">Welcome, ${esc(USER_ID)}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
         <button class="btn-hist" id="btnHist">📚 History</button>
         <span id="syncBadge" class="sync-badge ${S.syncStatus}">${esc(S.syncMsg)}</span>
+        </div>
       </div>
     </div>
     <div class="week-nav">
@@ -941,7 +987,11 @@ function buildHistory(){
   // Use allWeekMeals from Supabase + localStorage fallback
   const sbKeys = Object.keys(S.allWeekMeals);
   const lsKeys = [];
-  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("week:"))lsKeys.push(k.replace("week:",""));}
+  const wp = weekLsPrefix();
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&wp&&k.startsWith(wp))lsKeys.push(k.slice(wp.length));
+  }
   const allKeys = [...new Set([...sbKeys, ...lsKeys])].sort().reverse();
 
   return`<div class="overlay bottom" id="histOv">
@@ -949,12 +999,12 @@ function buildHistory(){
       <div class="hist-top"><div class="hist-title">📚 Saved Weeks</div><button class="btn-x" id="btnHistClose">×</button></div>
       ${allKeys.length===0?`<p style="color:#a8a29e;font-size:13px">No saved weeks yet. Start planning!</p>`:""}
       ${allKeys.map(dateKey=>{
-        const k="week:"+dateKey;const isOpen=!!S.historyOpen[k];
+        const k=weekLsKey(dateKey);const isOpen=!!S.historyOpen[k];
         const mon=new Date(dateKey+"T12:00:00");const sun=new Date(mon);sun.setDate(mon.getDate()+6);
         const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
         const weekMeals = S.allWeekMeals[dateKey] || lsGet(k, {});
         return`<div class="hist-week${isOpen?" open":""}">
-          <div class="hist-wk-hdr" data-hk="${k}"><span class="hist-wk-lbl">${f(mon)} – ${f(sun)}</span><span>${isOpen?"▲":"▼"}</span></div>
+          <div class="hist-wk-hdr" data-hk="${esc(k)}"><span class="hist-wk-lbl">${f(mon)} – ${f(sun)}</span><span>${isOpen?"▲":"▼"}</span></div>
           ${isOpen?`<div class="hist-wk-body">`+
             DAYS.map(day=>{
               const dm=weekMeals[day]||{};const entries=MEAL_TYPES.map(mt=>({mt,val:dm[mt]})).filter(x=>x.val);
@@ -1154,7 +1204,7 @@ function bind(){
   q("btnHist",()=>{S.showHistory=true;render();});
   q("btnHistClose",()=>{S.showHistory=false;render();});
   ov("histOv",()=>{S.showHistory=false;render();});
-  document.querySelectorAll("[data-hk]").forEach(el=>el.addEventListener("click",()=>{S.historyOpen[el.dataset.hk]=!S.historyOpen[el.dataset.hk];render();}));
+  document.querySelectorAll("[data-hk]").forEach(el=>el.addEventListener("click",()=>{const hk=el.getAttribute("data-hk");if(hk)S.historyOpen[hk]=!S.historyOpen[hk];render();}));
   document.querySelectorAll(".meal-cell").forEach(cell=>cell.addEventListener("click",()=>{
     const day=cell.dataset.day,mt=cell.dataset.mt,current=(S.meals[day]||{})[mt]||"";
     S.picker={day,mealType:mt,currentMeal:current};S.pickerInput="";render();
@@ -1329,7 +1379,7 @@ function addAndSelect(){
   const mt=S.picker.mealType,list=S.customMeals[mt]||[];
   if(!list.includes(val)){
     S.customMeals[mt]=[...list,val];
-    lsSet("customMeals",S.customMeals);
+    lsSet(customMealsLsKey(),S.customMeals);
     saveCustomMealToDB(mt, val); // async, non-blocking
   }
   selectMeal(val);
@@ -1350,7 +1400,8 @@ function reRenderPicker(){
 }
 
 // ── START ─────────────────────────────────────────────────────────────────
-init();
+if(USER_ID)init();
+else showUserGate();
 </script>
 </body>
 </html>
