@@ -274,9 +274,26 @@ const S={
   recipeOpen:   lsGet("s_recipeOpen",{}),
   recipeFilter: lsGet("s_recipeFilter","all"),
   groceryChecked: lsGet("s_groceryChecked",{}),
+  /** Built-in recipe names the user removed from the list (not stored in cloud). */
+  hiddenBuiltins: (function() {
+    const h = lsGet("s_hiddenBuiltins", null);
+    if (h == null) return {};
+    if (Array.isArray(h)) { const o = {}; h.forEach(n => { o[n] = true; }); return o; }
+    return typeof h === "object" ? h : {};
+  })(),
   syncStatus: "loading", // "loading" | "ok" | "error"
   syncMsg: "Connecting…"
 };
+
+// Merged list: default recipes minus hidden, then uploaded (uploaded wins on name clash).
+function allRecipesMerged() {
+  const o = {};
+  for (const k in RECIPES) {
+    if (S.hiddenBuiltins[k] && !S.uploadedRecipes[k]) continue;
+    o[k] = RECIPES[k];
+  }
+  return Object.assign(o, S.uploadedRecipes);
+}
 
 // ── SUPABASE SYNC FUNCTIONS ───────────────────────────────────────────────
 
@@ -358,7 +375,7 @@ async function deleteRecipeFromDB(name) {
 }
 
 function openRecipeEdit(name) {
-  const all = Object.assign({}, RECIPES, S.uploadedRecipes);
+  const all = allRecipesMerged();
   const r = all[name];
   if (!r) return;
   S.recipeEdit = {
@@ -741,7 +758,7 @@ function parseIngredientLine(line){
   return{qty,unit,name,raw:line.trim()};
 }
 function aggregateIngredients(mealNames){
-  const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
+  const allRecipes=allRecipesMerged();
   const map={};
   mealNames.forEach(mealName=>{
     const recipe=allRecipes[mealName];if(!recipe||!recipe.ingredients)return;
@@ -774,7 +791,7 @@ function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
   if(!meals.length)return`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">Add meals to your plan to generate a grocery list.</p></div>`;
-  const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
+  const allRecipes=allRecipesMerged();
   const missingRecipes=meals.filter(m=>!allRecipes[m]);
   const knownMeals=meals.filter(m=>!!allRecipes[m]);
   const items=aggregateIngredients(knownMeals);
@@ -793,7 +810,7 @@ function buildGrocery(){
 
 // ── RECIPES ───────────────────────────────────────────────────────────────
 function buildRecipes(){
-  const all=Object.assign({},RECIPES,S.uploadedRecipes);
+  const all=allRecipesMerged();
   const upCount=Object.keys(S.uploadedRecipes).length;
   const cats=[{id:"all",lbl:"All"},{id:"breakfast",lbl:"🌅 Breakfast"},{id:"lunch",lbl:"☀️ Lunch"},{id:"dinner",lbl:"🍽 Dinner"},{id:"snacks",lbl:"🍎 Snacks"}];
   const entries=Object.entries(all).filter(([,r])=>S.recipeFilter==="all"||r.tag===S.recipeFilter);
@@ -821,7 +838,7 @@ function buildRecipes(){
         </div>
         <div class="rec-actions">
           <button type="button" class="rec-edit-btn" data-re-edit="${esc(name)}" title="Edit recipe" aria-label="Edit recipe">✎</button>
-          ${isUp?`<button class="btn-del" data-dr="${esc(name)}" type="button">🗑</button>`:""}
+          <button class="btn-del" data-dr="${esc(name)}" type="button" title="${isUp ? "Delete from library and cloud" : "Remove from this list"}" aria-label="Delete recipe">🗑</button>
         </div>
       </div>
       ${isOpen?`<div class="rec-steps">
@@ -1123,10 +1140,18 @@ function bind(){
   if(S.recipeEdit)setTimeout(()=>{const n=document.getElementById("reName");if(n){n.focus();n.select();}},0);
   document.querySelectorAll("[data-dr]").forEach(b=>b.addEventListener("click",e=>{
     e.stopPropagation();
-    const name = b.dataset.dr;
-    delete S.uploadedRecipes[name];
-    lsSet("uploadedRecipes",S.uploadedRecipes);
-    deleteRecipeFromDB(name); // async, non-blocking
+    const name = b.getAttribute("data-dr");
+    if (!name) return;
+    if (S.uploadedRecipes[name]) {
+      delete S.uploadedRecipes[name];
+      lsSet("uploadedRecipes",S.uploadedRecipes);
+      deleteRecipeFromDB(name);
+    } else {
+      S.hiddenBuiltins[name] = true;
+      lsSet("s_hiddenBuiltins",S.hiddenBuiltins);
+    }
+    delete S.recipeOpen[name];
+    lsSet("s_recipeOpen",S.recipeOpen);
     render();
   }));
   q("btnShowUpload",()=>{S.showUpload=true;S.uploadText="";S.uploadPreview=null;S.uploadError="";S.uploadSaving=false;render();});
