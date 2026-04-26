@@ -203,17 +203,17 @@ const RECIPES={
   "Popcorn":{tag:"snacks",time:"10 min",servings:5,ingredients:["½ cup popcorn kernels","2 tbsp vegetable or coconut oil","2 tbsp melted butter","Salt to taste"],steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
   "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,ingredients:["1 multipack (12–16 count) yogurt tubes"],steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
 };
- 
+
 // ── STORAGE ───────────────────────────────────────────────────────────────
 function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
- 
+
 // ── WEEK HELPERS ──────────────────────────────────────────────────────────
 function getMonday(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-((n.getDay()+6)%7)+off*7);m.setHours(0,0,0,0);return m;}
 function weekKey(off){return getMonday(off).toISOString().slice(0,10);}
 function weekLabel(off){const m=getMonday(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
 function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week";if(off===-1)return"Last Week";return"Week of "+weekLabel(off).split("–")[0].trim();}
- 
+
 // ── STATE ─────────────────────────────────────────────────────────────────
 const S={
   tab:          lsGet("s_tab","planner")==="prep"?"planner":lsGet("s_tab","planner"),
@@ -239,12 +239,12 @@ function saveUIState(){
   lsSet("s_groceryChecked",S.groceryChecked);
 }
 loadMeals();
- 
+
 // ── RENDER ────────────────────────────────────────────────────────────────
 function render(){saveUIState();document.getElementById("app").innerHTML=buildApp();bind();}
- 
+
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
- 
+
 function buildApp(){
   const total=DAYS.length*4;
   const planned=Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean).length;
@@ -276,7 +276,7 @@ function buildApp(){
   ${S.showUpload?buildUpload():""}
   ${S.showEdit?buildEditModal():""}`;
 }
- 
+
 // ── PLANNER ───────────────────────────────────────────────────────────────
 function buildPlanner(){
   return`<p class="hint">Tap any cell to pick a meal. Everything saves automatically. ✨</p>`+
@@ -292,7 +292,7 @@ function buildPlanner(){
     }).join("")+`</div></div>`;
   }).join("");
 }
- 
+
 // ── INGREDIENT AGGREGATION ────────────────────────────────────────────────
 // Maps unicode/word fractions to decimal
 const FRAC={
@@ -322,7 +322,7 @@ const UNIT_ALIAS={
 };
 // Words that are notes/qualifiers, not ingredient names
 const STOP=new Set(["to","taste","optional","for","topping","serving","as","needed","divided","of","cooked","shredded","diced","sliced","minced","cubed","halved","chopped","frozen","thawed","warm","large","medium","small","extra","fresh","dry","dried","bonein","boneless","lean","low","fat","sodium","free","or","and","plus","little","a","an","the","approximately","approx"]);
- 
+
 function parseFrac(s){
   // returns numeric value for a string like "1½", "2/3", "1 1/2", "½", "3", etc.
   if(!s)return null;
@@ -344,7 +344,7 @@ function parseFrac(s){
   if(sf)return parseInt(sf[1])/parseInt(sf[2]);
   return null;
 }
- 
+
 function formatQty(n){
   if(n===null||n===undefined)return"";
   const FRAC_STRS={"0.5":"½","0.3333":"⅓","0.6667":"⅔","0.25":"¼","0.75":"¾","0.125":"⅛","0.375":"⅜","0.625":"⅝","0.875":"⅞"};
@@ -360,7 +360,7 @@ function formatQty(n){
   if(Number.isInteger(n))return String(n);
   return parseFloat(n.toFixed(2)).toString();
 }
- 
+
 function normalizeIngredientName(raw){
   // strip leading quantity+unit tokens to get just the ingredient name
   let s=raw.trim();
@@ -381,7 +381,7 @@ function normalizeIngredientName(raw){
   s=s.replace(/^(of|for|the|a|an)\s+/i,"");
   return s;
 }
- 
+
 function parseIngredientLine(line){
   // Returns {qty, unit, name, raw} or null
   // Patterns: "1½ cups rolled oats" | "10 eggs" | "Salt & pepper to taste" | "Butter (for griddle)"
@@ -389,9 +389,9 @@ function parseIngredientLine(line){
   // Remove leading bullet if any
   s=s.replace(/^[-•]\s*/,"");
   if(!s)return null;
- 
+
   let qty=null,unit=null;
- 
+
   // Try to extract leading number/fraction
   // Matches: "1½", "2½", "½", "1 1/2", "2/3", "1", "3.5"
   const qtyRe=/^([\d½⅓⅔¼¾⅛⅜⅝⅞]+(?:\s*[\d\/½⅓⅔¼¾⅛⅜⅝⅞]+)?)\s*/;
@@ -400,12 +400,12 @@ function parseIngredientLine(line){
     const parsed=parseFrac(qm[1].trim());
     if(parsed!==null){qty=parsed;s=s.slice(qm[0].length);}
   }
- 
+
   // Try to extract unit
   const unitRe=new RegExp("^("+Object.keys(UNIT_ALIAS).join("|")+")s?\\b\\.?\\s*","i");
   const um=s.match(unitRe);
   if(um){unit=UNIT_ALIAS[um[1].toLowerCase()]||um[1].toLowerCase();s=s.slice(um[0].length);}
- 
+
   // Rest is ingredient name — clean it
   const raw=s.trim();
   // Remove parenthetical notes
@@ -414,16 +414,16 @@ function parseIngredientLine(line){
   name=name.replace(/,.*$/,"").trim().toLowerCase();
   // Remove leading articles
   name=name.replace(/^(of|for|the|a|an)\s+/i,"").trim();
- 
+
   if(!name)return null;
   return{qty,unit,name,raw:line.trim()};
 }
- 
+
 function aggregateIngredients(mealNames){
   const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
   // Map: normalizedName → {qty, unit, display, recipes[]}
   const map={};
- 
+
   mealNames.forEach(mealName=>{
     const recipe=allRecipes[mealName];
     if(!recipe||!recipe.ingredients)return;
@@ -451,7 +451,7 @@ function aggregateIngredients(mealNames){
       if(!entry.recipes.includes(mealName))entry.recipes.push(mealName);
     });
   });
- 
+
   // Build display strings
   return Object.values(map).map(e=>{
     let display;
@@ -466,13 +466,13 @@ function aggregateIngredients(mealNames){
     return{key:e.name,display,recipes:e.recipes};
   }).sort((a,b)=>a.display.localeCompare(b.display));
 }
- 
+
 function pluralUnit(u){
   const map={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz",clove:"cloves",slice:"slices",can:"cans",jar:"jars",packet:"packets",stalk:"stalks",bag:"bags",container:"containers",head:"heads",bunch:"bunches"};
   return map[u]||u;
 }
 function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
- 
+
 // ── GROCERY ───────────────────────────────────────────────────────────────
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
@@ -495,7 +495,7 @@ function buildGrocery(){
     `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`
   :`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">No ingredients found. Upload recipes for your planned meals.</p></div>`);
 }
- 
+
 // ── RECIPES ───────────────────────────────────────────────────────────────
 function buildRecipes(){
   const all=Object.assign({},RECIPES,S.uploadedRecipes);
@@ -539,7 +539,7 @@ function buildRecipes(){
     </div>`;
   }).join("");
 }
- 
+
 // ── PICKER MODAL ──────────────────────────────────────────────────────────
 function buildPicker(){
   const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
@@ -573,7 +573,7 @@ function buildPicker(){
     </div>
   </div>`;
 }
- 
+
 // ── HISTORY SHEET ─────────────────────────────────────────────────────────
 function buildHistory(){
   const keys=[];
@@ -603,7 +603,7 @@ function buildHistory(){
     </div>
   </div>`;
 }
- 
+
 // ── UPLOAD MODAL ──────────────────────────────────────────────────────────
 function buildUpload(){
   const prev=S.uploadPreview;
@@ -625,7 +625,7 @@ Preparation
 1. Boil pasta until al dente
 2. Make Alfredo sauce
 3. Combine and serve
- 
+
 Banana Muffins
 Time: 40 min
 Category: breakfast
@@ -654,7 +654,7 @@ Ingredients
     </div>
   </div>`;
 }
- 
+
 // ── EDIT RECIPE MODAL ─────────────────────────────────────────────────────
 function buildEditModal(){
   const f=S.editForm;
@@ -707,40 +707,77 @@ function buildEditModal(){
     </div>
   </div>`;
 }
- 
+
 // ── PARSE RECIPE TEXT ─────────────────────────────────────────────────────
 function parseRecipes(text){
-  const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
-  const out={};
-  blocks.forEach(block=>{
-    const lines=block.split("\n").map(l=>l.trim()).filter(Boolean);
-    if(lines.length<2)return;
-    const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];const ingredients=[];
-    let inIngredients=false;
-    lines.slice(1).forEach(line=>{
-      const lo=line.toLowerCase();
-      if(lo.startsWith("time:")){time=line.split(":").slice(1).join(":").trim();return;}
-      if(lo.startsWith("serves:")||lo.startsWith("servings:")){servings=parseInt(line.split(":")[1])||5;return;}
-      if(lo.startsWith("category:")||lo.startsWith("type:")||lo.startsWith("meal:")){
+  const META_RE=/^(time|serves|servings|category|type|meal):/i;
+  const SECTION_RE=/^(ingredients|preparation|prep|directions|steps|notes):?$/i;
+  const BULLET_RE=/^[-\u2013\u2014\u2022]/;
+  const NUMBERED_RE=/^\d+[.)]/;
+  function isNameLine(l){
+    if(!l.trim())return false;
+    if(META_RE.test(l))return false;
+    if(SECTION_RE.test(l))return false;
+    if(BULLET_RE.test(l))return false;
+    if(NUMBERED_RE.test(l))return false;
+    return true;
+  }
+  const rawLines=text.split("\n").map(l=>l.trim());
+  const recipes=[];
+  let cur=null;
+  rawLines.forEach((line,i)=>{
+    if(!line)return;
+    const lo=line.toLowerCase();
+    // Detect metadata/section lines — always belong to current recipe
+    if(cur&&META_RE.test(lo)){
+      if(lo.startsWith("time:"))cur.time=line.split(":").slice(1).join(":").trim();
+      else if(lo.startsWith("serves:")||lo.startsWith("servings:"))cur.servings=parseInt(line.split(":")[1])||5;
+      else if(lo.startsWith("category:")||lo.startsWith("type:")||lo.startsWith("meal:")){
         const v=line.split(":")[1].trim().toLowerCase();
-        if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
+        if(["breakfast","lunch","dinner","snacks"].includes(v))cur.tag=v;
       }
-      if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;return;}
-      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
-      const sm=line.match(/^\d+[\.\)]\s+(.+)/);
-      if(sm){inIngredients=false;steps.push(sm[1]);return;}
-      if(line.startsWith("-")||line.startsWith("•")){
-        const val=line.replace(/^[-•]\s*/,"");
-        if(inIngredients||!steps.length)ingredients.push(val);
-        else steps.push(val);
+      return;
+    }
+    if(cur&&SECTION_RE.test(lo)){
+      cur.inIngr=/^(ingredients)/i.test(lo);
+      cur.inSteps=/^(preparation|prep|directions|steps)/i.test(lo);
+      return;
+    }
+    // Numbered step
+    const sm=line.match(/^\d+[.)]\s*(.+)/);
+    if(sm&&cur){cur.inIngr=false;cur.inSteps=true;cur.steps.push(sm[1]);return;}
+    // Bullet line
+    if(BULLET_RE.test(line)&&cur){
+      const val=line.replace(/^[-\u2013\u2014\u2022]\s*/,"");
+      if(cur.inIngr)cur.ingredients.push(val);
+      else if(cur.inSteps)cur.steps.push(val);
+      else if(!cur.steps.length)cur.ingredients.push(val);
+      else cur.steps.push(val);
+      return;
+    }
+    // Name line: starts a new recipe if there was a blank line before it (or it's the first)
+    if(isNameLine(line)){
+      const prevLine=rawLines[i-1];
+      const blankBefore=(prevLine===undefined||prevLine==="");
+      if(!cur||blankBefore){
+        if(cur&&cur.name)recipes.push(cur);
+        cur={name:line,time:"—",servings:5,tag:"dinner",ingredients:[],steps:[],inIngr:false,inSteps:false};
         return;
       }
-    });
-    if(steps.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
+    }
+    // Plain line belonging to current recipe
+    if(cur){
+      if(cur.inSteps)cur.steps.push(line);
+      else if(cur.inIngr)cur.ingredients.push(line);
+      else cur.steps.push(line);
+    }
   });
+  if(cur&&cur.name)recipes.push(cur);
+  const out={};
+  recipes.forEach(r=>{if(r.name)out[r.name]={tag:r.tag,time:r.time,servings:r.servings,ingredients:r.ingredients,steps:r.steps,_uploaded:true};});
   return out;
 }
- 
+
 // ── BIND EVENTS ───────────────────────────────────────────────────────────
 function bind(){
   // Tabs
@@ -843,10 +880,10 @@ function bind(){
   const fi=document.getElementById("fileInp");
   if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
   const ta=document.getElementById("uploadTA");
-  if(ta)ta.addEventListener("input",()=>{S.uploadText=ta.value;S.uploadPreview=null;S.uploadError="";});
+  if(ta)ta.addEventListener("input",()=>{S.uploadText=ta.value;S.uploadPreview=null;S.uploadError="";const btn=document.getElementById("btnPreview");if(btn)btn.disabled=!ta.value.trim();});
   q("btnPreview",()=>{
     const result=parseRecipes(S.uploadText);
-    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe has a name on the first line, followed by numbered steps (1. 2. 3.)";S.uploadPreview=null;}
+    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe starts with a name on its own line (e.g. \"Chicken Soup\"), followed by any ingredients or steps.";S.uploadPreview=null;}
     else{S.uploadPreview=result;S.uploadError="";}
     render();
   });
@@ -856,10 +893,10 @@ function bind(){
     S.showUpload=false;S.uploadPreview=null;S.uploadText="";render();
   });
 }
- 
+
 function q(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",fn);}
 function ov(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",e=>{if(e.target===el)fn();});}
- 
+
 function addAndSelect(){
   const val=(S.pickerInput||"").trim();if(!val)return;
   const mt=S.picker.mealType,list=S.customMeals[mt]||[];
@@ -885,7 +922,7 @@ function reRenderPicker(){
   render();
   setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.setSelectionRange(inp.length,inp.length);}},0);
 }
- 
+
 render();
 </script>
 </body>
