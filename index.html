@@ -64,6 +64,9 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .rec-up-badge{font-size:11px;padding:3px 10px;border-radius:99px;background:#ede9fe;color:#7c3aed;font-weight:700;}
 .rec-card{background:white;border-radius:18px;border:1.5px solid #f0ebe3;overflow:hidden;transition:border-color .2s;box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:10px;}
 .rec-card.open{border-color:#d97706;box-shadow:0 4px 16px rgba(217,119,6,.1);}
+.rec-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
+.rec-edit-btn{width:34px;height:34px;border-radius:10px;border:1.5px solid #e7e0d6;background:#fff;color:#b45309;font-size:16px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.rec-edit-btn:hover{background:#fffbeb;border-color:#d97706;}
 .rec-hdr{padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:white;user-select:none;}
 .rec-card.open .rec-hdr{background:#fffcf5;}
 .rec-arrow{width:26px;height:26px;border-radius:8px;background:#f0ebe3;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:11px;color:#78716c;}
@@ -98,6 +101,12 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .overlay.bottom{align-items:flex-end;}
 .modal{background:white;border-radius:24px;padding:24px;width:340px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
 .modal.wide{width:390px;}
+.edit-field-lbl{font-size:11px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:1px;}
+.edit-inp,.edit-ta,.edit-sel{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid #e7e0d6;font-size:13px;font-family:Georgia,serif;outline:none;color:#292524;background:white;}
+.edit-ta{min-height:88px;resize:vertical;font-family:monospace;font-size:12px;line-height:1.5;}
+.edit-sel{appearance:none;background:#fff;}
+.edit-hint{font-size:11px;color:#a8a29e;}
+.edit-err{color:#ef4444;font-size:12px;font-weight:600;}
 .modal.sheet{border-radius:24px 24px 0 0;width:100%;max-width:900px;max-height:85vh;box-shadow:0 -8px 40px rgba(0,0,0,.2);}
 .picker-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#a8a29e;margin-bottom:2px;}
 .picker-title{font-size:20px;font-weight:800;color:#292524;text-transform:capitalize;}
@@ -261,6 +270,7 @@ const S={
   showHistory:false, historyOpen:{},
   showUpload:false, uploadText:"", uploadPreview:null, uploadError:"",
   uploadSaving:false,
+  recipeEdit: null, // { originalName, wasUploaded, name, tag, time, servings, ingText, stepText, saving, err }
   recipeOpen:   lsGet("s_recipeOpen",{}),
   recipeFilter: lsGet("s_recipeFilter","all"),
   groceryChecked: lsGet("s_groceryChecked",{}),
@@ -347,6 +357,164 @@ async function deleteRecipeFromDB(name) {
   }
 }
 
+function openRecipeEdit(name) {
+  const all = Object.assign({}, RECIPES, S.uploadedRecipes);
+  const r = all[name];
+  if (!r) return;
+  S.recipeEdit = {
+    originalName: name,
+    wasUploaded: !!S.uploadedRecipes[name],
+    name,
+    tag: r.tag || "dinner",
+    time: r.time != null ? String(r.time) : "—",
+    servings: r.servings != null && !isNaN(r.servings) ? r.servings : 5,
+    ingText: (r.ingredients || []).join("\n"),
+    stepText: (r.steps || []).join("\n"),
+    saving: false,
+    err: ""
+  };
+  render();
+}
+
+function collectMealSlotsWithName(n) {
+  const seen = new Set();
+  const out = [];
+  const push = (wk, day, mt) => {
+    const k = wk + "|" + day + "|" + mt;
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push({ wk, day, meal_type: mt });
+  };
+  const curWk = weekKey(S.weekOffset);
+  for (const day of Object.keys(S.meals || {})) {
+    for (const mt of MEAL_TYPES) {
+      if (S.meals[day] && S.meals[day][mt] === n) push(curWk, day, mt);
+    }
+  }
+  for (const wk of Object.keys(S.allWeekMeals || {})) {
+    for (const day of Object.keys(S.allWeekMeals[wk] || {})) {
+      for (const mt of MEAL_TYPES) {
+        if (S.allWeekMeals[wk] && S.allWeekMeals[wk][day] && S.allWeekMeals[wk][day][mt] === n) {
+          push(wk, day, mt);
+        }
+      }
+    }
+  }
+  return out;
+}
+
+function replaceMealNameInLocalPlans(oldName, newName) {
+  if (oldName === newName) return;
+  for (const day of Object.keys(S.meals || {})) {
+    for (const mt of MEAL_TYPES) {
+      if (S.meals[day] && S.meals[day][mt] === oldName) S.meals[day][mt] = newName;
+    }
+  }
+  for (const wk of Object.keys(S.allWeekMeals || {})) {
+    for (const day of Object.keys(S.allWeekMeals[wk] || {})) {
+      for (const mt of MEAL_TYPES) {
+        if (S.allWeekMeals[wk] && S.allWeekMeals[wk][day] && S.allWeekMeals[wk][day][mt] === oldName) {
+          S.allWeekMeals[wk][day][mt] = newName;
+        }
+      }
+    }
+  }
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("week:")) {
+      const data = lsGet(k, null);
+      if (!data) continue;
+      let ch = false;
+      for (const day of Object.keys(data)) {
+        for (const mt of MEAL_TYPES) {
+          if (data[day] && data[day][mt] === oldName) { data[day][mt] = newName; ch = true; }
+        }
+      }
+      if (ch) lsSet(k, data);
+    }
+  }
+  for (const mt of MEAL_TYPES) {
+    const list = S.customMeals[mt] || [];
+    if (list.some(x => x === oldName)) {
+      S.customMeals[mt] = list.map(x => x === oldName ? newName : x);
+    }
+  }
+  lsSet("customMeals", S.customMeals);
+  if (S.recipeOpen[oldName]) {
+    S.recipeOpen[newName] = S.recipeOpen[oldName];
+    delete S.recipeOpen[oldName];
+  }
+}
+
+async function saveEditedRecipe() {
+  const e = S.recipeEdit;
+  if (!e || e.saving) return;
+  const nEl = document.getElementById("reName");
+  const tEl = document.getElementById("reTag");
+  const timeEl = document.getElementById("reTime");
+  const sEl = document.getElementById("reServ");
+  const iEl = document.getElementById("reIng");
+  const stEl = document.getElementById("reSteps");
+  const newName = (nEl && nEl.value || "").trim();
+  const tag = tEl && tEl.value || "dinner";
+  const time = (timeEl && timeEl.value || "").trim() || "—";
+  const servings = parseInt(sEl && sEl.value, 10) || 5;
+  const ingText = (iEl && iEl.value) || "";
+  const stepText = (stEl && stEl.value) || "";
+  if (!newName) {
+    e.err = "Recipe name is required.";
+    render();
+    return;
+  }
+  const ingredients = ingText.split("\n").map(s => s.trim()).filter(Boolean);
+  const steps = stepText.split("\n").map(s => s.trim()).filter(Boolean);
+  if (!ingredients.length && !steps.length) {
+    e.err = "Add at least one ingredient or one step.";
+    render();
+    return;
+  }
+  e.saving = true;
+  e.err = "";
+  render();
+
+  const oldName = e.originalName;
+  const wasUploaded = e.wasUploaded;
+  const recipe = { tag, time, servings, ingredients, steps, _uploaded: true };
+  const slots = newName !== oldName ? collectMealSlotsWithName(oldName) : [];
+
+  const res = await saveRecipeToDB(newName, recipe);
+  if (!res.ok) {
+    e.saving = false;
+    e.err = (res.error || "Could not save to cloud.").replace(/\s+/g, " ").trim();
+    if (e.err.length > 300) e.err = e.err.slice(0, 300) + "…";
+    setSyncErr("Recipe not fully synced");
+    render();
+    updateSyncBadge();
+    return;
+  }
+
+  if (wasUploaded && newName !== oldName) {
+    await deleteRecipeFromDB(oldName);
+  }
+  S.uploadedRecipes[newName] = recipe;
+  if (newName !== oldName) delete S.uploadedRecipes[oldName];
+  lsSet("uploadedRecipes", S.uploadedRecipes);
+
+  if (newName !== oldName) {
+    replaceMealNameInLocalPlans(oldName, newName);
+    saveMeals();
+    for (const s of slots) {
+      await saveMealToDB(s.day, s.meal_type, newName, s.wk);
+    }
+  }
+
+  e.saving = false;
+  S.recipeEdit = null;
+  setSyncOk();
+  render();
+  updateSyncBadge();
+}
+
 // Load meals for current week from Supabase
 async function loadMealsFromDB() {
   const wk = weekKey(S.weekOffset);
@@ -369,9 +537,9 @@ async function loadMealsFromDB() {
   }
 }
 
-// Save a single meal slot to Supabase
-async function saveMealToDB(day, mealType, mealName) {
-  const wk = weekKey(S.weekOffset);
+// Save a single meal slot to Supabase (optionally for a specific week key string, e.g. renames)
+async function saveMealToDB(day, mealType, mealName, weekKeyOverride) {
+  const wk = weekKeyOverride !== undefined ? weekKeyOverride : weekKey(S.weekOffset);
   try {
     if (mealName) {
       await dbUpsert("meal_plans", {
@@ -514,7 +682,8 @@ function buildApp(){
   </div>
   ${S.picker?buildPicker():""}
   ${S.showHistory?buildHistory():""}
-  ${S.showUpload?buildUpload():""}`;
+  ${S.showUpload?buildUpload():""}
+  ${S.recipeEdit?buildRecipeEdit():""}`;
 }
 
 // ── PLANNER ───────────────────────────────────────────────────────────────
@@ -650,7 +819,10 @@ function buildRecipes(){
             <span class="rec-meta-txt">👨‍👩‍👧‍👦 Serves ${recipe.servings}</span>
           </div>
         </div>
-        ${isUp?`<button class="btn-del" data-dr="${esc(name)}">🗑</button>`:""}
+        <div class="rec-actions">
+          <button type="button" class="rec-edit-btn" data-re-edit="${esc(name)}" title="Edit recipe" aria-label="Edit recipe">✎</button>
+          ${isUp?`<button class="btn-del" data-dr="${esc(name)}" type="button">🗑</button>`:""}
+        </div>
       </div>
       ${isOpen?`<div class="rec-steps">
         ${recipe.ingredients&&recipe.ingredients.length?`<div class="rec-section-lbl">Ingredients</div><div class="ingr-list">`+
@@ -757,6 +929,54 @@ Preparation
         ${!prev?`<button class="btn-primary" id="btnPreview" ${!S.uploadText.trim()?"disabled":""}>Preview Recipes</button>`
               :`<button class="btn-primary" id="btnSaveUp" ${S.uploadSaving?"disabled":""}>${S.uploadSaving?"Saving...":"☁️ Save "+Object.keys(prev).length+" Recipes to Cloud"}</button>`}
         <button class="btn-secondary" id="btnUploadClose">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── EDIT RECIPE MODAL ─────────────────────────────────────────────────────
+function buildRecipeEdit() {
+  const e = S.recipeEdit;
+  if (!e) return "";
+  const tags = ["breakfast", "lunch", "dinner", "snacks"];
+  return `<div class="overlay" id="reOv">
+    <div class="modal wide">
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#292524;margin-bottom:4px">✎ Edit recipe</div>
+        <div class="edit-hint">${e.wasUploaded ? "Changes sync to the cloud when you save." : "Saves a copy to your library (and cloud) — built-in recipes stay unchanged until you do."}</div>
+      </div>
+      <div>
+        <div class="edit-field-lbl" style="margin-bottom:6px">Name</div>
+        <input class="edit-inp" id="reName" value="${esc(e.name)}" ${e.saving ? "disabled" : ""} autocomplete="off"/>
+      </div>
+      <div>
+        <div class="edit-field-lbl" style="margin-bottom:6px">Category</div>
+        <select class="edit-sel" id="reTag" ${e.saving ? "disabled" : ""}>
+          ${tags.map(t => `<option value="${t}"${e.tag === t ? " selected" : ""}>${t}</option>`).join("")}
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div class="edit-field-lbl" style="margin-bottom:6px">Time</div>
+          <input class="edit-inp" id="reTime" value="${esc(e.time)}" ${e.saving ? "disabled" : ""} placeholder="e.g. 35 min"/>
+        </div>
+        <div>
+          <div class="edit-field-lbl" style="margin-bottom:6px">Serves</div>
+          <input class="edit-inp" id="reServ" type="number" min="1" value="${e.servings}" ${e.saving ? "disabled" : ""}/>
+        </div>
+      </div>
+      <div>
+        <div class="edit-field-lbl" style="margin-bottom:6px">Ingredients <span class="edit-hint">(one per line)</span></div>
+        <textarea class="edit-ta" id="reIng" ${e.saving ? "disabled" : ""}>${esc(e.ingText)}</textarea>
+      </div>
+      <div>
+        <div class="edit-field-lbl" style="margin-bottom:6px">Steps <span class="edit-hint">(one per line)</span></div>
+        <textarea class="edit-ta" id="reSteps" style="min-height:120px" ${e.saving ? "disabled" : ""}>${esc(e.stepText)}</textarea>
+      </div>
+      ${e.err ? `<div class="edit-err">${esc(e.err)}</div>` : ""}
+      <div class="btn-row">
+        <button class="btn-primary" id="btnReSave" type="button" ${e.saving ? "disabled" : ""}>${e.saving ? "Saving…" : "☁️ Save recipe"}</button>
+        <button class="btn-secondary" id="btnReCancel" type="button" ${e.saving ? "disabled" : ""}>Cancel</button>
       </div>
     </div>
   </div>`;
@@ -878,6 +1098,17 @@ function bind(){
     if(e.target.closest("[data-dr]"))return;
     S.recipeOpen[h.dataset.rn]=!S.recipeOpen[h.dataset.rn];lsSet("s_recipeOpen",S.recipeOpen);render();
   }));
+  document.querySelectorAll(".rec-actions").forEach(a=>a.addEventListener("click",e=>e.stopPropagation()));
+  document.querySelectorAll("[data-re-edit]").forEach(b=>b.addEventListener("click",e=>{
+    e.stopPropagation();
+    e.preventDefault();
+    const n=b.getAttribute("data-re-edit");
+    if(n)openRecipeEdit(n);
+  }));
+  q("btnReSave",()=>{saveEditedRecipe();});
+  q("btnReCancel",()=>{if(S.recipeEdit&&S.recipeEdit.saving)return;S.recipeEdit=null;render();});
+  ov("reOv",()=>{if(S.recipeEdit&&S.recipeEdit.saving)return;S.recipeEdit=null;render();});
+  if(S.recipeEdit)setTimeout(()=>{const n=document.getElementById("reName");if(n){n.focus();n.select();}},0);
   document.querySelectorAll("[data-dr]").forEach(b=>b.addEventListener("click",e=>{
     e.stopPropagation();
     const name = b.dataset.dr;
