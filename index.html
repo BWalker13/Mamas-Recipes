@@ -1047,12 +1047,14 @@ function parseRecipes(text){
     }
 
     if(isSectionLikeName(name)){
-      // If a pasted recipe was split by blank lines, merge section-only blocks
-      // like "Ingredients:" or "Prep:" into the most recent recipe.
       const mergeTarget=lastRecipeName||Object.keys(out).pop();
       if(mergeTarget&&out[mergeTarget]){
-        out[mergeTarget].ingredients=out[mergeTarget].ingredients.concat(ingredients);
-        out[mergeTarget].steps=out[mergeTarget].steps.concat(steps);
+        const isPrep=/^(preparation|prep|directions|instructions|steps?)\s*:?\s*$/i.test(name);
+        if(isPrep){
+          out[mergeTarget].steps=out[mergeTarget].steps.concat(ingredients).concat(steps);
+        } else {
+          out[mergeTarget].ingredients=out[mergeTarget].ingredients.concat(ingredients).concat(steps);
+        }
       }
       return;
     }
