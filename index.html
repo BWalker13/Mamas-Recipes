@@ -105,8 +105,8 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .empty-txt{font-size:13px;}
 .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);}
 .overlay.bottom{align-items:flex-end;}
-.modal{background:white;border-radius:24px;padding:24px;width:340px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
-.modal.wide{width:390px;}
+.modal{background:white;border-radius:24px;padding:24px;width:340px;max-height:88vh;overflow-y:auto;overflow-x:hidden;box-shadow:0 24px 60px rgba(0,0,0,.25);display:flex;flex-direction:column;gap:14px;}
+.modal.wide{width:390px;max-height:92vh;}
 .modal.sheet{border-radius:24px 24px 0 0;width:100%;max-width:900px;max-height:85vh;box-shadow:0 -8px 40px rgba(0,0,0,.2);}
 .picker-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#a8a29e;margin-bottom:2px;}
 .picker-title{font-size:20px;font-weight:800;color:#292524;text-transform:capitalize;}
@@ -126,7 +126,7 @@ button{font-family:Georgia,serif;cursor:pointer;}
 .fmt-pre{font-size:11px;color:#92400e;line-height:1.7;font-family:monospace;white-space:pre-wrap;}
 .btn-file{width:100%;padding:10px 14px;border-radius:12px;border:1.5px dashed #d6d3d1;background:#faf9f6;color:#78716c;font-size:13px;font-weight:700;}
 .divider{font-size:11px;color:#a8a29e;text-align:center;margin:4px 0;}
-.upload-ta{width:100%;height:160px;padding:10px 12px;border-radius:12px;border:1.5px solid #e7e0d6;font-size:12px;font-family:monospace;resize:vertical;outline:none;color:#292524;line-height:1.6;}
+.upload-ta{width:100%;min-height:260px;height:260px;max-height:50vh;padding:10px 12px;border-radius:12px;border:1.5px solid #e7e0d6;font-size:12px;font-family:monospace;resize:vertical;outline:none;color:#292524;line-height:1.6;overflow-y:auto;box-sizing:border-box;}
 .err-txt{font-size:12px;color:#ef4444;font-weight:600;}
 .preview-box{background:#f0fdf4;border-radius:14px;padding:12px;border:1px solid #bbf7d0;}
 .preview-lbl{font-size:11px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
@@ -203,17 +203,17 @@ const RECIPES={
   "Popcorn":{tag:"snacks",time:"10 min",servings:5,ingredients:["½ cup popcorn kernels","2 tbsp vegetable or coconut oil","2 tbsp melted butter","Salt to taste"],steps:["Heat 2 tbsp oil in a large pot over medium-high heat. Add 3–4 popcorn kernels and cover.","When those kernels pop, add ½ cup popcorn kernels in an even layer. Cover and remove from heat for 30 seconds.","Return to medium-high heat, keeping the lid slightly ajar. Shake the pot occasionally.","Once popping slows to 2–3 seconds between pops, remove from heat immediately.","Transfer to a large bowl. Season immediately with melted butter, salt, or any seasoning you like. Portion into bags once cooled."]},
   "Yogurt Tubes":{tag:"snacks",time:"2 min",servings:5,ingredients:["1 multipack (12–16 count) yogurt tubes"],steps:["Grab a multipack of yogurt tubes from the fridge section.","Freeze half the pack for grab-and-go lunches — they thaw by lunchtime and act as a built-in ice pack.","Keep the other half refrigerated for fresh snacking.","Optional: pair with a small bag of granola or fruit for a more filling snack."]}
 };
-
+ 
 // ── STORAGE ───────────────────────────────────────────────────────────────
 function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}}
 function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
-
+ 
 // ── WEEK HELPERS ──────────────────────────────────────────────────────────
 function getMonday(off){const n=new Date(),m=new Date(n);m.setDate(n.getDate()-((n.getDay()+6)%7)+off*7);m.setHours(0,0,0,0);return m;}
 function weekKey(off){return getMonday(off).toISOString().slice(0,10);}
 function weekLabel(off){const m=getMonday(off),s=new Date(m);s.setDate(m.getDate()+6);const f=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});return `${f(m)} – ${f(s)}`;}
 function weekTitle(off){if(off===0)return"This Week";if(off===1)return"Next Week";if(off===-1)return"Last Week";return"Week of "+weekLabel(off).split("–")[0].trim();}
-
+ 
 // ── STATE ─────────────────────────────────────────────────────────────────
 const S={
   tab:          lsGet("s_tab","planner")==="prep"?"planner":lsGet("s_tab","planner"),
@@ -239,12 +239,12 @@ function saveUIState(){
   lsSet("s_groceryChecked",S.groceryChecked);
 }
 loadMeals();
-
+ 
 // ── RENDER ────────────────────────────────────────────────────────────────
 function render(){saveUIState();document.getElementById("app").innerHTML=buildApp();bind();}
-
+ 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-
+ 
 function buildApp(){
   const total=DAYS.length*4;
   const planned=Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean).length;
@@ -276,7 +276,7 @@ function buildApp(){
   ${S.showUpload?buildUpload():""}
   ${S.showEdit?buildEditModal():""}`;
 }
-
+ 
 // ── PLANNER ───────────────────────────────────────────────────────────────
 function buildPlanner(){
   return`<p class="hint">Tap any cell to pick a meal. Everything saves automatically. ✨</p>`+
@@ -292,7 +292,7 @@ function buildPlanner(){
     }).join("")+`</div></div>`;
   }).join("");
 }
-
+ 
 // ── INGREDIENT AGGREGATION ────────────────────────────────────────────────
 // Maps unicode/word fractions to decimal
 const FRAC={
@@ -322,7 +322,7 @@ const UNIT_ALIAS={
 };
 // Words that are notes/qualifiers, not ingredient names
 const STOP=new Set(["to","taste","optional","for","topping","serving","as","needed","divided","of","cooked","shredded","diced","sliced","minced","cubed","halved","chopped","frozen","thawed","warm","large","medium","small","extra","fresh","dry","dried","bonein","boneless","lean","low","fat","sodium","free","or","and","plus","little","a","an","the","approximately","approx"]);
-
+ 
 function parseFrac(s){
   // returns numeric value for a string like "1½", "2/3", "1 1/2", "½", "3", etc.
   if(!s)return null;
@@ -344,7 +344,7 @@ function parseFrac(s){
   if(sf)return parseInt(sf[1])/parseInt(sf[2]);
   return null;
 }
-
+ 
 function formatQty(n){
   if(n===null||n===undefined)return"";
   const FRAC_STRS={"0.5":"½","0.3333":"⅓","0.6667":"⅔","0.25":"¼","0.75":"¾","0.125":"⅛","0.375":"⅜","0.625":"⅝","0.875":"⅞"};
@@ -360,7 +360,7 @@ function formatQty(n){
   if(Number.isInteger(n))return String(n);
   return parseFloat(n.toFixed(2)).toString();
 }
-
+ 
 function normalizeIngredientName(raw){
   // strip leading quantity+unit tokens to get just the ingredient name
   let s=raw.trim();
@@ -381,7 +381,7 @@ function normalizeIngredientName(raw){
   s=s.replace(/^(of|for|the|a|an)\s+/i,"");
   return s;
 }
-
+ 
 function parseIngredientLine(line){
   // Returns {qty, unit, name, raw} or null
   // Patterns: "1½ cups rolled oats" | "10 eggs" | "Salt & pepper to taste" | "Butter (for griddle)"
@@ -389,9 +389,9 @@ function parseIngredientLine(line){
   // Remove leading bullet if any
   s=s.replace(/^[-•]\s*/,"");
   if(!s)return null;
-
+ 
   let qty=null,unit=null;
-
+ 
   // Try to extract leading number/fraction
   // Matches: "1½", "2½", "½", "1 1/2", "2/3", "1", "3.5"
   const qtyRe=/^([\d½⅓⅔¼¾⅛⅜⅝⅞]+(?:\s*[\d\/½⅓⅔¼¾⅛⅜⅝⅞]+)?)\s*/;
@@ -400,12 +400,12 @@ function parseIngredientLine(line){
     const parsed=parseFrac(qm[1].trim());
     if(parsed!==null){qty=parsed;s=s.slice(qm[0].length);}
   }
-
+ 
   // Try to extract unit
   const unitRe=new RegExp("^("+Object.keys(UNIT_ALIAS).join("|")+")s?\\b\\.?\\s*","i");
   const um=s.match(unitRe);
   if(um){unit=UNIT_ALIAS[um[1].toLowerCase()]||um[1].toLowerCase();s=s.slice(um[0].length);}
-
+ 
   // Rest is ingredient name — clean it
   const raw=s.trim();
   // Remove parenthetical notes
@@ -414,16 +414,16 @@ function parseIngredientLine(line){
   name=name.replace(/,.*$/,"").trim().toLowerCase();
   // Remove leading articles
   name=name.replace(/^(of|for|the|a|an)\s+/i,"").trim();
-
+ 
   if(!name)return null;
   return{qty,unit,name,raw:line.trim()};
 }
-
+ 
 function aggregateIngredients(mealNames){
   const allRecipes=Object.assign({},RECIPES,S.uploadedRecipes);
   // Map: normalizedName → {qty, unit, display, recipes[]}
   const map={};
-
+ 
   mealNames.forEach(mealName=>{
     const recipe=allRecipes[mealName];
     if(!recipe||!recipe.ingredients)return;
@@ -451,7 +451,7 @@ function aggregateIngredients(mealNames){
       if(!entry.recipes.includes(mealName))entry.recipes.push(mealName);
     });
   });
-
+ 
   // Build display strings
   return Object.values(map).map(e=>{
     let display;
@@ -466,13 +466,13 @@ function aggregateIngredients(mealNames){
     return{key:e.name,display,recipes:e.recipes};
   }).sort((a,b)=>a.display.localeCompare(b.display));
 }
-
+ 
 function pluralUnit(u){
   const map={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz",clove:"cloves",slice:"slices",can:"cans",jar:"jars",packet:"packets",stalk:"stalks",bag:"bags",container:"containers",head:"heads",bunch:"bunches"};
   return map[u]||u;
 }
 function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
-
+ 
 // ── GROCERY ───────────────────────────────────────────────────────────────
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
@@ -495,7 +495,7 @@ function buildGrocery(){
     `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`
   :`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">No ingredients found. Upload recipes for your planned meals.</p></div>`);
 }
-
+ 
 // ── RECIPES ───────────────────────────────────────────────────────────────
 function buildRecipes(){
   const all=Object.assign({},RECIPES,S.uploadedRecipes);
@@ -539,7 +539,7 @@ function buildRecipes(){
     </div>`;
   }).join("");
 }
-
+ 
 // ── PICKER MODAL ──────────────────────────────────────────────────────────
 function buildPicker(){
   const {day,mealType,currentMeal}=S.picker;const inp=S.pickerInput||"";
@@ -573,7 +573,7 @@ function buildPicker(){
     </div>
   </div>`;
 }
-
+ 
 // ── HISTORY SHEET ─────────────────────────────────────────────────────────
 function buildHistory(){
   const keys=[];
@@ -603,7 +603,7 @@ function buildHistory(){
     </div>
   </div>`;
 }
-
+ 
 // ── UPLOAD MODAL ──────────────────────────────────────────────────────────
 function buildUpload(){
   const prev=S.uploadPreview;
@@ -625,7 +625,7 @@ Preparation
 1. Boil pasta until al dente
 2. Make Alfredo sauce
 3. Combine and serve
-
+ 
 Banana Muffins
 Time: 40 min
 Category: breakfast
@@ -654,7 +654,7 @@ Ingredients
     </div>
   </div>`;
 }
-
+ 
 // ── EDIT RECIPE MODAL ─────────────────────────────────────────────────────
 function buildEditModal(){
   const f=S.editForm;
@@ -707,7 +707,7 @@ function buildEditModal(){
     </div>
   </div>`;
 }
-
+ 
 // ── PARSE RECIPE TEXT ─────────────────────────────────────────────────────
 function parseRecipes(text){
   const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
@@ -740,7 +740,7 @@ function parseRecipes(text){
   });
   return out;
 }
-
+ 
 // ── BIND EVENTS ───────────────────────────────────────────────────────────
 function bind(){
   // Tabs
@@ -856,10 +856,10 @@ function bind(){
     S.showUpload=false;S.uploadPreview=null;S.uploadText="";render();
   });
 }
-
+ 
 function q(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",fn);}
 function ov(id,fn){const el=document.getElementById(id);if(el)el.addEventListener("click",e=>{if(e.target===el)fn();});}
-
+ 
 function addAndSelect(){
   const val=(S.pickerInput||"").trim();if(!val)return;
   const mt=S.picker.mealType,list=S.customMeals[mt]||[];
@@ -885,7 +885,7 @@ function reRenderPicker(){
   render();
   setTimeout(()=>{const i=document.getElementById("pickerInp");if(i){i.focus();i.setSelectionRange(inp.length,inp.length);}},0);
 }
-
+ 
 render();
 </script>
 </body>
