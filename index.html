@@ -1005,7 +1005,11 @@ function parseRecipes(text){
         if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
       }
       if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;inPreparation=false;return;}
-      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="instructions"||lo==="instructions:"||lo==="steps"||lo==="steps:"){
+      if(
+        lo==="preparation"||lo==="preparation:"||lo==="prep"||lo==="prep:"||
+        lo==="directions"||lo==="directions:"||lo==="instructions"||lo==="instructions:"||
+        lo==="steps"||lo==="steps:"
+      ){
         inIngredients=false;
         inPreparation=true;
         return;
@@ -1020,10 +1024,8 @@ function parseRecipes(text){
       }
       if(line.startsWith("-")||line.startsWith("•")){
         const val=line.replace(/^[-•]\s*/,"");
-        if(inIngredients)ingredients.push(val);
-        else if(inPreparation)steps.push(val);
-        else if(!steps.length)ingredients.push(val);
-        else steps.push(val);
+        if(inPreparation)steps.push(val);
+        else ingredients.push(val);
         return;
       }
       // Accept plain, non-bulleted lines under Ingredients.
