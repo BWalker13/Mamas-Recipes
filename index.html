@@ -766,10 +766,14 @@ Preparation
 function parseRecipes(text){
   const blocks=text.split(/\n{2,}/).map(b=>b.trim()).filter(Boolean);
   const out={};
+  let lastRecipeName=null;
+  const isSectionLikeName=n=>/^(ingredients?|ingredient list|preparation|prep|directions|steps?|instructions?)\s*:?\s*$/i.test(n||"");
+  const isMetaLikeName=n=>/^(time|serves|servings|category|type|meal)\s*:/i.test(n||"");
   blocks.forEach(block=>{
     const lines=block.split("\n").map(l=>l.trim()).filter(Boolean);
     if(lines.length<2)return;
     const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];const ingredients=[];
+    if(isMetaLikeName(name))return;
     let inIngredients=false;
     lines.slice(1).forEach(line=>{
       const lo=line.toLowerCase();
@@ -804,7 +808,28 @@ function parseRecipes(text){
         steps.push(line);
       }
     });
-    if(steps.length>0||ingredients.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
+    if(steps.length===0&&ingredients.length===0)return;
+
+    if(isSectionLikeName(name)){
+      // If a pasted recipe was split by blank lines, merge section-only blocks
+      // like "Ingredients:" or "Prep:" into the most recent recipe.
+      if(lastRecipeName&&out[lastRecipeName]){
+        out[lastRecipeName].ingredients=out[lastRecipeName].ingredients.concat(ingredients);
+        out[lastRecipeName].steps=out[lastRecipeName].steps.concat(steps);
+      }
+      return;
+    }
+
+    if(out[name]){
+      out[name].ingredients=out[name].ingredients.concat(ingredients);
+      out[name].steps=out[name].steps.concat(steps);
+      if(out[name].time==="—"&&time!=="—")out[name].time=time;
+      if((out[name].servings===5||!out[name].servings)&&servings)out[name].servings=servings;
+      if(out[name].tag==="dinner"&&tag!=="dinner")out[name].tag=tag;
+    } else {
+      out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
+    }
+    lastRecipeName=name;
   });
   return out;
 }
@@ -861,13 +886,22 @@ function bind(){
   const fi=document.getElementById("fileInp");
   if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
   const ta=document.getElementById("uploadTA");
+  const fitUploadTA=()=>{
+    if(!ta)return;
+    ta.style.height="auto";
+    const target=Math.min(420,Math.max(160,ta.scrollHeight));
+    ta.style.height=target+"px";
+    ta.style.overflowY=ta.scrollHeight>420?"auto":"hidden";
+  };
   if(ta)ta.addEventListener("input",()=>{
     S.uploadText=ta.value;
     S.uploadPreview=null;
     S.uploadError="";
+    fitUploadTA();
     const btn=document.getElementById("btnPreview");
     if(btn)btn.disabled=!S.uploadText.trim();
   });
+  fitUploadTA();
   q("btnPreview",()=>{
     const result=parseRecipes(S.uploadText);
     if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Use a name on line 1, then add Ingredients and/or Preparation lines.";S.uploadPreview=null;}
