@@ -792,6 +792,40 @@ function pluralUnit(u){const m={cup:"cups",tbsp:"tbsp",tsp:"tsp",lb:"lbs",oz:"oz
 function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
 
 // ── GROCERY ───────────────────────────────────────────────────────────────
+const GROCERY_CATEGORY_DISPLAY_ORDER=[
+  "Produce","Meat & Seafood","Dairy & Eggs","Bread & Bakery","Dry Goods & Pasta",
+  "Canned & Jarred Goods","Condiments","Frozen Foods","Snacks & Nuts","Spices & Baking","Other"
+];
+
+function groceryKeywordMatch(s,k){
+  if(k==="egg")return/\beggs?\b/.test(s);
+  if(k==="deli")return/\bdeli\b/.test(s);
+  if(k==="nut")return/\bnuts?\b/.test(s);
+  return s.includes(k);
+}
+
+function categorizeIngredient(display){
+  const s=String(display).toLowerCase();
+  const PRIORITY=[
+    {name:"Canned & Jarred Goods",keys:["diced tomato","tomato sauce","kidney bean","black bean","chickpea","marinara","canned","broth","soup","jar"]},
+    {name:"Meat & Seafood",keys:["ground beef","chicken","turkey","sausage","bacon","shrimp","beef","pork","fish","deli","tofu"]},
+    {name:"Dairy & Eggs",keys:["sour cream","mozzarella","parmesan","cheddar","ricotta","yogurt","butter","cheese","cream","milk","egg"]},
+    {name:"Bread & Bakery",keys:["taco shell","tortilla","biscuit","bread","pita","wrap","roll","bun"]},
+    {name:"Produce",keys:["bell pepper","snap pea","strawberry","broccoli","cucumber","lettuce","berries","carrot","celery","tomato","onion","banana","garlic","ginger","lemon","grape","melon","apple","berry","fruit","vegetable","lime"]},
+    {name:"Dry Goods & Pasta",keys:["fettuccine","breadcrumb","spaghetti","granola","rotini","penne","elbow","ziti","noodle","pasta","cereal","flour","quinoa","rice","oat"]},
+    {name:"Condiments",keys:["stir-fry sauce","peanut butter","olive oil","vegetable oil","coconut oil","bbq sauce","soy sauce","hot sauce","teriyaki","dressing","mustard","ketchup","vinegar","mayo","ranch","salsa","tahini","honey","jelly","jam"]},
+    {name:"Snacks & Nuts",keys:["chocolate chip","trail mix","dried fruit","cranberry","popcorn","pretzel","almond","cashew","peanut","cracker","raisin","coconut","kernel","chip","nut"]},
+    {name:"Spices & Baking",keys:["italian seasoning","garlic powder","onion powder","chili powder","brown sugar","powdered sugar","maple syrup","seasoning","cinnamon","paprika","vanilla","cumin","pepper","baking","spice","sugar","salt"]},
+    {name:"Frozen Foods",keys:["frozen"]}
+  ];
+  for(const {name,keys} of PRIORITY){
+    for(const k of keys){
+      if(groceryKeywordMatch(s,k))return name;
+    }
+  }
+  return"Other";
+}
+
 function buildGrocery(){
   const meals=[...new Set(Object.values(S.meals).flatMap(d=>Object.values(d)).filter(Boolean))];
   if(!meals.length)return`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">Add meals to your plan to generate a grocery list.</p></div>`;
@@ -801,13 +835,28 @@ function buildGrocery(){
   const items=aggregateIngredients(knownMeals);
   const rem=items.filter(i=>!S.groceryChecked[i.key]).length;
   const tip=BUDGET_TIPS[Math.floor(Math.random()*BUDGET_TIPS.length)];
+  const byCat={};
+  for(const c of GROCERY_CATEGORY_DISPLAY_ORDER)byCat[c]=[];
+  for(const item of items){
+    const cat=categorizeIngredient(item.display);
+    (byCat[cat]||(byCat[cat]=[])).push(item);
+  }
+  for(const c of GROCERY_CATEGORY_DISPLAY_ORDER){
+    if(byCat[c]&&byCat[c].length)byCat[c].sort((a,b)=>a.display.localeCompare(b.display));
+  }
+  const groupedHtml=GROCERY_CATEGORY_DISPLAY_ORDER.map(cat=>{
+    const list=byCat[cat]||[];
+    if(!list.length)return"";
+    return`<div class="rec-section-lbl">${esc(cat)}</div>`+
+      list.map(item=>{const on=!!S.groceryChecked[item.key];
+        return`<div class="groc-item${on?" on":""}" data-gi="${esc(item.key)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="groc-lbl${on?" on":""}">${esc(item.display)}</span></div>`;
+      }).join("");
+  }).join("");
   return(missingRecipes.length?`<div class="no-recipe-section"><div class="no-recipe-lbl">⚠️ Missing Recipes — ingredients not included</div>`+
     missingRecipes.map(m=>`<div class="no-recipe-row"><span class="no-recipe-name">${esc(m)}</span><span class="no-recipe-pill">No recipe uploaded</span></div>`).join("")+`</div>`:"")+
   (items.length?
     `<div class="groc-hdr"><span class="groc-cnt">${rem} of ${items.length} items remaining</span><button class="btn-rst" id="btnResetGroc">Reset</button></div>`+
-    items.map(item=>{const on=!!S.groceryChecked[item.key];
-      return`<div class="groc-item${on?" on":""}" data-gi="${esc(item.key)}"><div class="chkbox${on?" on":""}">${on?"✓":""}</div><span class="groc-lbl${on?" on":""}">${esc(item.display)}</span></div>`;
-    }).join("")+
+    groupedHtml+
     `<div class="budget-box"><div class="budget-lbl">💡 Budget Tip</div><div class="budget-txt">${esc(tip)}</div></div>`
   :`<div class="empty"><div class="empty-icon">🛒</div><p class="empty-txt">No ingredients found. Upload recipes for your planned meals.</p></div>`);
 }
