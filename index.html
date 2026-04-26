@@ -856,7 +856,13 @@ function bind(){
   const fi=document.getElementById("fileInp");
   if(fi)fi.addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{S.uploadText=ev.target.result;S.uploadPreview=null;S.uploadError="";render();};r.readAsText(f);});
   const ta=document.getElementById("uploadTA");
-  if(ta)ta.addEventListener("input",()=>{S.uploadText=ta.value;S.uploadPreview=null;S.uploadError="";});
+  if(ta)ta.addEventListener("input",()=>{
+    S.uploadText=ta.value;
+    S.uploadPreview=null;
+    S.uploadError="";
+    const btn=document.getElementById("btnPreview");
+    if(btn)btn.disabled=!S.uploadText.trim();
+  });
   q("btnPreview",()=>{
     const result=parseRecipes(S.uploadText);
     if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe has a name on the first line, followed by numbered steps (1. 2. 3.)";S.uploadPreview=null;}
