@@ -808,14 +808,21 @@ function parseRecipes(text){
         steps.push(line);
       }
     });
-    if(steps.length===0&&ingredients.length===0)return;
+    if(steps.length===0&&ingredients.length===0){
+      lastRecipeName=name;
+      if(!isSectionLikeName(name)&&!isMetaLikeName(name)&&!out[name]){
+        out[name]={tag,time,servings,ingredients:[],steps:[],_uploaded:true};
+      }
+      return;
+    }
 
     if(isSectionLikeName(name)){
       // If a pasted recipe was split by blank lines, merge section-only blocks
       // like "Ingredients:" or "Prep:" into the most recent recipe.
-      if(lastRecipeName&&out[lastRecipeName]){
-        out[lastRecipeName].ingredients=out[lastRecipeName].ingredients.concat(ingredients);
-        out[lastRecipeName].steps=out[lastRecipeName].steps.concat(steps);
+      const mergeTarget=lastRecipeName||Object.keys(out).pop();
+      if(mergeTarget&&out[mergeTarget]){
+        out[mergeTarget].ingredients=out[mergeTarget].ingredients.concat(ingredients);
+        out[mergeTarget].steps=out[mergeTarget].steps.concat(steps);
       }
       return;
     }
