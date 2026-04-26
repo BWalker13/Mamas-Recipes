@@ -995,6 +995,7 @@ function parseRecipes(text){
     const name=lines[0];let time="—",servings=5,tag="dinner";const steps=[];const ingredients=[];
     if(isMetaLikeName(name))return;
     let inIngredients=false;
+    let inPreparation=false;
     lines.slice(1).forEach(line=>{
       const lo=line.toLowerCase();
       if(lo.startsWith("time:")){time=line.split(":").slice(1).join(":").trim();return;}
@@ -1003,18 +1004,25 @@ function parseRecipes(text){
         const v=line.split(":")[1].trim().toLowerCase();
         if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
       }
-      if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;return;}
-      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="instructions"||lo==="instructions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
+      if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;inPreparation=false;return;}
+      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="instructions"||lo==="instructions:"||lo==="steps"||lo==="steps:"){
+        inIngredients=false;
+        inPreparation=true;
+        return;
+      }
       const sm=line.match(/^\d+[\.\)]\s+(.+)/);
-      if(sm){inIngredients=false;steps.push(sm[1]);return;}
+      if(sm){inIngredients=false;inPreparation=true;steps.push(sm[1]);return;}
       if(/^\s*step\s*\d+\s*:/i.test(line)){
         inIngredients=false;
+        inPreparation=true;
         steps.push(line.replace(/^\s*step\s*\d+\s*:\s*/i,""));
         return;
       }
       if(line.startsWith("-")||line.startsWith("•")){
         const val=line.replace(/^[-•]\s*/,"");
-        if(inIngredients||!steps.length)ingredients.push(val);
+        if(inIngredients)ingredients.push(val);
+        else if(inPreparation)steps.push(val);
+        else if(!steps.length)ingredients.push(val);
         else steps.push(val);
         return;
       }
