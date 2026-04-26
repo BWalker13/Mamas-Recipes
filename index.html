@@ -780,7 +780,7 @@ function parseRecipes(text){
         if(["breakfast","lunch","dinner","snacks"].includes(v))tag=v;return;
       }
       if(lo==="ingredients"||lo==="ingredients:"){inIngredients=true;return;}
-      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
+      if(lo==="preparation"||lo==="preparation:"||lo==="directions"||lo==="directions:"||lo==="instructions"||lo==="instructions:"||lo==="steps"||lo==="steps:"){inIngredients=false;return;}
       const sm=line.match(/^\d+[\.\)]\s+(.+)/);
       if(sm){inIngredients=false;steps.push(sm[1]);return;}
       if(/^\s*step\s*\d+\s*:/i.test(line)){
@@ -794,12 +794,17 @@ function parseRecipes(text){
         else steps.push(val);
         return;
       }
+      // Accept plain, non-bulleted lines under Ingredients.
+      if(inIngredients){
+        ingredients.push(line);
+        return;
+      }
       // Typed recipes often have plain lines under Preparation without numbering.
       if(!inIngredients) {
         steps.push(line);
       }
     });
-    if(steps.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
+    if(steps.length>0||ingredients.length>0)out[name]={tag,time,servings,ingredients,steps,_uploaded:true};
   });
   return out;
 }
@@ -865,7 +870,7 @@ function bind(){
   });
   q("btnPreview",()=>{
     const result=parseRecipes(S.uploadText);
-    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Make sure each recipe has a name on the first line, followed by numbered steps (1. 2. 3.)";S.uploadPreview=null;}
+    if(!Object.keys(result).length){S.uploadError="Couldn't find any recipes. Use a name on line 1, then add Ingredients and/or Preparation lines.";S.uploadPreview=null;}
     else{S.uploadPreview=result;S.uploadError="";}
     render();
   });
